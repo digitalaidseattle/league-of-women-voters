@@ -7,7 +7,7 @@ import {
 import logo from "./assets/images/logo-light-icon.svg";
 
 import { MenuItem } from "@digitalaidseattle/mui";
-import Notification from "./Notification";
+import packageJson from "../package.json";
 
 export const TemplateConfig = () => {
     const dashboard = {
@@ -41,12 +41,11 @@ export const TemplateConfig = () => {
     } as MenuItem;
 
     return ({
-        appName: 'DAS',
+        appName: 'League of Women Voters',
         logoUrl: logo,
         drawerWidth: 240,
         menuItems: [dashboard, pages],
-        toolbarItems: [
-            <Notification key={1} />
-        ]
+        toolbarItems: [],
+        version: packageJson.version,
     });
 }
