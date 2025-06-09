@@ -1,21 +1,43 @@
 // material-ui
-import { Typography } from '@mui/material';
+import { Button, Typography } from '@mui/material';
 import {
   MainCard
 } from '@digitalaidseattle/mui';
+import { createClient } from '@supabase/supabase-js'
+import { useState } from 'react';
 // project import
 
 // ==============================|| SAMPLE PAGE ||============================== //
 
-const SamplePage = () => (
-  <MainCard title="Sample Card">
-    <Typography variant="body2">
-      Lorem ipsum dolor sit amen, consenter nipissing eli, sed do elusion tempos incident ut laborers et doolie magna alissa. Ut enif ad
-      minim venice, quin nostrum exercitation illampu laborings nisi ut liquid ex ea commons construal. Duos aube grue dolor in reprehended
-      in voltage veil esse colum doolie eu fujian bulla parian. Exceptive sin ocean cuspidate non president, sunk in culpa qui officiate
-      descent molls anim id est labours.
-    </Typography>
-  </MainCard>
-);
+const SamplePage = () => {
+  const [message, setMessage] = useState<string>('Click on the button!');
+
+  const supabase = createClient(
+    import.meta.env.VITE_SUPABASE_URL,
+    import.meta.env.VITE_SUPABASE_ANON_KEY
+  )
+
+  function clickHandler() {
+    supabase.functions
+      .invoke('hello-world', {
+        body: { name: ', I just called an Edge Function' }
+      })
+      .then(resp => {
+        setMessage(resp.data.message);
+      })
+      .catch(error => {
+        console.error('Error invoking function:', error);
+      });
+  }
+
+  return (
+    <MainCard title="Sample Card">
+      <Button onClick={clickHandler} variant="contained" color="primary">Click</Button>
+      <Typography variant="body2">
+        {message}
+      </Typography>
+    </MainCard>
+  )
+};
 
 export default SamplePage;
