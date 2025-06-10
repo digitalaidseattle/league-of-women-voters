@@ -1,5 +1,6 @@
 import DashboardDefault from './dashboard';
-import SamplePage from './extra-pages/SamplePage';
+import CommitteePage from './extra-pages/CommitteePage';
+import CommitteesPage from './extra-pages/CommitteesPage';
 
 import {
   Error,
@@ -19,8 +20,12 @@ const routes = [
         element: <DashboardDefault />,
       },
       {
-        path: "sample-page",
-        element: <SamplePage />,
+        path: "committees-page",
+        element: <CommitteesPage />,
+      },
+      {
+        path: "committee-page",
+        element: <CommitteePage />,
       },
       {
         path: "privacy",
