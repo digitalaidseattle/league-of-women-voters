@@ -4,7 +4,7 @@ import {
     DashboardOutlined,
     TeamOutlined
 } from '@ant-design/icons';
-import logo from "./assets/images/logo-light-icon.svg";
+import logo from "./assets/images/LWV_Logo2_500x337_rgb.jpg";
 
 import { MenuItem } from "@digitalaidseattle/mui";
 import packageJson from "../package.json";
