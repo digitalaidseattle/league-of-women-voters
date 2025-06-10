@@ -1,8 +1,8 @@
 
 
 import {
-    ChromeOutlined,
-    DashboardOutlined
+    DashboardOutlined,
+    TeamOutlined
 } from '@ant-design/icons';
 import logo from "./assets/images/logo-light-icon.svg";
 
@@ -31,11 +31,11 @@ export const TemplateConfig = () => {
         type: 'group',
         children: [
             {
-                id: 'sample-page',
-                title: 'Sample Page',
+                id: 'committees-page',
+                title: 'Committees',
                 type: 'item',
-                url: '/sample-page',
-                icon: <ChromeOutlined />
+                url: '/committees-page',
+                icon: <TeamOutlined />
             } as MenuItem
         ]
     } as MenuItem;
