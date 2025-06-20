@@ -1,5 +1,4 @@
 import DashboardDefault from './dashboard';
-import CommitteePage from './extra-pages/CommitteePage';
 import CommitteesPage from './extra-pages/CommitteesPage';
 
 import {
@@ -9,6 +8,8 @@ import {
   MarkdownPage,
   MinimalLayout
 } from "@digitalaidseattle/mui";
+import CommitteePage from './extra-pages/CommitteePage';
+import SponsorsPage from './extra-pages/SponsorsPage';
 
 const routes = [
   {
@@ -26,6 +27,10 @@ const routes = [
       {
         path: "committee-page",
         element: <CommitteePage />,
+      },
+      {
+        path: "sponsors-page",
+        element: <SponsorsPage />,
       },
       {
         path: "privacy",

@@ -36,6 +36,13 @@ export const TemplateConfig = () => {
                 type: 'item',
                 url: '/committees-page',
                 icon: <TeamOutlined />
+            } as MenuItem,
+            {
+                id: 'sponsors-page',
+                title: 'Sponsors',
+                type: 'item',
+                url: '/sponsors-page',
+                icon: <TeamOutlined />
             } as MenuItem
         ]
     } as MenuItem;

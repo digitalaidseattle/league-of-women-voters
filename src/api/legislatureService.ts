@@ -12,9 +12,19 @@ class LegislatureService {
     return LegislatureService.instance;
   }
 
+  public async getSponsors(): Promise<Member[]> {
+    return supabaseClient.functions
+      .invoke("sponsors", {
+        body: { biennium: "2023-24" },
+      })
+      .then((resp) => resp.data as Member[]);
+  }
+
   public async getCommittees(): Promise<Committee[]> {
     return supabaseClient.functions
-      .invoke("committees")
+      .invoke("committee-services", {
+        body: { operation: 'GetActiveCommittees'},
+      })
       .then((resp) => resp.data as Committee[]);
   }
 
@@ -23,12 +33,22 @@ class LegislatureService {
     committeeName: string,
   ): Promise<Member[]> {
     return supabaseClient.functions
-      .invoke("committee-members", {
-        body: { agency: agency, committeeName: committeeName },
+      .invoke("committee-services", {
+        body: { operation: 'GetActiveCommitteeMembers', agency: agency, committeeName: committeeName },
       })
       .then((resp) => resp.data as Member[]);
   }
 
+  public async GetCommitteeReferralsByCommittee(
+    agency: string,
+    committeeName: string,
+  ): Promise<Member[]> {
+    return supabaseClient.functions
+      .invoke("committee-services", {
+        body: { operation: 'GetCommitteeReferralsByCommittee', biennium: '2023-24', agency: agency, committeeName: committeeName },
+      })
+      .then((resp) => resp.data as Member[]);
+  }
 }
 
 export { LegislatureService };

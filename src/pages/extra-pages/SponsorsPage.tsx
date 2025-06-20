@@ -1,59 +1,34 @@
 // material-ui
-import { ExportOutlined, ReloadOutlined } from "@ant-design/icons";
+import { InfoCircleOutlined, ReloadOutlined } from "@ant-design/icons";
 import { useEffect, useState } from 'react';
 
 import { PageInfo } from "@digitalaidseattle/supabase";
-import { Box, IconButton, Stack, Toolbar, Tooltip, Typography } from '@mui/material';
+import { Box, IconButton, Toolbar, Tooltip, Typography } from '@mui/material';
 import { DataGrid, GridColDef, useGridApiRef } from "@mui/x-data-grid";
-import { useSearchParams } from "react-router-dom";
 import { LegislatureService } from '../../api/legislatureService';
 // project import
 
 // ==============================|| SAMPLE PAGE ||============================== //
 const PAGE_SIZE = 25;
 
-const CommitteePage = () => {
+const SponsorsPage = () => {
   const apiRef = useGridApiRef();
-  const [searchParams] = useSearchParams();
-
   const [paginationModel, setPaginationModel] = useState({
     page: 0,
     pageSize: PAGE_SIZE,
   });
 
   const [columns, setColumns] = useState<GridColDef[]>([]);
-  const [pageInfo, setPageInfo] = useState<PageInfo<Member>>({
+  const [pageInfo, setPageInfo] = useState<PageInfo<Committee>>({
     rows: [],
     totalRowCount: 0,
   });
 
-  const committeeName = searchParams.get("committeeName")!;
-  const agency = searchParams.get("agency")!;
-
   useEffect(() => {
     setColumns(getColumns());
+    refresh()
   }, []);
 
-  useEffect(() => {
-    if (committeeName && agency) {
-      refresh()
-    }
-  }, [committeeName, agency]);
-
-  function exportData() {
-    const csvContent = pageInfo.rows.map(row => {
-      return Object.values(row).join(",");
-    }).join("\n");
-
-    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement("a");
-    link.href = url;
-    link.setAttribute("download", `${committeeName}_members.csv`);
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-  }
 
   function refresh() {
     setPageInfo({
@@ -61,13 +36,12 @@ const CommitteePage = () => {
       totalRowCount: 0,
     })
     LegislatureService.getInstance()
-      .getCommitteeMembers(agency, committeeName)
-      .then(response => {
+      .getSponsors()
+      .then(response =>
         setPageInfo({
           rows: response,
           totalRowCount: response.length,
-        })
-      })
+        }))
       .catch(error => {
         console.error('Error invoking function:', error);
       });
@@ -75,12 +49,26 @@ const CommitteePage = () => {
 
   const getColumns = (): GridColDef[] => {
     return [
-      // {
-      //   field: "Id",
-      //   headerName: "Id",
-      //   width: 100,
-      //   type: "number"
-      // },
+      {
+        field: "Id",
+        headerName: "",
+        width: 100,
+        renderCell: (params) => {
+          return (
+            <Tooltip title="View Members">
+              <IconButton
+                color="primary"
+                onClick={() => {
+                  const committee = params.row;
+                  window.location.href = `/committee-page?agency=${committee.Agency}&committeeName=${encodeURIComponent(committee.Name)}`;
+                }}
+              >
+                <InfoCircleOutlined />
+              </IconButton>
+            </Tooltip>
+          );
+        }
+      },
       {
         field: "Name",
         headerName: "Name",
@@ -102,19 +90,25 @@ const CommitteePage = () => {
       {
         field: "Party",
         headerName: "Party",
-        width: 100,
+        width: 50,
         type: "string"
       },
       {
         field: "District",
         headerName: "District",
-        width: 100,
+        width: 50,
         type: "number"
       },
       {
-        field: "LongName",
-        headerName: "Long Name",
-        width: 300,
+        field: "Email",
+        headerName: "Email",
+        width: 250,
+        type: "string"
+      },
+      {
+        field: "Phone",
+        headerName: "Phone",
+        width: 150,
         type: "string"
       }
     ];
@@ -123,22 +117,15 @@ const CommitteePage = () => {
   return (
     <Box sx={{ marginTop: 1 }}>
       <Toolbar>
-        <Stack sx={{ flexGrow: 1 }}>
-          <Typography variant="h3" component="div" sx={{ flexGrow: 1 }}>Agency: {agency}</Typography>
-          <Typography variant="h3" component="div" sx={{ flexGrow: 1 }}>Committee: {committeeName}</Typography>
-        </Stack>
-        <Tooltip title="Export">
-          <IconButton color="primary" onClick={exportData}>
-            <ExportOutlined />
-          </IconButton>
-        </Tooltip>
+        <Typography variant="h3" component="div" sx={{ flexGrow: 1 }}>
+          Sponsors
+        </Typography>
         <Tooltip title="Refresh">
           <IconButton color="primary" onClick={refresh}>
             <ReloadOutlined />
           </IconButton>
         </Tooltip>
       </Toolbar>
-      <Typography variant="h5" component="div" sx={{ flexGrow: 1 }}>Members</Typography>
       <DataGrid
         getRowId={(row) => row.Id}
         apiRef={apiRef}
@@ -152,4 +139,4 @@ const CommitteePage = () => {
   )
 };
 
-export default CommitteePage;
+export default SponsorsPage;
