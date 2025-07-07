@@ -1,10 +1,20 @@
 import { PageInfo } from "@digitalaidseattle/supabase";
-import { DataGrid, GridColDef, GridRenderCellParams, useGridApiRef } from "@mui/x-data-grid";
+import { DataGrid, GridColDef, useGridApiRef } from "@mui/x-data-grid";
 import { useEffect, useState } from "react";
 import { LegislatureService } from "../../../api/legislatureService";
-import { Typography } from "@mui/material";
 
 const PAGE_SIZE = 25;
+
+type Referral = {
+  id: string
+  BillId: string
+  OriginalAgency: string
+  ReferredDate: string
+  CommitteeId: string
+  CommitteeName: string
+  Agency: string
+}
+
 
 const ReferralsGrid = (props: { agency: string, committeeName: string }) => {
   const apiRef = useGridApiRef();
@@ -14,7 +24,7 @@ const ReferralsGrid = (props: { agency: string, committeeName: string }) => {
   });
 
   const [columns, setColumns] = useState<GridColDef[]>([]);
-  const [pageInfo, setPageInfo] = useState<PageInfo<Member>>({
+  const [pageInfo, setPageInfo] = useState<PageInfo<Referral>>({
     rows: [],
     totalRowCount: 0,
   });
@@ -53,18 +63,33 @@ const ReferralsGrid = (props: { agency: string, committeeName: string }) => {
       rows: [],
       totalRowCount: 0,
     })
+
     LegislatureService.getInstance()
       .GetCommitteeReferralsByCommittee(props.agency, props.committeeName)
       .then(response => {
         console.log("Response from GetCommitteeReferralsByCommittee:", response);
+        const referrals = response.map((referral: any) => toReferral(referral))
         setPageInfo({
-          rows: response,
-          totalRowCount: response.length,
+          rows: referrals,
+          totalRowCount: referrals.length,
         })
       })
       .catch(error => {
         console.error('Error invoking function:', error);
       });
+  }
+
+  function toReferral(referral: any): Referral {
+    console.log("Converting referral:", referral);
+    return {
+      id: `${referral.Committee.Id}-${referral.LegislationInfo.BillId}`,
+      BillId: referral.LegislationInfo.BillId,
+      OriginalAgency: referral.LegislationInfo.OriginalAgency,
+      ReferredDate: referral.ReferredDate,
+      CommitteeId: referral.Committee.Id,
+      CommitteeName: referral.Committee.Name,
+      Agency: referral.Committee.Agency
+    }
   }
 
   const getColumns = (): GridColDef[] => {
@@ -76,42 +101,28 @@ const ReferralsGrid = (props: { agency: string, committeeName: string }) => {
       //   type: "number"
       // },
       {
-        field: "LegislationInfo.BillId",
+        field: "BillId",
         headerName: "Bill Id",
         width: 200,
-        type: "string",
-        renderCell: (param: GridRenderCellParams) => {
-          return <Typography>{param.row.LegislationInfo.BillId}</Typography>;
-        },
-        valueGetter: (param: GridRenderCellParams) => {
-          console.log("ValueGetter for BillId:", param);
-          return "";
-        }
+        type: "string"
       },
       {
-        field: "LegislationInfo.OriginalAgency",
+        field: "OriginalAgency",
         headerName: "Orig Agency",
         width: 100,
-        type: "string",
-        renderCell: (param: GridRenderCellParams) => {
-          return <Typography>{param.row.LegislationInfo.OriginalAgency}</Typography>;
-        },
+        type: "string"
       },
       {
         field: "ReferredDate",
         headerName: "Referred Date",
         width: 300,
-        type: "string",
-        renderCell: (param: GridRenderCellParams) => {
-          return <Typography>{param.row.ReferredDate}</Typography>;
-        },
+        type: "string"
       }
     ];
   };
 
   return (
     <DataGrid
-      getRowId={(row) => row.LegislationInfo.BillId}
       apiRef={apiRef}
       rows={pageInfo.rows}
       columns={columns}
