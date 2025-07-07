@@ -1,5 +1,8 @@
 import { supabaseClient } from "@digitalaidseattle/supabase";
 
+
+const CURRENT_BIENNIUM = import.meta.env.VITE_LWVW_CURRENT_BIENNIUM;
+
 class LegislatureService {
   private static instance: LegislatureService;
 
@@ -45,7 +48,7 @@ class LegislatureService {
   ): Promise<Member[]> {
     return supabaseClient.functions
       .invoke("committee-services", {
-        body: { operation: 'GetCommitteeReferralsByCommittee', biennium: '2023-24', agency: agency, committeeName: committeeName },
+        body: { operation: 'GetCommitteeReferralsByCommittee', biennium: CURRENT_BIENNIUM, agency: agency, committeeName: committeeName },
       })
       .then((resp) => resp.data as Member[]);
   }
