@@ -104,6 +104,12 @@ const MembersGrid = (props: { agency: string, committeeName: string }) => {
         type: "number"
       },
       {
+        field: "Email",
+        headerName: "Email",
+        width: 200,
+        type: "string"
+      },
+      {
         field: "LongName",
         headerName: "Long Name",
         width: 300,
