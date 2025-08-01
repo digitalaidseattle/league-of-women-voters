@@ -1,4 +1,3 @@
-import DashboardDefault from './dashboard';
 import CommitteesPage from './extra-pages/CommitteesPage';
 
 import {
@@ -9,6 +8,7 @@ import {
   MinimalLayout
 } from "@digitalaidseattle/mui";
 import CommitteePage from './extra-pages/CommitteePage';
+import SponsorPage from './extra-pages/SponsorPage';
 import SponsorsPage from './extra-pages/SponsorsPage';
 
 const routes = [
@@ -18,19 +18,23 @@ const routes = [
     children: [
       {
         path: "",
-        element: <DashboardDefault />,
-      },
-      {
-        path: "committees-page",
         element: <CommitteesPage />,
       },
       {
-        path: "committee-page",
+        path: "committees",
+        element: <CommitteesPage />,
+      },
+      {
+        path: "committee",
         element: <CommitteePage />,
       },
       {
-        path: "sponsors-page",
+        path: "sponsors",
         element: <SponsorsPage />,
+      },
+      {
+        path: "sponsor",
+        element: <SponsorPage />,
       },
       {
         path: "privacy",
