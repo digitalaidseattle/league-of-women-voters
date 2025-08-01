@@ -1,9 +1,8 @@
 import { PageInfo } from "@digitalaidseattle/supabase";
+import { Link } from "@mui/material";
 import { DataGrid, GridColDef, useGridApiRef } from "@mui/x-data-grid";
 import { useEffect, useState } from "react";
 import { LegislatureService } from "../../../api/legislatureService";
-import { Link, Tooltip, Typography } from "@mui/material";
-import { useNavigate } from "react-router";
 
 const PAGE_SIZE = 25;
 
@@ -34,7 +33,6 @@ const MembersGrid = (props: { agency: string, committeeName: string }) => {
     }
   }, [props]);
 
-  const navigate = useNavigate()
 
   // function exportData() {
   //   const csvContent = pageInfo.rows.map(row => {
