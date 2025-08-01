@@ -1,12 +1,12 @@
 // material-ui
-import { InfoCircleOutlined, ReloadOutlined } from "@ant-design/icons";
+import { ReloadOutlined } from "@ant-design/icons";
 import { useEffect, useState } from 'react';
 
 import { PageInfo } from "@digitalaidseattle/supabase";
 import { Box, IconButton, Toolbar, Tooltip, Typography } from '@mui/material';
 import { DataGrid, GridColDef, useGridApiRef } from "@mui/x-data-grid";
-import { LegislatureService } from '../../api/legislatureService';
 import { useNavigate } from "react-router";
+import { LegislatureService } from '../../api/legislatureService';
 // project import
 
 // ==============================|| SAMPLE PAGE ||============================== //
