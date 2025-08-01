@@ -86,7 +86,7 @@ const MembersGrid = (props: { agency: string, committeeName: string }) => {
           const sponsor = params.row;
           console.log('Rendering sponsor:', sponsor);
           return (
-              <Link>{sponsor.Name}</Link>
+              <Link href={`/sponsor?id=${sponsor.Id}`}>{sponsor.Name}</Link>
           );
         }
       },

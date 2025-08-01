@@ -6,6 +6,7 @@ import { PageInfo } from "@digitalaidseattle/supabase";
 import { Box, IconButton, Toolbar, Tooltip, Typography } from '@mui/material';
 import { DataGrid, GridColDef, useGridApiRef } from "@mui/x-data-grid";
 import { LegislatureService } from '../../api/legislatureService';
+import { useNavigate } from "react-router";
 // project import
 
 // ==============================|| SAMPLE PAGE ||============================== //
@@ -23,6 +24,8 @@ const SponsorsPage = () => {
     rows: [],
     totalRowCount: 0,
   });
+
+  const navigate = useNavigate();
 
   useEffect(() => {
     setColumns(getColumns());
@@ -49,26 +52,6 @@ const SponsorsPage = () => {
 
   const getColumns = (): GridColDef[] => {
     return [
-      {
-        field: "Id",
-        headerName: "",
-        width: 100,
-        renderCell: (params) => {
-          return (
-            <Tooltip title="View Members">
-              <IconButton
-                color="primary"
-                onClick={() => {
-                  const committee = params.row;
-                  window.location.href = `/committee-page?agency=${committee.Agency}&committeeName=${encodeURIComponent(committee.Name)}`;
-                }}
-              >
-                <InfoCircleOutlined />
-              </IconButton>
-            </Tooltip>
-          );
-        }
-      },
       {
         field: "Name",
         headerName: "Name",
@@ -134,6 +117,8 @@ const SponsorsPage = () => {
         paginationModel={paginationModel}
         onPaginationModelChange={setPaginationModel}
         pageSizeOptions={[10, 25, 50, 100]}
+        onRowDoubleClick={params => navigate(`/sponsor?id=${params.row.Id}`)}
+
       />
     </Box>
   )
