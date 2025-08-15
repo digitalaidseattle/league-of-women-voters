@@ -96,6 +96,8 @@ The application is deployed at Google's Firebase as a static website.  GitHub's 
 
 ## Local Set-up
 
+Note: You need to be given access on the supabase project
+
 ### Set-up a Supabase Account
 
 - Go to https://supabase.com/ and set up an account using your Digital Aid Seattle Email.
@@ -111,6 +113,7 @@ The application is deployed at Google's Firebase as a static website.  GitHub's 
 - On the side menu go to Project Setting > API Keys this is where you get the anon key.
 
 ### Spinning up the project.
+Clone the project found at https://github.com/digitalaidseattle/league-of-women-voters in your local machine.
 
 #### Find your .env file add these two variables
 
