@@ -14,17 +14,17 @@ export const TemplateConfig = () => {
         type: 'group',
         children: [
             {
-                id: 'committees-page',
+                id: 'committees',
                 title: 'Committees',
                 type: 'item',
-                url: '/committees-page',
+                url: '/committees',
                 icon: <TeamOutlined />
             } as MenuItem,
             {
-                id: 'sponsors-page',
+                id: 'sponsors',
                 title: 'Sponsors',
                 type: 'item',
-                url: '/sponsors-page',
+                url: '/sponsors',
                 icon: <TeamOutlined />
             } as MenuItem
         ]

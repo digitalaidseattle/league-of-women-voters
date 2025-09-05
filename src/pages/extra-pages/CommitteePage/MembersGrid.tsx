@@ -1,4 +1,5 @@
 import { PageInfo } from "@digitalaidseattle/supabase";
+import { Link } from "@mui/material";
 import { DataGrid, GridColDef, useGridApiRef } from "@mui/x-data-grid";
 import { useEffect, useState } from "react";
 import { LegislatureService } from "../../../api/legislatureService";
@@ -31,6 +32,7 @@ const MembersGrid = (props: { agency: string, committeeName: string }) => {
       refresh()
     }
   }, [props]);
+
 
   // function exportData() {
   //   const csvContent = pageInfo.rows.map(row => {
@@ -77,58 +79,65 @@ const MembersGrid = (props: { agency: string, committeeName: string }) => {
         field: "Name",
         headerName: "Name",
         width: 200,
-        type: "string"
+        type: "string",
+        renderCell: (params) => {
+          const sponsor = params.row;
+          console.log('Rendering sponsor:', sponsor);
+          return (
+              <Link href={`/sponsor?id=${sponsor.Id}`}>{sponsor.Name}</Link>
+          );
+        }
       },
-      {
-        field: "Acronym",
-        headerName: "Acronym",
-        width: 100,
+{
+  field: "Acronym",
+    headerName: "Acronym",
+      width: 100,
         type: "string"
-      },
-      {
-        field: "Agency",
-        headerName: "Agency",
-        width: 100,
+},
+{
+  field: "Agency",
+    headerName: "Agency",
+      width: 100,
         type: "string"
-      },
-      {
-        field: "Party",
-        headerName: "Party",
-        width: 100,
+},
+{
+  field: "Party",
+    headerName: "Party",
+      width: 100,
         type: "string"
-      },
-      {
-        field: "District",
-        headerName: "District",
-        width: 100,
+},
+{
+  field: "District",
+    headerName: "District",
+      width: 100,
         type: "number"
-      },
-      {
-        field: "Email",
-        headerName: "Email",
-        width: 200,
+},
+{
+  field: "Email",
+    headerName: "Email",
+      width: 200,
         type: "string"
-      },
-      {
-        field: "LongName",
-        headerName: "Long Name",
-        width: 300,
+},
+{
+  field: "LongName",
+    headerName: "Long Name",
+      width: 300,
         type: "string"
-      }
+}
     ];
   };
 
-  return (
-    <DataGrid
-      getRowId={(row) => row.Id}
-      apiRef={apiRef}
-      rows={pageInfo.rows}
-      columns={columns}
-      paginationModel={paginationModel}
-      onPaginationModelChange={setPaginationModel}
-      pageSizeOptions={[10, 25, 50, 100]}
-    />
-  )
+return (
+  <DataGrid
+    getRowId={(row) => row.Id}
+    apiRef={apiRef}
+    rows={pageInfo.rows}
+    columns={columns}
+    paginationModel={paginationModel}
+    onPaginationModelChange={setPaginationModel}
+    pageSizeOptions={[10, 25, 50, 100]}
+  />
+)
 }
 
 export default MembersGrid;

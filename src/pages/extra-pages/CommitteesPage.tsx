@@ -1,10 +1,11 @@
 // material-ui
-import { InfoCircleOutlined, ReloadOutlined } from "@ant-design/icons";
+import { ReloadOutlined } from "@ant-design/icons";
 import { useEffect, useState } from 'react';
 
 import { PageInfo } from "@digitalaidseattle/supabase";
 import { Box, IconButton, Toolbar, Tooltip, Typography } from '@mui/material';
 import { DataGrid, GridColDef, useGridApiRef } from "@mui/x-data-grid";
+import { useNavigate } from "react-router";
 import { LegislatureService } from '../../api/legislatureService';
 // project import
 
@@ -23,6 +24,8 @@ const CommitteesPage = () => {
     rows: [],
     totalRowCount: 0,
   });
+
+  const navigate = useNavigate()
 
   useEffect(() => {
     setColumns(getColumns());
@@ -47,29 +50,13 @@ const CommitteesPage = () => {
       });
   }
 
+  const openCommittee = (params: any) => {
+    const committee = params.row;
+    navigate(`/committee?agency=${committee.Agency}&committeeName=${encodeURIComponent(committee.Name)}`);
+  };
+
   const getColumns = (): GridColDef[] => {
     return [
-      {
-        field: "Id",
-        headerName: "",
-        width: 100,
-        renderCell: (params) => {
-          return (
-            <Tooltip title="View Members">
-              <IconButton
-                color="primary"
-                onClick={() => {
-                  const committee = params.row;
-                  window.location.href = `/committee-page?agency=${committee.Agency}&committeeName=${encodeURIComponent(committee.Name)}`;
-                }}
-              >
-                <InfoCircleOutlined />
-              </IconButton>
-            </Tooltip>
-          );
-        }
-
-      },
       {
         field: "Name",
         headerName: "Name",
@@ -123,6 +110,7 @@ const CommitteesPage = () => {
         paginationModel={paginationModel}
         onPaginationModelChange={setPaginationModel}
         pageSizeOptions={[10, 25, 50, 100]}
+        onRowDoubleClick={openCommittee}
       />
     </Box>
   )
