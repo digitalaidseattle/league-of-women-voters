@@ -115,11 +115,19 @@ Note: You need to be given access on the supabase project
 ### Spinning up the project.
 Clone the project found at https://github.com/digitalaidseattle/league-of-women-voters in your local machine.
 
-#### Find your .env file add these two variables
+#### Create a .env.local  file add these two variables
 
 `VITE_SUPABASE_URL=`
 
 `VITE_SUPABASE_ANON_KEY=`
+
+
+#### Additionally, for this project Google authentication can be added.
+
+`SUPABASE_GOOGLE_CLIENT_ID=`
+`SUPABASE_AUTH_EXTERNAL_GOOGLE_SECRET=`
+
+- This allows the local server to act as the auth service.
 
 #### Copy and paste the url and anon key value accordingly
 
