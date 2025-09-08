@@ -24,74 +24,85 @@
   1. Run `supabase start` (see: https://supabase.com/docs/reference/cli/supabase-start)
   2. Make an HTTP request:
 
-  curl -i --location --request POST 'http://127.0.0.1:54321/functions/v1/bills-services' \
-    --header 'Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6ImFub24iLCJleHAiOjE5ODM4MTI5OTZ9.CRXP1A7WOeoJeXxjNni43kdQwgnWNReilDMblYTn_I0' \
-    --header 'Content-Type: application/json' \
-    --data '{"name":"Functions"}'
+
 
 */
+// supabase/functions/bills-services/index.ts
 import { XMLParser } from "https://esm.sh/fast-xml-parser@4.3.5";
 
 Deno.serve(async (req) => {
   const origin = req.headers.get("origin") || "*";
-  const { method } = req;
 
-  if (method === "OPTIONS") {
+  // Handle preflight CORS (OPTIONS)
+  if (req.method === "OPTIONS") {
     return new Response(null, {
       status: 204,
       headers: {
         "Access-Control-Allow-Origin": origin,
         "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
-        "Access-Control-Allow-Headers": "Content-Type, Authorization, apikey, x-client-info",
+        "Access-Control-Allow-Headers":
+          "Content-Type, Authorization, apikey, x-client-info",
         "Access-Control-Max-Age": "86400",
       },
     });
   }
 
   try {
-    const url = new URL(req.url);
-    const biennium = url.searchParams.get("biennium");
-    const documentClass = url.searchParams.get("documentClass");
+    // Accept query params for GET or JSON body for POST
+    let biennium: string | null = null;
+    let documentClass: string | null = null;
+
+    if (req.method === "GET") {
+      const url = new URL(req.url);
+      biennium = url.searchParams.get("biennium");
+      documentClass = url.searchParams.get("documentClass");
+    } else if (req.method === "POST") {
+      const body = await req.json();
+      biennium = body.biennium;
+      documentClass = body.documentClass;
+    }
 
     if (!biennium || !documentClass) {
-      return new Response(JSON.stringify({ error: "Missing biennium or documentClass query parameter" }), {
-        status: 400,
-        headers: {
-          "Content-Type": "application/json",
-          "Access-Control-Allow-Origin": origin,
-        },
-      });
+      return new Response(
+        JSON.stringify({ error: "Missing required parameters: biennium, documentClass" }),
+        {
+          status: 400,
+          headers: {
+            "Content-Type": "application/json",
+            "Access-Control-Allow-Origin": origin,
+          },
+        }
+      );
     }
 
-    const apiUrl = `https://wslwebservices.leg.wa.gov/LegislativeDocumentService.asmx/GetAllDocumentsByClass?biennium=${encodeURIComponent(biennium)}&documentClass=${encodeURIComponent(documentClass)}`;
+    // Build request URL
+    const wsUrl = `https://wslwebservices.leg.wa.gov/LegislativeDocumentService.asmx/GetAllDocumentsByClass?biennium=${encodeURIComponent(
+      biennium
+    )}&documentClass=${encodeURIComponent(documentClass)}`;
 
-    const response = await fetch(apiUrl);
-    console.log("External API status:", response.status);
-
+    // Fetch XML response
+    const response = await fetch(wsUrl);
     if (!response.ok) {
-      throw new Error(`Failed to fetch from WA Legislative API. Status: ${response.status}`);
+      throw new Error(`Upstream request failed: ${response.status}`);
     }
 
-    const xml = await response.text();
-    console.log("Fetched XML sample:", xml.slice(0, 300));
+    const xmlText = await response.text();
+    const parser = new XMLParser({ ignoreAttributes: false });
+    const json = parser.parse(xmlText);
 
-    const parser = new XMLParser({
-      ignoreAttributes: false,
-      removeNSPrefix: true,
-    });
+    // Extract LegislativeDocument array
+    const entities =
+      json?.ArrayOfLegislativeDocument?.LegislativeDocument || [];
 
-    const json = parser.parse(xml);
-    const documents = json.ArrayOfLegislativeDocument?.LegislativeDocument ?? [];
-
-    return new Response(JSON.stringify(documents), {
+    return new Response(JSON.stringify(entities), {
       headers: {
         "Content-Type": "application/json",
         "Access-Control-Allow-Origin": origin,
       },
     });
   } catch (err) {
-    console.error("Error in edge function:", err);
-    return new Response(JSON.stringify({ error: err.message || "Internal Server Error" }), {
+    console.error("SOAP request failed:", err);
+    return new Response(JSON.stringify({ error: err.message }), {
       status: 500,
       headers: {
         "Content-Type": "application/json",
