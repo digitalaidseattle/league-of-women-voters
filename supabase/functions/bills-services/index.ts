@@ -25,9 +25,7 @@
   2. Make an HTTP request:
 
 
-
 */
-// supabase/functions/bills-services/index.ts
 import { XMLParser } from "https://esm.sh/fast-xml-parser@4.3.5";
 
 Deno.serve(async (req) => {
