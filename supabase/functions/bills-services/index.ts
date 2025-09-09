@@ -28,32 +28,6 @@
 */
 import { XMLParser } from "https://esm.sh/fast-xml-parser@4.3.5";
 
-// 🔹 Extract inputs from request body
-async function extractInputs(req: Request) {
-  const body = await req.json();
-  const { biennium, documentClass } = body;
-
-  if (!biennium || !documentClass) {
-    throw new Error("Missing required parameters: biennium, documentClass");
-  }
-
-  return { biennium, documentClass };
-}
-
-// 🔹 Build the request URL
-function getLegUrl({ biennium, documentClass }: { biennium: string; documentClass: string }) {
-  return `https://wslwebservices.leg.wa.gov/LegislativeDocumentService.asmx/GetAllDocumentsByClass?biennium=${encodeURIComponent(
-    biennium,
-  )}&documentClass=${encodeURIComponent(documentClass)}`;
-}
-
-// 🔹 Parse XML response into JSON entities
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-function getEntities(json: any) {
-  // The XML root is <ArrayOfLegislativeDocument>, containing multiple <LegislativeDocument>
-  return json?.ArrayOfLegislativeDocument?.LegislativeDocument ?? [];
-}
-
 Deno.serve(async (req) => {
   const origin = req.headers.get("origin") || "*";
 
@@ -63,7 +37,7 @@ Deno.serve(async (req) => {
       status: 204,
       headers: {
         "Access-Control-Allow-Origin": origin,
-        "Access-Control-Allow-Methods": "POST, OPTIONS",
+        "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
         "Access-Control-Allow-Headers":
           "Content-Type, Authorization, apikey, x-client-info",
         "Access-Control-Max-Age": "86400",
@@ -71,23 +45,39 @@ Deno.serve(async (req) => {
     });
   }
 
+  const parser = new XMLParser();
+
   try {
-    // 🔹 Extract input values from request body
-    const requestParams = await extractInputs(req);
+    // Expect request body for biennium + documentClass
+    const { biennium, documentClass } = await req.json();
 
-    // 🔹 Construct URL
-    const url = getLegUrl(requestParams);
+    if (!biennium || !documentClass) {
+      throw new Error("Missing required parameters: biennium, documentClass");
+    }
 
-    // 🔹 Fetch and parse XML
-    const response = await fetch(url);
+    const response = await fetch(
+      `https://wslwebservices.leg.wa.gov/LegislativeDocumentService.asmx/GetAllDocumentsByClass?biennium=${encodeURIComponent(
+        biennium,
+      )}&documentClass=${encodeURIComponent(documentClass)}`,
+      {
+        method: "GET",
+        headers: {
+          "Content-Type": "text/xml;charset=UTF-8",
+          "SOAPAction":
+            "https://wslwebservices.leg.wa.gov/LegislativeDocumentService.asmx/GetAllDocumentsByClass",
+        },
+      },
+    );
+
     const xmlText = await response.text();
-    const parser = new XMLParser();
+
+    // Parse XML to JSON
     const json = parser.parse(xmlText);
 
-    // 🔹 Extract LegislativeDocument entities
-    const entities = getEntities(json);
+    // Extract array of LegislativeDocument
+    const docs = json["ArrayOfLegislativeDocument"]["LegislativeDocument"];
 
-    return new Response(JSON.stringify(entities), {
+    return new Response(JSON.stringify(docs), {
       headers: {
         "Content-Type": "application/json",
         "Access-Control-Allow-Origin": origin,
