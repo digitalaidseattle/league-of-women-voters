@@ -28,6 +28,17 @@
 */
 import { XMLParser } from "https://esm.sh/fast-xml-parser@4.3.5";
 
+async function extractInputs(req: Request) {
+  const body = await req.json();
+  const { biennium, documentClass } = body;
+
+  if (!biennium || !documentClass) {
+    throw new Error("Missing required parameters: biennium, documentClass");
+  }
+
+  return { biennium, documentClass };
+}
+
 Deno.serve(async (req) => {
   const origin = req.headers.get("origin") || "*";
 
@@ -48,12 +59,8 @@ Deno.serve(async (req) => {
   const parser = new XMLParser();
 
   try {
-    // Expect request body for biennium + documentClass
-    const { biennium, documentClass } = await req.json();
-
-    if (!biennium || !documentClass) {
-      throw new Error("Missing required parameters: biennium, documentClass");
-    }
+    // 🔹 Extract inputs using helper
+    const { biennium, documentClass } = await extractInputs(req);
 
     const response = await fetch(
       `https://wslwebservices.leg.wa.gov/LegislativeDocumentService.asmx/GetAllDocumentsByClass?biennium=${encodeURIComponent(
@@ -70,11 +77,9 @@ Deno.serve(async (req) => {
     );
 
     const xmlText = await response.text();
-
-    // Parse XML to JSON
     const json = parser.parse(xmlText);
 
-    // Extract array of LegislativeDocument
+    // Extract LegislativeDocument list
     const docs = json["ArrayOfLegislativeDocument"]["LegislativeDocument"];
 
     return new Response(JSON.stringify(docs), {
