@@ -28,6 +28,32 @@
 */
 import { XMLParser } from "https://esm.sh/fast-xml-parser@4.3.5";
 
+// 🔹 Extract inputs from request body
+async function extractInputs(req: Request) {
+  const body = await req.json();
+  const { biennium, documentClass } = body;
+
+  if (!biennium || !documentClass) {
+    throw new Error("Missing required parameters: biennium, documentClass");
+  }
+
+  return { biennium, documentClass };
+}
+
+// 🔹 Build the request URL
+function getLegUrl({ biennium, documentClass }: { biennium: string; documentClass: string }) {
+  return `https://wslwebservices.leg.wa.gov/LegislativeDocumentService.asmx/GetAllDocumentsByClass?biennium=${encodeURIComponent(
+    biennium,
+  )}&documentClass=${encodeURIComponent(documentClass)}`;
+}
+
+// 🔹 Parse XML response into JSON entities
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function getEntities(json: any) {
+  // The XML root is <ArrayOfLegislativeDocument>, containing multiple <LegislativeDocument>
+  return json?.ArrayOfLegislativeDocument?.LegislativeDocument ?? [];
+}
+
 Deno.serve(async (req) => {
   const origin = req.headers.get("origin") || "*";
 
@@ -37,7 +63,7 @@ Deno.serve(async (req) => {
       status: 204,
       headers: {
         "Access-Control-Allow-Origin": origin,
-        "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
+        "Access-Control-Allow-Methods": "POST, OPTIONS",
         "Access-Control-Allow-Headers":
           "Content-Type, Authorization, apikey, x-client-info",
         "Access-Control-Max-Age": "86400",
@@ -46,51 +72,20 @@ Deno.serve(async (req) => {
   }
 
   try {
-    // Accept query params for GET or JSON body for POST
-    let biennium: string | null = null;
-    let documentClass: string | null = null;
+    // 🔹 Extract input values from request body
+    const requestParams = await extractInputs(req);
 
-    if (req.method === "GET") {
-      const url = new URL(req.url);
-      biennium = url.searchParams.get("biennium");
-      documentClass = url.searchParams.get("documentClass");
-    } else if (req.method === "POST") {
-      const body = await req.json();
-      biennium = body.biennium;
-      documentClass = body.documentClass;
-    }
+    // 🔹 Construct URL
+    const url = getLegUrl(requestParams);
 
-    if (!biennium || !documentClass) {
-      return new Response(
-        JSON.stringify({ error: "Missing required parameters: biennium, documentClass" }),
-        {
-          status: 400,
-          headers: {
-            "Content-Type": "application/json",
-            "Access-Control-Allow-Origin": origin,
-          },
-        }
-      );
-    }
-
-    // Build request URL
-    const wsUrl = `https://wslwebservices.leg.wa.gov/LegislativeDocumentService.asmx/GetAllDocumentsByClass?biennium=${encodeURIComponent(
-      biennium
-    )}&documentClass=${encodeURIComponent(documentClass)}`;
-
-    // Fetch XML response
-    const response = await fetch(wsUrl);
-    if (!response.ok) {
-      throw new Error(`Upstream request failed: ${response.status}`);
-    }
-
+    // 🔹 Fetch and parse XML
+    const response = await fetch(url);
     const xmlText = await response.text();
-    const parser = new XMLParser({ ignoreAttributes: false });
+    const parser = new XMLParser();
     const json = parser.parse(xmlText);
 
-    // Extract LegislativeDocument array
-    const entities =
-      json?.ArrayOfLegislativeDocument?.LegislativeDocument || [];
+    // 🔹 Extract LegislativeDocument entities
+    const entities = getEntities(json);
 
     return new Response(JSON.stringify(entities), {
       headers: {
@@ -100,12 +95,15 @@ Deno.serve(async (req) => {
     });
   } catch (err) {
     console.error("SOAP request failed:", err);
-    return new Response(JSON.stringify({ error: err.message }), {
-      status: 500,
-      headers: {
-        "Content-Type": "application/json",
-        "Access-Control-Allow-Origin": origin,
+    return new Response(
+      JSON.stringify({ error: err.message ?? "Internal Server Error" }),
+      {
+        status: 500,
+        headers: {
+          "Content-Type": "application/json",
+          "Access-Control-Allow-Origin": origin,
+        },
       },
-    });
+    );
   }
 });
