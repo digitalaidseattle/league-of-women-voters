@@ -135,8 +135,6 @@ Clone the project found at https://github.com/digitalaidseattle/league-of-women-
 
 `npm install`
 
-`yarn install`
-
 `npm install -g supabase`
 
 #### NOTE: You will need to install docker to start up supabase
@@ -147,7 +145,7 @@ Clone the project found at https://github.com/digitalaidseattle/league-of-women-
 
 `supabase start`
 
-`yarn dev`
+`npm run dev`
 
 You can stop the containers by running command below
 
