@@ -21,28 +21,64 @@ SOAPAction: "http://WSLWebServices.leg.wa.gov/GetActiveCommitteeMembers"
  */
 import { XMLParser } from "https://esm.sh/fast-xml-parser@4.3.5";
 
-function getLegUrl(
-  operation: string,
-  biennium: string,
-  agency: string,
-  committeeName: string,
-) {
+
+type CommitteeInputParams = {
+  operation: string;
+  biennium?: string;
+  agency?: string;
+  committeeName?: string;
+};
+
+function validateParams(params: CommitteeInputParams) {
+  const validOperations = [
+    "GetActiveCommitteeMembers",
+    "GetActiveCommittees",
+    "GetCommitteeReferralsByCommittee",
+  ];
+  if (!params.operation || !validOperations.includes(params.operation)) {
+    throw new Error(
+      `Invalid operation. Must be one of: ${validOperations.join(", ")}`,
+      { cause: "BadRequest" },
+    );
+  }
+  if (
+    (params.operation === "GetActiveCommitteeMembers" ||
+      params.operation === "GetCommitteeReferralsByCommittee") &&
+    (!params.agency || !params.committeeName)
+  ) {
+    throw new Error(
+      `agency and committeeName are required for operation ${params.operation}`,
+      { cause: "BadRequest" },
+    );
+  }
+  if (
+    params.operation === "GetCommitteeReferralsByCommittee" &&
+    !params.biennium
+  ) {
+    throw new Error(
+      `biennium is required for operation ${params.operation}`,
+      { cause: "BadRequest" },
+    );
+  }
+}
+
+function getLegUrl(params: CommitteeInputParams) {
   const committeeURL =
     "https://wslwebservices.leg.wa.gov/CommitteeService.asmx";
   const committeeActionURL =
     "https://wslwebservices.leg.wa.gov/CommitteeActionService.asmx";
-  switch (operation) {
+  switch (params.operation) {
     case "GetActiveCommitteeMembers":
       return `${committeeURL}/GetActiveCommitteeMembers?agency=${
-        encodeURIComponent(agency)
-      }&committeeName=${encodeURIComponent(committeeName)}`;
+        encodeURIComponent(params.agency!)
+      }&committeeName=${encodeURIComponent(params.committeeName!)}`;
     case "GetActiveCommittees":
       return `${committeeURL}/GetActiveCommittees`;
     case "GetCommitteeReferralsByCommittee":
       return `${committeeActionURL}/GetCommitteeReferralsByCommittee?biennium=${
-        encodeURIComponent(biennium)
-      }&agency=${encodeURIComponent(agency)}&committeeName=${
-        encodeURIComponent(committeeName)
+        encodeURIComponent(params.biennium!)
+      }&agency=${encodeURIComponent(params.agency!)}&committeeName=${
+        encodeURIComponent(params.committeeName!)
       }`;
     default:
       return committeeURL;
@@ -79,22 +115,16 @@ Deno.serve(async (req) => {
     });
   }
 
-  const { operation, biennium, agency, committeeName } = await req.json();
-
-  const url = getLegUrl(
-    operation,
-    biennium,
-    agency,
-    committeeName,
-  );
-
   try {
+    const params = await req.json();
+    validateParams(params);
+    const url = getLegUrl(params);
     const parser = new XMLParser();
     const response = await fetch(url);
     const xmlText = await response.text();
     const json = parser.parse(xmlText);
 
-    const entities = getEntities(operation, json);
+    const entities = getEntities(params, json);
 
     return new Response(JSON.stringify(entities), {
       headers: {
@@ -103,7 +133,13 @@ Deno.serve(async (req) => {
       },
     });
   } catch (err) {
-    console.error("SOAP request failed:", err);
-    throw err;
+    const statusCode = err.cause === "BadRequest" ? 400 : 500;
+    return new Response(JSON.stringify({ error: err.message || "Internal Server Error" }), {
+      status: statusCode,
+      headers: {
+        "Content-Type": "application/json",
+        "Access-Control-Allow-Origin": origin,
+      },
+    });
   }
 });
