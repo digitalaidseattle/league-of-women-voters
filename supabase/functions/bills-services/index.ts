@@ -33,7 +33,9 @@ async function extractInputs(req: Request) {
   const { biennium, documentClass } = body;
 
   if (!biennium || !documentClass) {
-    throw new Error("Missing required parameters: biennium, documentClass");
+    throw new Error(`Missing required parameters: biennium, documentClass,
+      {cause: "BadRequest"},
+      `);
   }
 
   return { biennium, documentClass };
@@ -90,10 +92,11 @@ Deno.serve(async (req) => {
     });
   } catch (err) {
     console.error("SOAP request failed:", err);
+    const statusCode = err.cause === "BadRequest" ? 400 : 500;
     return new Response(
-      JSON.stringify({ error: err.message ?? "Internal Server Error" }),
+      JSON.stringify({ error: err.message || "Internal Server Error" }),
       {
-        status: 500,
+        status:statusCode,
         headers: {
           "Content-Type": "application/json",
           "Access-Control-Allow-Origin": origin,
