@@ -59,12 +59,6 @@ const SponsorsPage = () => {
         type: "string"
       },
       {
-        field: "Acronym",
-        headerName: "Acronym",
-        width: 100,
-        type: "string"
-      },
-      {
         field: "Agency",
         headerName: "Agency",
         width: 100,
