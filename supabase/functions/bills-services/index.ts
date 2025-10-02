@@ -28,23 +28,53 @@
 */
 import { XMLParser } from "https://esm.sh/fast-xml-parser@4.3.5";
 
+// Extract inputs from request body (POST)
 async function extractInputs(req: Request) {
   const body = await req.json();
   const { biennium, documentClass } = body;
 
   if (!biennium || !documentClass) {
-    throw new Error(`Missing required parameters: biennium, documentClass,
+    throw new Error(`Missing required parameters: biennium, documentClass`,
       {cause: "BadRequest"},
-      `);
+      );
   }
-
   return { biennium, documentClass };
+}
+
+
+function getLegUrl({ biennium, documentClass }: { biennium: string; documentClass: string }) {
+  return `https://wslwebservices.leg.wa.gov/LegislativeDocumentService.asmx/GetAllDocumentsByClass?biennium=${encodeURIComponent(
+    biennium,
+  )}&documentClass=${encodeURIComponent(documentClass)}`;
+}
+
+// Add `url` field to each LegislativeDocument object
+function addUrlToEntities(entities: object[]) {
+  if (!Array.isArray(entities)) return entities;
+
+  return entities.map((doc) => {
+    // Some XML->JSON conversions may return primitive strings, It's a guard for it
+    const name = (doc?.Name ?? doc?.name ?? "") + "";
+    const biennium = (doc?.Biennium ?? doc?.biennium ?? "") + "";
+
+    // Extract the first 4 chars of biennium if possible (e.g., "2025-26" -> "2025")
+    const year = typeof biennium === "string" && biennium.length >= 4 ? biennium.slice(0, 4) : "2025";
+
+    // Build the BillSummary URL and encode components
+    const billNumber = encodeURIComponent(name);
+    const yearEncoded = encodeURIComponent(year);
+
+    const Url = `https://app.leg.wa.gov/BillSummary/?BillNumber=${billNumber}&Year=${yearEncoded}&Initiative=false`;
+
+    // Return a shallow copy of the original doc with the new `url` field
+    return { ...doc, Url };
+  });
 }
 
 Deno.serve(async (req) => {
   const origin = req.headers.get("origin") || "*";
 
-  // Handle preflight CORS (OPTIONS)
+  
   if (req.method === "OPTIONS") {
     return new Response(null, {
       status: 204,
@@ -61,14 +91,12 @@ Deno.serve(async (req) => {
   const parser = new XMLParser();
 
   try {
-    // 🔹 Extract inputs using helper
+
     const { biennium, documentClass } = await extractInputs(req);
 
+  
     const response = await fetch(
-      `https://wslwebservices.leg.wa.gov/LegislativeDocumentService.asmx/GetAllDocumentsByClass?biennium=${encodeURIComponent(
-        biennium,
-      )}&documentClass=${encodeURIComponent(documentClass)}`,
-      {
+     getLegUrl({biennium, documentClass}),{
         method: "GET",
         headers: {
           "Content-Type": "text/xml;charset=UTF-8",
@@ -78,13 +106,24 @@ Deno.serve(async (req) => {
       },
     );
 
+    if (!response.ok) {
+      throw new Error(`Upstream request failed with status ${response.status}`);
+    }
+
     const xmlText = await response.text();
     const json = parser.parse(xmlText);
 
-    // Extract LegislativeDocument list
-    const docs = json["ArrayOfLegislativeDocument"]["LegislativeDocument"];
+    
+    const rawDocs =
+      json?.ArrayOfLegislativeDocument?.LegislativeDocument ?? [];
 
-    return new Response(JSON.stringify(docs), {
+   
+    const docsArray = Array.isArray(rawDocs) ? rawDocs : [rawDocs].filter(Boolean);
+
+    // Add url field to each object
+    const docsWithUrl = addUrlToEntities(docsArray);
+
+    return new Response(JSON.stringify(docsWithUrl), {
       headers: {
         "Content-Type": "application/json",
         "Access-Control-Allow-Origin": origin,
@@ -96,7 +135,7 @@ Deno.serve(async (req) => {
     return new Response(
       JSON.stringify({ error: err.message || "Internal Server Error" }),
       {
-        status:statusCode,
+        status: statusCode,
         headers: {
           "Content-Type": "application/json",
           "Access-Control-Allow-Origin": origin,
