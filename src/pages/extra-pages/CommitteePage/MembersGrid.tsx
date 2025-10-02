@@ -88,12 +88,7 @@ const MembersGrid = (props: { agency: string, committeeName: string }) => {
           );
         }
       },
-{
-  field: "Acronym",
-    headerName: "Acronym",
-      width: 100,
-        type: "string"
-},
+
 {
   field: "Agency",
     headerName: "Agency",
