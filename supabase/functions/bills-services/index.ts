@@ -61,10 +61,52 @@ function getWorker(params: GetAllDocumentsParams) {
        return new GetAllDocumentsByClass();
 }
 
+// Build Legislative Document URL 
+function getLegUrl({
+  biennium,
+  documentClass,
+}: {
+  biennium: string;
+  documentClass: string;
+}) {
+  return `https://wslwebservices.leg.wa.gov/LegislativeDocumentService.asmx/GetAllDocumentsByClass?biennium=${encodeURIComponent(
+    biennium,
+  )}&documentClass=${encodeURIComponent(documentClass)}`;
+}
+
+// Use removeNSPrefix to avoid namespace surprises
+const parser = new XMLParser({ removeNSPrefix: true });
+
+//  Parse JSON and add url field to each document
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function getEntities(json: any) {
+  const rawDocs =
+    json?.ArrayOfLegislativeDocument?.LegislativeDocument ?? [];
+  const docsArray = Array.isArray(rawDocs) ? rawDocs : [rawDocs].filter(Boolean);
+
+  return docsArray.map((doc) => {
+    const name = (doc?.Name ?? doc?.name ?? "") + "";
+    const biennium = (doc?.Biennium ?? doc?.biennium ?? "") + "";
+
+    // Take only first 4 digits of Biennium for Year (e.g., "2025-26" → "2025")
+    const year =
+      typeof biennium === "string" && biennium.length >= 4
+        ? biennium.slice(0, 4)
+        : "2025";
+
+    const billNumber = encodeURIComponent(name);
+    const yearEncoded = encodeURIComponent(year);
+
+    const Url = `https://app.leg.wa.gov/BillSummary/?BillNumber=${billNumber}&Year=${yearEncoded}&Initiative=false`;
+
+    return { ...doc, Url };
+  });
+}
+
+
 Deno.serve(async (req) => {
   const origin = req.headers.get("origin") || "*";
 
-  // Handle preflight CORS (OPTIONS)
   if (req.method === "OPTIONS") {
     return new Response(null, {
       status: 204,
@@ -104,7 +146,7 @@ Deno.serve(async (req) => {
     return new Response(
       JSON.stringify({ error: err.message || "Internal Server Error" }),
       {
-        status:statusCode,
+        status: statusCode,
         headers: {
           "Content-Type": "application/json",
           "Access-Control-Allow-Origin": origin,
