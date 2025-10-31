@@ -27,19 +27,38 @@
 
 */
 import { XMLParser } from "https://esm.sh/fast-xml-parser@4.3.5";
+import { ServiceWorker } from "../types.ts";
 
-//  Extract inputs from request body (POST)
-async function extractInputs(req: Request) {
-  const body = await req.json();
-  const { biennium, documentClass } = body;
+type GetAllDocumentsParams = {
+  biennium: string;
+  documentClass: string;
+};
 
-  if (!biennium || !documentClass) {
-    throw new Error(`Missing required parameters: biennium, documentClass`, {
-      cause: "BadRequest",
-    });
+class GetAllDocumentsByClass implements ServiceWorker<GetAllDocumentsParams>{
+  validate(params: GetAllDocumentsParams) {
+    if (
+      ((!params.biennium || !params.documentClass))
+    ) {
+      throw new Error(
+        `Missing required parameters: biennium, documentClass,`,
+        { cause: "BadRequest" },
+      );
+    }
   }
 
-  return { biennium, documentClass };
+  getLegUrl (params: GetAllDocumentsParams): string {
+    return `https://wslwebservices.leg.wa.gov/LegislativeDocumentService.asmx/GetAllDocumentsByClass?biennium=${encodeURIComponent(
+        params.biennium,
+      )}&documentClass=${encodeURIComponent(params.documentClass)}`
+  };
+
+  getEntities (json: any):any {
+    return json["ArrayOfLegislativeDocument"]["LegislativeDocument"];
+  };
+  
+}
+function getWorker(params: GetAllDocumentsParams) {
+       return new GetAllDocumentsByClass();
 }
 
 // Build Legislative Document URL 
@@ -102,31 +121,25 @@ Deno.serve(async (req) => {
   }
 
   try {
-    const { biennium, documentClass } = await extractInputs(req);
-
-    const response = await fetch(getLegUrl({ biennium, documentClass }), {
-      method: "GET",
-      headers: {
-        "Content-Type": "text/xml;charset=UTF-8",
-        "SOAPAction":
-          "https://wslwebservices.leg.wa.gov/LegislativeDocumentService.asmx/GetAllDocumentsByClass",
-      },
-    });
-
-    if (!response.ok) {
-      throw new Error(`Upstream request failed with status ${response.status}`);
-    }
-
-    const xmlText = await response.text();
-    const json = parser.parse(xmlText);
-    const entities = getEntities(json);
-
-    return new Response(JSON.stringify(entities), {
-      headers: {
-        "Content-Type": "application/json",
-        "Access-Control-Allow-Origin": origin,
-      },
-    });
+     const params = await req.json();
+ 
+     const worker = getWorker(params);
+ 
+     worker.validate(params);
+     
+     const url = worker.getLegUrl(params);
+     const response = await fetch(url);
+     const xmlText = await response.text();
+     
+     const parser = new XMLParser();
+     const json = parser.parse(xmlText);
+     const entities = worker.getEntities(json);
+     return new Response(JSON.stringify(entities), {
+       headers: {
+         "Content-Type": "application/json",
+         "Access-Control-Allow-Origin": origin,
+       },
+     });
   } catch (err) {
     console.error("SOAP request failed:", err);
     const statusCode = err.cause === "BadRequest" ? 400 : 500;
