@@ -27,67 +27,70 @@
 
 */
 import { XMLParser } from "https://esm.sh/fast-xml-parser@4.3.5";
+import { ServiceWorker } from "../types.ts";
 
-//  Extract inputs from request body (POST)
-async function extractInputs(req: Request) {
-  const body = await req.json();
-  const { biennium, documentClass } = body;
-
-  if (!biennium || !documentClass) {
-    throw new Error(`Missing required parameters: biennium, documentClass`, {
-      cause: "BadRequest",
-    });
-  }
-
-  return { biennium, documentClass };
-}
-
-// Build Legislative Document URL 
-function getLegUrl({
-  biennium,
-  documentClass,
-}: {
+type GetAllDocumentsParams = {
   biennium: string;
   documentClass: string;
-}) {
-  return `https://wslwebservices.leg.wa.gov/LegislativeDocumentService.asmx/GetAllDocumentsByClass?biennium=${encodeURIComponent(
-    biennium,
-  )}&documentClass=${encodeURIComponent(documentClass)}`;
+};
+
+class GetAllDocumentsByClass implements ServiceWorker<GetAllDocumentsParams> {
+  validate(params: GetAllDocumentsParams) {
+    if (!params.biennium || !params.documentClass) {
+      throw new Error(
+        `Missing required parameters: biennium, documentClass`,
+        { cause: "BadRequest" },
+      );
+    }
+  }
+
+  getLegUrl(params: GetAllDocumentsParams): string {
+    return `https://wslwebservices.leg.wa.gov/LegislativeDocumentService.asmx/GetAllDocumentsByClass?biennium=${encodeURIComponent(
+      params.biennium,
+    )}&documentClass=${encodeURIComponent(params.documentClass)}`;
+  }
+
+  // Parse JSON, normalize array, and add Url field
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  getEntities(json: any): any {
+    const rawDocs =
+      json?.ArrayOfLegislativeDocument?.LegislativeDocument ?? [];
+    const docsArray = Array.isArray(rawDocs)
+      ? rawDocs
+      : [rawDocs].filter(Boolean);
+
+    return docsArray.map((doc) => {
+      const name = (doc?.Name ?? doc?.name ?? "") + "";
+      const biennium = (doc?.Biennium ?? doc?.biennium ?? "") + "";
+
+      // Extract year from biennium, e.g. "2025-26" → "2025"
+      const year =
+        typeof biennium === "string" && biennium.length >= 4
+          ? biennium.slice(0, 4)
+          : "2025";
+
+      const billNumber = encodeURIComponent(name);
+      const yearEncoded = encodeURIComponent(year);
+
+      const Url = `https://app.leg.wa.gov/BillSummary/?BillNumber=${billNumber}&Year=${yearEncoded}&Initiative=false`;
+
+      return { ...doc, Url };
+    });
+  }
 }
 
-// Use removeNSPrefix to avoid namespace surprises
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+function getWorker(params: GetAllDocumentsParams) {
+  return new GetAllDocumentsByClass();
+}
+
+// Global XML parser (removeNSPrefix to avoid namespace issues)
 const parser = new XMLParser({ removeNSPrefix: true });
-
-//  Parse JSON and add url field to each document
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-function getEntities(json: any) {
-  const rawDocs =
-    json?.ArrayOfLegislativeDocument?.LegislativeDocument ?? [];
-  const docsArray = Array.isArray(rawDocs) ? rawDocs : [rawDocs].filter(Boolean);
-
-  return docsArray.map((doc) => {
-    const name = (doc?.Name ?? doc?.name ?? "") + "";
-    const biennium = (doc?.Biennium ?? doc?.biennium ?? "") + "";
-
-    // Take only first 4 digits of Biennium for Year (e.g., "2025-26" → "2025")
-    const year =
-      typeof biennium === "string" && biennium.length >= 4
-        ? biennium.slice(0, 4)
-        : "2025";
-
-    const billNumber = encodeURIComponent(name);
-    const yearEncoded = encodeURIComponent(year);
-
-    const Url = `https://app.leg.wa.gov/BillSummary/?BillNumber=${billNumber}&Year=${yearEncoded}&Initiative=false`;
-
-    return { ...doc, Url };
-  });
-}
-
 
 Deno.serve(async (req) => {
   const origin = req.headers.get("origin") || "*";
 
+  // Handle CORS preflight
   if (req.method === "OPTIONS") {
     return new Response(null, {
       status: 204,
@@ -102,9 +105,13 @@ Deno.serve(async (req) => {
   }
 
   try {
-    const { biennium, documentClass } = await extractInputs(req);
+    const params = await req.json();
+    const worker = getWorker(params);
 
-    const response = await fetch(getLegUrl({ biennium, documentClass }), {
+    worker.validate(params);
+
+    const url = worker.getLegUrl(params);
+    const response = await fetch(url, {
       method: "GET",
       headers: {
         "Content-Type": "text/xml;charset=UTF-8",
@@ -119,7 +126,7 @@ Deno.serve(async (req) => {
 
     const xmlText = await response.text();
     const json = parser.parse(xmlText);
-    const entities = getEntities(json);
+    const entities = worker.getEntities(json);
 
     return new Response(JSON.stringify(entities), {
       headers: {
