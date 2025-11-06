@@ -1,7 +1,8 @@
 import { supabaseClient } from "@digitalaidseattle/supabase";
+import type { LegislativeDocument } from "./bill";
 
 
-const CURRENT_BIENNIUM = import.meta.env.VITE_LWVW_CURRENT_BIENNIUM;
+const CURRENT_BIENNIUM = import.meta.env.VITE_LWVW_CURRENT_BIENNIUM ?? "2023-24";
 
 class LegislatureService {
   private static instance: LegislatureService;
@@ -51,6 +52,16 @@ class LegislatureService {
         body: { operation: 'GetCommitteeReferralsByCommittee', biennium: CURRENT_BIENNIUM, agency: agency, committeeName: committeeName },
       })
       .then((resp) => resp.data as Member[]);
+  }
+
+  public async getBills(
+    documentClass: string,
+  ): Promise<LegislativeDocument[]> {
+    return supabaseClient.functions
+      .invoke("bills-services", {
+        body: { biennium: CURRENT_BIENNIUM, documentClass },
+      })
+      .then((resp) => resp.data as LegislativeDocument[]);
   }
 }
 
