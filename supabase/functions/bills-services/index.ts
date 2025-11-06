@@ -27,7 +27,7 @@
 
 */
 import { XMLParser } from "https://esm.sh/fast-xml-parser@4.3.5";
-import { ServiceWorker } from "../types.ts";
+
 
 type GetAllDocumentsParams = {
   biennium: string;
@@ -115,8 +115,6 @@ Deno.serve(async (req) => {
       method: "GET",
       headers: {
         "Content-Type": "text/xml;charset=UTF-8",
-        "SOAPAction":
-          "https://wslwebservices.leg.wa.gov/LegislativeDocumentService.asmx/GetAllDocumentsByClass",
       },
     });
 
