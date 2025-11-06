@@ -20,7 +20,7 @@ SOAPAction: "http://WSLWebServices.leg.wa.gov/GetActiveCommitteeMembers"
 
  */
 import { XMLParser } from "https://esm.sh/fast-xml-parser@4.3.5";
-
+import { ServiceWorker } from "../types.ts";
 
 type CommitteeInputParams = {
   operation: string;
@@ -29,72 +29,84 @@ type CommitteeInputParams = {
   committeeName?: string;
 };
 
-function validateParams(params: CommitteeInputParams) {
-  const validOperations = [
-    "GetActiveCommitteeMembers",
-    "GetActiveCommittees",
-    "GetCommitteeReferralsByCommittee",
-  ];
-  if (!params.operation || !validOperations.includes(params.operation)) {
-    throw new Error(
-      `Invalid operation. Must be one of: ${validOperations.join(", ")}`,
-      { cause: "BadRequest" },
-    );
+class GetActiveCommitteesWorker implements ServiceWorker<CommitteeInputParams>{
+
+  validate(_params: CommitteeInputParams) {
+    // nothing to check
   }
-  if (
-    (params.operation === "GetActiveCommitteeMembers" ||
-      params.operation === "GetCommitteeReferralsByCommittee") &&
-    (!params.agency || !params.committeeName)
-  ) {
-    throw new Error(
-      `agency and committeeName are required for operation ${params.operation}`,
-      { cause: "BadRequest" },
-    );
+
+  getLegUrl(_params: CommitteeInputParams) : string {
+    const committeeURL =
+      "https://wslwebservices.leg.wa.gov/CommitteeService.asmx";
+    return `${committeeURL}/GetActiveCommittees`;
   }
-  if (
-    params.operation === "GetCommitteeReferralsByCommittee" &&
-    !params.biennium
-  ) {
-    throw new Error(
-      `biennium is required for operation ${params.operation}`,
-      { cause: "BadRequest" },
-    );
+
+  getEntities(json: any) : any {
+      return json["ArrayOfCommittee"]["Committee"];
   }
+
 }
 
-function getLegUrl(params: CommitteeInputParams) {
-  const committeeURL =
-    "https://wslwebservices.leg.wa.gov/CommitteeService.asmx";
-  const committeeActionURL =
-    "https://wslwebservices.leg.wa.gov/CommitteeActionService.asmx";
-  switch (params.operation) {
-    case "GetActiveCommitteeMembers":
-      return `${committeeURL}/GetActiveCommitteeMembers?agency=${
+class GetActiveCommitteeMembersWorker implements ServiceWorker<CommitteeInputParams>{
+
+  validate(params: CommitteeInputParams) {
+    if (
+      (!params.agency || !params.committeeName)
+    ) {
+      throw new Error(`agency and committeeName are required for operation ${params.operation}`, { cause: "BadRequest" });
+    }
+  }
+
+  getLegUrl(params: CommitteeInputParams) : string {
+    const committeeURL =
+      "https://wslwebservices.leg.wa.gov/CommitteeService.asmx";
+    return `${committeeURL}/GetActiveCommitteeMembers?agency=${
         encodeURIComponent(params.agency!)
       }&committeeName=${encodeURIComponent(params.committeeName!)}`;
-    case "GetActiveCommittees":
-      return `${committeeURL}/GetActiveCommittees`;
-    case "GetCommitteeReferralsByCommittee":
-      return `${committeeActionURL}/GetCommitteeReferralsByCommittee?biennium=${
-        encodeURIComponent(params.biennium!)
-      }&agency=${encodeURIComponent(params.agency!)}&committeeName=${
-        encodeURIComponent(params.committeeName!)
-      }`;
-    default:
-      return committeeURL;
   }
+
+  getEntities(json: any) : any {
+      return json["ArrayOfMember"]["Member"];
+  }
+
 }
 
-function getEntities(operation: string, json: any) {
-  switch (operation) {
-    case "GetActiveCommitteeMembers":
-      return json["ArrayOfMember"]["Member"];
-    case "GetActiveCommittees":
-      return json["ArrayOfCommittee"]["Committee"];
-    case "GetCommitteeReferralsByCommittee":
+class GetCommitteeReferralsByCommitteeWorker implements ServiceWorker<CommitteeInputParams>{
+
+  validate(params: CommitteeInputParams) {
+    if (
+      (!params.agency || !params.committeeName)
+    ) {
+      throw new Error(`agency and committeeName are required for operation ${params.operation}`, { cause: "BadRequest" });
+    }
+  }
+
+  getLegUrl(params: CommitteeInputParams) : string {
+    const committeeActionURL =
+      "https://wslwebservices.leg.wa.gov/CommitteeActionService.asmx";
+    return `${committeeActionURL}/GetCommitteeReferralsByCommittee?biennium=${
+          encodeURIComponent(params.biennium!)
+        }&agency=${encodeURIComponent(params.agency!)}&committeeName=${
+          encodeURIComponent(params.committeeName!)
+        }`;
+  }
+
+  getEntities(json: any) : any {
       return json["ArrayOfCommitteeReferral"]["CommitteeReferral"];
+  }
+
+}
+
+function getWorker(params: CommitteeInputParams) {
+  switch(params.operation) {
+    case "GetActiveCommittees":
+      return new GetActiveCommitteesWorker();
+    case "GetActiveCommitteeMembers":
+      return new GetActiveCommitteeMembersWorker();
+    case "GetCommitteeReferralsByCommittee":
+      return new GetCommitteeReferralsByCommitteeWorker();
     default:
-      return [];
+      throw Error(`Unknown operation: ${params.operation}` )
   }
 }
 
@@ -117,15 +129,18 @@ Deno.serve(async (req) => {
 
   try {
     const params = await req.json();
-    validateParams(params);
-    const url = getLegUrl(params);
-    const parser = new XMLParser();
+
+    const worker = getWorker(params);
+
+    worker.validate(params);
+    
+    const url = worker.getLegUrl(params);
     const response = await fetch(url);
     const xmlText = await response.text();
+    
+    const parser = new XMLParser();
     const json = parser.parse(xmlText);
-
-    const entities = getEntities(params, json);
-
+    const entities = worker.getEntities(json);
     return new Response(JSON.stringify(entities), {
       headers: {
         "Content-Type": "application/json",
