@@ -1,0 +1,17 @@
+/Users/judedonkor/das/league-of-women-voters
+├── README.md
+├── firebase.json
+├── index.html
+├── node_modules
+├── package-lock.json
+├── package.json
+├── public
+├── src
+├── supabase
+├── test
+├── tsconfig.json
+├── tsconfig.node.json
+└── vite.config.ts
+
+directory: 5 file: 8
+

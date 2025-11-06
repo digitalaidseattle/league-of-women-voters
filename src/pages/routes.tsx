@@ -8,6 +8,8 @@ import {
   MinimalLayout
 } from "@digitalaidseattle/mui";
 import CommitteePage from './extra-pages/CommitteePage';
+import BillsPage from './extra-pages/BillsPage';
+import BillDetailPage from './extra-pages/BillDetailPage';
 import SponsorPage from './extra-pages/SponsorPage';
 import SponsorsPage from './extra-pages/SponsorsPage';
 
@@ -27,6 +29,14 @@ const routes = [
       {
         path: "committee",
         element: <CommitteePage />,
+      },
+      {
+        path: "bills",
+        element: <BillsPage />,
+      },
+      {
+        path: "bill",
+        element: <BillDetailPage />,
       },
       {
         path: "sponsors",
