@@ -27,7 +27,7 @@
 
 */
 import { XMLParser } from "https://esm.sh/fast-xml-parser@4.3.5";
-
+import { ServiceWorker } from "../types.ts";
 
 type GetAllDocumentsParams = {
   biennium: string;
