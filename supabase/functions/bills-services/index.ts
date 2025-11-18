@@ -34,79 +34,63 @@ type GetAllDocumentsParams = {
   documentClass: string;
 };
 
-class GetAllDocumentsByClass implements ServiceWorker<GetAllDocumentsParams>{
+class GetAllDocumentsByClass implements ServiceWorker<GetAllDocumentsParams> {
   validate(params: GetAllDocumentsParams) {
-    if (
-      ((!params.biennium || !params.documentClass))
-    ) {
+    if (!params.biennium || !params.documentClass) {
       throw new Error(
-        `Missing required parameters: biennium, documentClass,`,
+        `Missing required parameters: biennium, documentClass`,
         { cause: "BadRequest" },
       );
     }
   }
 
-  getLegUrl (params: GetAllDocumentsParams): string {
+  getLegUrl(params: GetAllDocumentsParams): string {
     return `https://wslwebservices.leg.wa.gov/LegislativeDocumentService.asmx/GetAllDocumentsByClass?biennium=${encodeURIComponent(
-        params.biennium,
-      )}&documentClass=${encodeURIComponent(params.documentClass)}`
-  };
+      params.biennium,
+    )}&documentClass=${encodeURIComponent(params.documentClass)}`;
+  }
 
-  getEntities (json: any):any {
-    return json["ArrayOfLegislativeDocument"]["LegislativeDocument"];
-  };
-  
+  // Parse JSON, normalize array, and add Url field
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  getEntities(json: any): any {
+    const rawDocs =
+      json?.ArrayOfLegislativeDocument?.LegislativeDocument ?? [];
+    const docsArray = Array.isArray(rawDocs)
+      ? rawDocs
+      : [rawDocs].filter(Boolean);
+
+    return docsArray.map((doc) => {
+      const name = (doc?.Name ?? doc?.name ?? "") + "";
+      const biennium = (doc?.Biennium ?? doc?.biennium ?? "") + "";
+
+      // Extract year from biennium, e.g. "2025-26" → "2025"
+      const year =
+        typeof biennium === "string" && biennium.length >= 4
+          ? biennium.slice(0, 4)
+          : "2025";
+
+      const billNumber = encodeURIComponent(name);
+      const yearEncoded = encodeURIComponent(year);
+
+      const Url = `https://app.leg.wa.gov/BillSummary/?BillNumber=${billNumber}&Year=${yearEncoded}&Initiative=false`;
+
+      return { ...doc, Url };
+    });
+  }
 }
+
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 function getWorker(params: GetAllDocumentsParams) {
-       return new GetAllDocumentsByClass();
+  return new GetAllDocumentsByClass();
 }
 
-// Build Legislative Document URL 
-function getLegUrl({
-  biennium,
-  documentClass,
-}: {
-  biennium: string;
-  documentClass: string;
-}) {
-  return `https://wslwebservices.leg.wa.gov/LegislativeDocumentService.asmx/GetAllDocumentsByClass?biennium=${encodeURIComponent(
-    biennium,
-  )}&documentClass=${encodeURIComponent(documentClass)}`;
-}
-
-// Use removeNSPrefix to avoid namespace surprises
+// Global XML parser (removeNSPrefix to avoid namespace issues)
 const parser = new XMLParser({ removeNSPrefix: true });
-
-//  Parse JSON and add url field to each document
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-function getEntities(json: any) {
-  const rawDocs =
-    json?.ArrayOfLegislativeDocument?.LegislativeDocument ?? [];
-  const docsArray = Array.isArray(rawDocs) ? rawDocs : [rawDocs].filter(Boolean);
-
-  return docsArray.map((doc) => {
-    const name = (doc?.Name ?? doc?.name ?? "") + "";
-    const biennium = (doc?.Biennium ?? doc?.biennium ?? "") + "";
-
-    // Take only first 4 digits of Biennium for Year (e.g., "2025-26" → "2025")
-    const year =
-      typeof biennium === "string" && biennium.length >= 4
-        ? biennium.slice(0, 4)
-        : "2025";
-
-    const billNumber = encodeURIComponent(name);
-    const yearEncoded = encodeURIComponent(year);
-
-    const Url = `https://app.leg.wa.gov/BillSummary/?BillNumber=${billNumber}&Year=${yearEncoded}&Initiative=false`;
-
-    return { ...doc, Url };
-  });
-}
-
 
 Deno.serve(async (req) => {
   const origin = req.headers.get("origin") || "*";
 
+  // Handle CORS preflight
   if (req.method === "OPTIONS") {
     return new Response(null, {
       status: 204,
@@ -121,25 +105,33 @@ Deno.serve(async (req) => {
   }
 
   try {
-     const params = await req.json();
- 
-     const worker = getWorker(params);
- 
-     worker.validate(params);
-     
-     const url = worker.getLegUrl(params);
-     const response = await fetch(url);
-     const xmlText = await response.text();
-     
-     const parser = new XMLParser();
-     const json = parser.parse(xmlText);
-     const entities = worker.getEntities(json);
-     return new Response(JSON.stringify(entities), {
-       headers: {
-         "Content-Type": "application/json",
-         "Access-Control-Allow-Origin": origin,
-       },
-     });
+    const params = await req.json();
+    const worker = getWorker(params);
+
+    worker.validate(params);
+
+    const url = worker.getLegUrl(params);
+    const response = await fetch(url, {
+      method: "GET",
+      headers: {
+        "Content-Type": "text/xml;charset=UTF-8",
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error(`Upstream request failed with status ${response.status}`);
+    }
+
+    const xmlText = await response.text();
+    const json = parser.parse(xmlText);
+    const entities = worker.getEntities(json);
+
+    return new Response(JSON.stringify(entities), {
+      headers: {
+        "Content-Type": "application/json",
+        "Access-Control-Allow-Origin": origin,
+      },
+    });
   } catch (err) {
     console.error("SOAP request failed:", err);
     const statusCode = err.cause === "BadRequest" ? 400 : 500;
