@@ -2,7 +2,10 @@ import { supabaseClient } from "@digitalaidseattle/supabase";
 import type { LegislativeDocument } from "./bill";
 
 
-const CURRENT_BIENNIUM = import.meta.env.VITE_LWVW_CURRENT_BIENNIUM ?? "2023-24";
+const CURRENT_BIENNIUM = import.meta.env.VITE_LWVW_CURRENT_BIENNIUM;
+if (!CURRENT_BIENNIUM) {
+  throw new Error("VITE_LWVW_CURRENT_BIENNIUM is required but was not provided.");
+}
 
 class LegislatureService {
   private static instance: LegislatureService;
