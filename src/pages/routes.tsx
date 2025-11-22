@@ -14,7 +14,7 @@ import SponsorsPage from './extra-pages/SponsorsPage';
 const routes = [
   {
     path: "/",
-    element: <MainLayout />,
+    element: <MainLayout sx={{ p: 1 }} />,
     children: [
       {
         path: "",

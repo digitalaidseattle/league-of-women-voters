@@ -3,8 +3,8 @@ import { ReloadOutlined } from "@ant-design/icons";
 import { useEffect, useState } from 'react';
 
 import { PageInfo } from "@digitalaidseattle/supabase";
-import { Card, CardContent, CardHeader, IconButton, Toolbar, Tooltip } from '@mui/material';
-import { DataGrid, GridColDef, useGridApiRef } from "@mui/x-data-grid";
+import { Card, CardContent, CardHeader, IconButton, Tooltip } from '@mui/material';
+import { DataGrid, GridColDef, Toolbar, useGridApiRef } from "@mui/x-data-grid";
 import { useNavigate } from "react-router";
 import { LegislatureService } from '../../api/legislatureService';
 // project import
