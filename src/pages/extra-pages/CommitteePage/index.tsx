@@ -4,11 +4,11 @@
  *  @copyright 2024 Digital Aid Seattle
  *
  */
-import { Box, Card, CardContent, CardHeader, Stack, Tab, Tabs, Toolbar, Typography } from '@mui/material';
+import { Box, Card, CardContent, CardHeader, Tab, Tabs } from '@mui/material';
+import { useState } from 'react';
 import { useSearchParams } from "react-router-dom";
 import MembersGrid from './MembersGrid';
 import ReferralsGrid from './ReferralsGrid';
-import { useState } from 'react';
 // project import
 
 interface TabPanelProps {
