@@ -20,7 +20,7 @@ class LegislatureService {
       .invoke("sponsors", {
         body: { biennium: "2023-24" },
       })
-      .then((resp) => resp.data as Member[]);
+      .then((resp: any) => resp.data as Member[]);
   }
 
   public async getCommittees(): Promise<Committee[]> {
@@ -28,7 +28,7 @@ class LegislatureService {
       .invoke("committee-services", {
         body: { operation: 'GetActiveCommittees'},
       })
-      .then((resp) => resp.data as Committee[]);
+      .then((resp: any) => resp.data as Committee[]);
   }
 
   public async getCommitteeMembers(
@@ -39,7 +39,7 @@ class LegislatureService {
       .invoke("committee-services", {
         body: { operation: 'GetActiveCommitteeMembers', agency: agency, committeeName: committeeName },
       })
-      .then((resp) => resp.data as Member[]);
+      .then((resp: any) => resp.data as Member[]);
   }
 
   public async GetCommitteeReferralsByCommittee(
@@ -50,7 +50,7 @@ class LegislatureService {
       .invoke("committee-services", {
         body: { operation: 'GetCommitteeReferralsByCommittee', biennium: CURRENT_BIENNIUM, agency: agency, committeeName: committeeName },
       })
-      .then((resp) => resp.data as Member[]);
+      .then((resp: any) => resp.data as Member[]);
   }
 }
 
