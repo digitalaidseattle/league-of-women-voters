@@ -3,8 +3,8 @@ import { ReloadOutlined } from "@ant-design/icons";
 import { useEffect, useState } from 'react';
 
 import { PageInfo } from "@digitalaidseattle/supabase";
-import { Box, IconButton, Toolbar, Tooltip, Typography } from '@mui/material';
-import { DataGrid, GridColDef, useGridApiRef } from "@mui/x-data-grid";
+import { Box, Card, CardContent, CardHeader, IconButton, Tooltip, Typography } from '@mui/material';
+import { DataGrid, GridColDef, Toolbar, useGridApiRef } from "@mui/x-data-grid";
 import { useNavigate } from "react-router";
 import { LegislatureService } from '../../api/legislatureService';
 // project import
@@ -91,18 +91,21 @@ const SponsorsPage = () => {
     ];
   };
 
-  return (
-    <Box sx={{ marginTop: 1 }}>
+  function CustomToolbar() {
+    return (
       <Toolbar>
-        <Typography variant="h3" component="div" sx={{ flexGrow: 1 }}>
-          Sponsors
-        </Typography>
         <Tooltip title="Refresh">
           <IconButton color="primary" onClick={refresh}>
             <ReloadOutlined />
           </IconButton>
         </Tooltip>
       </Toolbar>
+    )
+  }
+  return (
+    <Card sx={{ spacing: 0 }}>
+      <CardHeader sx={{ padding: 1 }} title="Sponsors" />
+      <CardContent sx={{ padding: 0.5 }}></CardContent>
       <DataGrid
         getRowId={(row) => row.Id}
         apiRef={apiRef}
@@ -112,9 +115,12 @@ const SponsorsPage = () => {
         onPaginationModelChange={setPaginationModel}
         pageSizeOptions={[10, 25, 50, 100]}
         onRowDoubleClick={params => navigate(`/sponsor?id=${params.row.Id}`)}
-
+        showToolbar={true}
+        slots={{
+          toolbar: CustomToolbar
+        }}
       />
-    </Box>
+    </Card>
   )
 };
 

@@ -3,8 +3,8 @@ import { ReloadOutlined } from "@ant-design/icons";
 import { useEffect, useState } from 'react';
 
 import { PageInfo } from "@digitalaidseattle/supabase";
-import { Box, IconButton, Toolbar, Tooltip, Typography } from '@mui/material';
-import { DataGrid, GridColDef, useGridApiRef } from "@mui/x-data-grid";
+import { Box, Card, CardContent, CardHeader, Tooltip } from '@mui/material';
+import { ColumnsPanelTrigger, DataGrid, FilterPanelTrigger, GridColDef, GridFilterListIcon, GridViewColumnIcon, Toolbar, ToolbarButton, useGridApiRef } from "@mui/x-data-grid";
 import { useNavigate } from "react-router";
 import { LegislatureService } from '../../api/legislatureService';
 // project import
@@ -84,29 +84,50 @@ const CommitteesPage = () => {
     ];
   };
 
-  return (
-    <Box sx={{ marginTop: 1 }}>
+  function CommitteesToolbar() {
+    return (
       <Toolbar>
-        <Typography variant="h3" component="div" sx={{ flexGrow: 1 }}>
-          Committees
-        </Typography>
-        <Tooltip title="Refresh">
-          <IconButton color="primary" onClick={refresh}>
-            <ReloadOutlined />
-          </IconButton>
-        </Tooltip>
+        <Box sx={{ flexGrow: 1 }}>
+          <Tooltip title="Refresh">
+            <ToolbarButton color="primary" onClick={refresh}>
+              <ReloadOutlined />
+            </ToolbarButton>
+          </Tooltip>
+        </Box>
+        <Box>
+          <ColumnsPanelTrigger render={<ToolbarButton />}>
+            <GridViewColumnIcon fontSize="small" />
+          </ColumnsPanelTrigger>
+          <FilterPanelTrigger render={<ToolbarButton />}>
+            <GridFilterListIcon fontSize="small" />
+          </FilterPanelTrigger>
+        </Box>
       </Toolbar>
-      <DataGrid
-        getRowId={(row) => row.Id}
-        apiRef={apiRef}
-        rows={pageInfo.rows}
-        columns={columns}
-        paginationModel={paginationModel}
-        onPaginationModelChange={setPaginationModel}
-        pageSizeOptions={[10, 25, 50, 100]}
-        onRowDoubleClick={openCommittee}
-      />
-    </Box>
+    )
+  }
+
+  return (
+    <Card sx={{ spacing: 0 }}>
+      <CardHeader sx={{ padding: 1 }} title="Committees" />
+      <CardContent sx={{ padding: 0.5 }}>
+        <DataGrid
+          sx={{ marginTop: 1 }}
+          getRowId={(row) => row.Id}
+          apiRef={apiRef}
+          rows={pageInfo.rows}
+          columns={columns}
+          paginationModel={paginationModel}
+          onPaginationModelChange={setPaginationModel}
+          pageSizeOptions={[10, 25, 50, 100]}
+          onRowDoubleClick={openCommittee}
+
+          showToolbar={true}
+          slots={{
+            toolbar: CommitteesToolbar
+          }}
+        />
+      </CardContent>
+    </Card>
   )
 };
 
