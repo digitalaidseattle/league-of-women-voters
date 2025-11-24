@@ -6,7 +6,7 @@ const CURRENT_BIENNIUM = import.meta.env.VITE_LWVW_CURRENT_BIENNIUM;
 class LegislatureService {
   private static instance: LegislatureService;
 
-  private constructor() {}
+  private constructor() { }
 
   public static getInstance(): LegislatureService {
     if (!LegislatureService.instance) {
@@ -18,7 +18,7 @@ class LegislatureService {
   public async getSponsors(): Promise<Member[]> {
     return supabaseClient.functions
       .invoke("sponsors", {
-        body: { biennium: "2023-24" },
+        body: { biennium: CURRENT_BIENNIUM },
       })
       .then((resp: any) => resp.data as Member[]);
   }
@@ -26,7 +26,7 @@ class LegislatureService {
   public async getCommittees(): Promise<Committee[]> {
     return supabaseClient.functions
       .invoke("committee-services", {
-        body: { operation: 'GetActiveCommittees'},
+        body: { operation: 'GetActiveCommittees' },
       })
       .then((resp: any) => resp.data as Committee[]);
   }
