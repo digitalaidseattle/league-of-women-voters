@@ -64,7 +64,7 @@ class LegislatureService {
       .invoke("bills-services", {
         body: { biennium: CURRENT_BIENNIUM, documentClass },
       })
-      .then((resp) => resp.data as LegislativeDocument[]);
+      .then((resp: any) => resp.data as LegislativeDocument[]);
   }
 }
 
