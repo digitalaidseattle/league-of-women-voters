@@ -93,25 +93,34 @@ function extractBillNumber(
     bill?.Description
   ];
 
-  for (const value of possibilities) {
-    if (typeof value !== "string") {
-      continue;
-    }
-    const digitsOnly = value.replace(/\D+/g, "");
-    if (digitsOnly.length > 0) {
-      return digitsOnly;
-    }
-  }
-  return undefined;
+  return possibilities
+    .filter(poss => poss)
+    .map(poss => poss!.replace(/\D+/g, ""))
+    .find(poss => poss.length > 0)
+
+  // for (const value of possibilities) {
+  //   if (typeof value !== "string") {
+  //     continue;
+  //   }
+  //   const digitsOnly = value.replace(/\D+/g, "");
+  //   if (digitsOnly.length > 0) {
+  //     return digitsOnly;
+  //   }
+  // }
+  // return undefined;
 }
 
 function stringFallback(candidates: Array<string | undefined | null>) {
-  for (const candidate of candidates) {
-    if (typeof candidate === "string" && candidate.trim().length > 0) {
-      return candidate.trim();
-    }
-  }
-  return "";
+  const found = candidates
+    .find(candidate => typeof candidate === "string" && candidate.trim().length > 0);
+  return found ? found.trim() : "";
+
+  // for (const candidate of candidates) {
+  //   if (typeof candidate === "string" && candidate.trim().length > 0) {
+  //     return candidate.trim();
+  //   }
+  // }
+  // return "";
 }
 
 function deriveCommittee(bill: LegislativeDocument) {
@@ -119,8 +128,8 @@ function deriveCommittee(bill: LegislativeDocument) {
     Array.isArray(bill.CommitteeNames?.CommitteeName)
       ? bill.CommitteeNames?.CommitteeName?.[0]
       : typeof bill.CommitteeNames?.CommitteeName === "string"
-      ? bill.CommitteeNames.CommitteeName
-      : undefined,
+        ? bill.CommitteeNames.CommitteeName
+        : undefined,
     bill.CommitteeName,
     bill.OriginatingAgency,
     bill.Agency
@@ -238,7 +247,7 @@ function displayValue(value: string) {
 }
 
 function summarizeSponsors(bill: LegislativeDocument): string {
-  const sponsorField = bill?.Sponsors;
+  const sponsorField = bill.Sponsors;
   if (!sponsorField) {
     return "";
   }

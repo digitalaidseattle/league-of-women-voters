@@ -1,10 +1,13 @@
 import {
+  ExpandAltOutlined,
   ReloadOutlined,
-  SearchOutlined,
-  ExpandAltOutlined
+  SearchOutlined
 } from "@ant-design/icons";
 import {
   Box,
+  Card,
+  CardContent,
+  CardHeader,
   IconButton,
   InputAdornment,
   Link,
@@ -12,8 +15,7 @@ import {
   Tabs,
   TextField,
   Toolbar,
-  Tooltip,
-  Typography
+  Tooltip
 } from "@mui/material";
 import {
   DataGrid,
@@ -23,8 +25,8 @@ import {
 } from "@mui/x-data-grid";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { LegislatureService } from "../../api/legislatureService";
 import type { BillRow, LegislativeDocument } from "../../api/bill";
+import { LegislatureService } from "../../api/legislatureService";
 import { mapLegislativeDocumentToBillRow, sanitizeBillUrl } from "../../utils/bills";
 
 const DEFAULT_DOCUMENT_CLASS = "Bills";
@@ -179,75 +181,83 @@ const BillsPage = () => {
     });
   }, [rows, tab, search]);
 
-  return (
-    <Box sx={{ marginTop: 1 }}>
-      <Toolbar>
-        <Typography variant="h3" component="div" sx={{ flexGrow: 1 }}>
-          Bills
-        </Typography>
-        <TextField
-          value={search}
-          onChange={(event) => setSearch(event.target.value)}
-          size="small"
-          placeholder="Search"
-          sx={{ width: 220, mr: 1.5 }}
-          InputProps={{
-            startAdornment: (
-              <InputAdornment position="start">
-                <SearchOutlined />
-              </InputAdornment>
-            )
-          }}
-        />
-        <Tooltip title="Open Bill Search">
-          <IconButton
-            color="primary"
-            onClick={() => window.open(BILL_SEARCH_URL, "_blank", "noopener")}
-          >
-            <ExpandAltOutlined />
-          </IconButton>
-        </Tooltip>
-        <Tooltip title="Refresh">
-          <IconButton color="primary" onClick={fetchBills}>
-            <ReloadOutlined />
-          </IconButton>
-        </Tooltip>
-      </Toolbar>
-      <Tabs
-        value={tab}
-        onChange={(_event, value: TabValue) => setTab(value)}
-        aria-label="bill chamber filter"
-        sx={{ mb: 2 }}
-      >
-        {tabs.map((tabOption) => (
-          <Tab key={tabOption.value} label={tabOption.label} value={tabOption.value} />
-        ))}
-      </Tabs>
-      <DataGrid
-        apiRef={apiRef}
-        autoHeight
-        rows={filteredRows}
-        columns={columns}
-        loading={loading}
-        getRowId={(row) => row.id}
-        paginationModel={paginationModel}
-        onPaginationModelChange={setPaginationModel}
-        pageSizeOptions={[10, 25, 50, 100]}
-        disableRowSelectionOnClick
-        onRowDoubleClick={(params) => {
-          const row = params.row as BillRow;
-          const targetBill =
-            row?.normalizedBillNumber ||
-            row?.billNumber?.replace(/\D+/g, "") ||
-            "";
-          const rawName = row?.raw?.Name ?? "";
-          if (!targetBill) {
-            return;
-          }
-          navigate(`/bill?number=${encodeURIComponent(targetBill)}&name=${encodeURIComponent(rawName)}`);
+  function CustomToolbar() {
+    return (<Toolbar>
+      <Box sx={{ marginTop: 1, flexGrow: 1 }}>
+        <Tabs
+          value={tab}
+          onChange={(_event, value: TabValue) => setTab(value)}
+          aria-label="bill chamber filter"
+          sx={{ mb: 2 }}
+        >
+          {tabs.map((tabOption) => (
+            <Tab key={tabOption.value} label={tabOption.label} value={tabOption.value} />
+          ))}
+        </Tabs>
+      </Box>
+      <TextField
+        value={search}
+        onChange={(event) => setSearch(event.target.value)}
+        size="small"
+        placeholder="Search"
+        sx={{ width: 220, mr: 1.5 }}
+        InputProps={{
+          startAdornment: (
+            <InputAdornment position="start">
+              <SearchOutlined />
+            </InputAdornment>
+          )
         }}
       />
-    </Box>
+      <Tooltip title="Open Bill Search">
+        <IconButton
+          color="primary"
+          onClick={() => window.open(BILL_SEARCH_URL, "_blank", "noopener")}
+        >
+          <ExpandAltOutlined />
+        </IconButton>
+      </Tooltip>
+      <Tooltip title="Refresh">
+        <IconButton color="primary" size="small" onClick={fetchBills}>
+          <ReloadOutlined />
+        </IconButton>
+      </Tooltip>
+    </Toolbar>
+    );
+  }
+
+  return (
+    <Card>
+      <CardHeader title="Bills" />
+      <CardContent>
+        <DataGrid
+          apiRef={apiRef}
+          autoHeight
+          rows={filteredRows}
+          columns={columns}
+          loading={loading}
+          getRowId={(row) => row.id}
+          paginationModel={paginationModel}
+          onPaginationModelChange={setPaginationModel}
+          pageSizeOptions={[10, 25, 50, 100]}
+          disableRowSelectionOnClick
+          onRowDoubleClick={(params) => {
+            const row = params.row as BillRow;
+            const targetBill =
+              row?.normalizedBillNumber ||
+              row?.billNumber?.replace(/\D+/g, "") ||
+              "";
+            const rawName = row?.raw?.Name ?? "";
+            if (!targetBill) {
+              return;
+            }
+            navigate(`/bill?number=${encodeURIComponent(targetBill)}&name=${encodeURIComponent(rawName)}`);
+          }}
+          showToolbar={true}
+          slots={{ toolbar: CustomToolbar }}
+        />
+      </CardContent>
+    </Card>
   );
 };
 
