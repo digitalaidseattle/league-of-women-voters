@@ -19,8 +19,12 @@ SOAPAction: "http://WSLWebServices.leg.wa.gov/GetActiveCommitteeMembers"
 </pre>
 
  */
-import { XMLParser } from "https://esm.sh/fast-xml-parser@4.3.5";
-import { ServiceWorker } from "../types.ts";
+
+// src/supabase/functions/committee-services/index.ts
+
+import type { ServiceWorker } from "../types.ts";
+import { handleCors } from "../../../utils/cors.ts";
+import { runService } from "../../../utils/service_runner.ts";
 
 type CommitteeInputParams = {
   operation: string;
@@ -29,76 +33,81 @@ type CommitteeInputParams = {
   committeeName?: string;
 };
 
-class GetActiveCommitteesWorker implements ServiceWorker<CommitteeInputParams>{
-
+class GetActiveCommitteesWorker
+  implements ServiceWorker<CommitteeInputParams>
+{
   validate(_params: CommitteeInputParams) {
     // nothing to check
   }
 
-  getLegUrl(_params: CommitteeInputParams) : string {
+  getLegUrl(_params: CommitteeInputParams): string {
     const committeeURL =
       "https://wslwebservices.leg.wa.gov/CommitteeService.asmx";
     return `${committeeURL}/GetActiveCommittees`;
   }
 
-  getEntities(json: any) : any {
-      return json["ArrayOfCommittee"]["Committee"];
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  getEntities(json: any): any {
+    return json["ArrayOfCommittee"]["Committee"];
   }
-
 }
 
-class GetActiveCommitteeMembersWorker implements ServiceWorker<CommitteeInputParams>{
-
+class GetActiveCommitteeMembersWorker
+  implements ServiceWorker<CommitteeInputParams>
+{
   validate(params: CommitteeInputParams) {
-    if (
-      (!params.agency || !params.committeeName)
-    ) {
-      throw new Error(`agency and committeeName are required for operation ${params.operation}`, { cause: "BadRequest" });
+    if (!params.agency || !params.committeeName) {
+      throw new Error(
+        `agency and committeeName are required for operation ${params.operation}`,
+        { cause: "BadRequest" },
+      );
     }
   }
 
-  getLegUrl(params: CommitteeInputParams) : string {
+  getLegUrl(params: CommitteeInputParams): string {
     const committeeURL =
       "https://wslwebservices.leg.wa.gov/CommitteeService.asmx";
     return `${committeeURL}/GetActiveCommitteeMembers?agency=${
-        encodeURIComponent(params.agency!)
-      }&committeeName=${encodeURIComponent(params.committeeName!)}`;
+      encodeURIComponent(params.agency!)
+    }&committeeName=${encodeURIComponent(params.committeeName!)}`;
   }
 
-  getEntities(json: any) : any {
-      return json["ArrayOfMember"]["Member"];
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  getEntities(json: any): any {
+    return json["ArrayOfMember"]["Member"];
   }
-
 }
 
-class GetCommitteeReferralsByCommitteeWorker implements ServiceWorker<CommitteeInputParams>{
-
+class GetCommitteeReferralsByCommitteeWorker
+  implements ServiceWorker<CommitteeInputParams>
+{
   validate(params: CommitteeInputParams) {
-    if (
-      (!params.agency || !params.committeeName)
-    ) {
-      throw new Error(`agency and committeeName are required for operation ${params.operation}`, { cause: "BadRequest" });
+    if (!params.agency || !params.committeeName || !params.biennium) {
+      throw new Error(
+        `agency, committeeName, and biennium are required for operation ${params.operation}`,
+        { cause: "BadRequest" },
+      );
     }
   }
 
-  getLegUrl(params: CommitteeInputParams) : string {
+  getLegUrl(params: CommitteeInputParams): string {
     const committeeActionURL =
       "https://wslwebservices.leg.wa.gov/CommitteeActionService.asmx";
     return `${committeeActionURL}/GetCommitteeReferralsByCommittee?biennium=${
-          encodeURIComponent(params.biennium!)
-        }&agency=${encodeURIComponent(params.agency!)}&committeeName=${
-          encodeURIComponent(params.committeeName!)
-        }`;
+      encodeURIComponent(params.biennium!)
+    }&agency=${encodeURIComponent(params.agency!)}&committeeName=${
+      encodeURIComponent(params.committeeName!)
+    }`;
   }
 
-  getEntities(json: any) : any {
-      return json["ArrayOfCommitteeReferral"]["CommitteeReferral"];
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  getEntities(json: any): any {
+    return json["ArrayOfCommitteeReferral"]["CommitteeReferral"];
   }
-
 }
 
 function getWorker(params: CommitteeInputParams) {
-  switch(params.operation) {
+  switch (params.operation) {
     case "GetActiveCommittees":
       return new GetActiveCommitteesWorker();
     case "GetActiveCommitteeMembers":
@@ -106,55 +115,15 @@ function getWorker(params: CommitteeInputParams) {
     case "GetCommitteeReferralsByCommittee":
       return new GetCommitteeReferralsByCommitteeWorker();
     default:
-      throw Error(`Unknown operation: ${params.operation}` )
+      throw new Error(`Unknown operation: ${params.operation}`, {
+        cause: "BadRequest",
+      });
   }
 }
 
 Deno.serve(async (req) => {
-  const origin = req.headers.get("origin") || "*";
+  const cors = handleCors(req);
+  if (cors) return cors;
 
-  // Handle preflight CORS (OPTIONS)
-  if (req.method === "OPTIONS") {
-    return new Response(null, {
-      status: 204,
-      headers: {
-        "Access-Control-Allow-Origin": origin,
-        "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
-        "Access-Control-Allow-Headers":
-          "Content-Type, Authorization, apikey, x-client-info",
-        "Access-Control-Max-Age": "86400",
-      },
-    });
-  }
-
-  try {
-    const params = await req.json();
-
-    const worker = getWorker(params);
-
-    worker.validate(params);
-    
-    const url = worker.getLegUrl(params);
-    const response = await fetch(url);
-    const xmlText = await response.text();
-    
-    const parser = new XMLParser();
-    const json = parser.parse(xmlText);
-    const entities = worker.getEntities(json);
-    return new Response(JSON.stringify(entities), {
-      headers: {
-        "Content-Type": "application/json",
-        "Access-Control-Allow-Origin": origin,
-      },
-    });
-  } catch (err) {
-    const statusCode = err.cause === "BadRequest" ? 400 : 500;
-    return new Response(JSON.stringify({ error: err.message || "Internal Server Error" }), {
-      status: statusCode,
-      headers: {
-        "Content-Type": "application/json",
-        "Access-Control-Allow-Origin": origin,
-      },
-    });
-  }
+  return runService<CommitteeInputParams>(req, getWorker);
 });

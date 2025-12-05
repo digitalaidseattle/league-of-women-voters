@@ -26,15 +26,20 @@
 
 
 */
-import { XMLParser } from "https://esm.sh/fast-xml-parser@4.3.5";
-import { ServiceWorker } from "../types.ts";
+// src/supabase/functions/bills-services/index.ts
+
+import type { ServiceWorker } from "../types.ts";
+import { handleCors } from "../../../utils/cors.ts";
+import { runService } from "../../../utils/service_runner.ts";
 
 type GetAllDocumentsParams = {
   biennium: string;
   documentClass: string;
 };
 
-class GetAllDocumentsByClass implements ServiceWorker<GetAllDocumentsParams> {
+class GetAllDocumentsByClass
+  implements ServiceWorker<GetAllDocumentsParams>
+{
   validate(params: GetAllDocumentsParams) {
     if (!params.biennium || !params.documentClass) {
       throw new Error(
@@ -45,12 +50,11 @@ class GetAllDocumentsByClass implements ServiceWorker<GetAllDocumentsParams> {
   }
 
   getLegUrl(params: GetAllDocumentsParams): string {
-    return `https://wslwebservices.leg.wa.gov/LegislativeDocumentService.asmx/GetAllDocumentsByClass?biennium=${encodeURIComponent(
-      params.biennium,
-    )}&documentClass=${encodeURIComponent(params.documentClass)}`;
+    return `https://wslwebservices.leg.wa.gov/LegislativeDocumentService.asmx/GetAllDocumentsByClass?biennium=${
+      encodeURIComponent(params.biennium)
+    }&documentClass=${encodeURIComponent(params.documentClass)}`;
   }
 
-  // Parse JSON, normalize array, and add Url field
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   getEntities(json: any): any {
     const rawDocs =
@@ -63,7 +67,6 @@ class GetAllDocumentsByClass implements ServiceWorker<GetAllDocumentsParams> {
       const name = (doc?.Name ?? doc?.name ?? "") + "";
       const biennium = (doc?.Biennium ?? doc?.biennium ?? "") + "";
 
-      // Extract year from biennium, e.g. "2025-26" → "2025"
       const year =
         typeof biennium === "string" && biennium.length >= 4
           ? biennium.slice(0, 4)
@@ -72,78 +75,21 @@ class GetAllDocumentsByClass implements ServiceWorker<GetAllDocumentsParams> {
       const billNumber = encodeURIComponent(name);
       const yearEncoded = encodeURIComponent(year);
 
-      const Url = `https://app.leg.wa.gov/BillSummary/?BillNumber=${billNumber}&Year=${yearEncoded}&Initiative=false`;
+      const Url =
+        `https://app.leg.wa.gov/BillSummary/?BillNumber=${billNumber}&Year=${yearEncoded}&Initiative=false`;
 
       return { ...doc, Url };
     });
   }
 }
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-function getWorker(params: GetAllDocumentsParams) {
+function getWorker(_params: GetAllDocumentsParams) {
   return new GetAllDocumentsByClass();
 }
 
-// Global XML parser (removeNSPrefix to avoid namespace issues)
-const parser = new XMLParser({ removeNSPrefix: true });
-
 Deno.serve(async (req) => {
-  const origin = req.headers.get("origin") || "*";
+  const cors = handleCors(req);
+  if (cors) return cors;
 
-  // Handle CORS preflight
-  if (req.method === "OPTIONS") {
-    return new Response(null, {
-      status: 204,
-      headers: {
-        "Access-Control-Allow-Origin": origin,
-        "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
-        "Access-Control-Allow-Headers":
-          "Content-Type, Authorization, apikey, x-client-info",
-        "Access-Control-Max-Age": "86400",
-      },
-    });
-  }
-
-  try {
-    const params = await req.json();
-    const worker = getWorker(params);
-
-    worker.validate(params);
-
-    const url = worker.getLegUrl(params);
-    const response = await fetch(url, {
-      method: "GET",
-      headers: {
-        "Content-Type": "text/xml;charset=UTF-8",
-      },
-    });
-
-    if (!response.ok) {
-      throw new Error(`Upstream request failed with status ${response.status}`);
-    }
-
-    const xmlText = await response.text();
-    const json = parser.parse(xmlText);
-    const entities = worker.getEntities(json);
-
-    return new Response(JSON.stringify(entities), {
-      headers: {
-        "Content-Type": "application/json",
-        "Access-Control-Allow-Origin": origin,
-      },
-    });
-  } catch (err) {
-    console.error("SOAP request failed:", err);
-    const statusCode = err.cause === "BadRequest" ? 400 : 500;
-    return new Response(
-      JSON.stringify({ error: err.message || "Internal Server Error" }),
-      {
-        status: statusCode,
-        headers: {
-          "Content-Type": "application/json",
-          "Access-Control-Allow-Origin": origin,
-        },
-      },
-    );
-  }
+  return runService<GetAllDocumentsParams>(req, getWorker);
 });
