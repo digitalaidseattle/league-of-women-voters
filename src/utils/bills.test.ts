@@ -5,7 +5,6 @@
  *
  */
 import { describe, expect, it } from "vitest";
-import { LegislativeDocument } from "../api/bill";
 import { deriveDocumentLink, extractBillNumber, inferChamber, summarizeSponsors } from "./bills";
 
 describe("bills", () => {
