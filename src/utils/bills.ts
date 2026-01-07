@@ -219,16 +219,10 @@ function deriveDocumentLink(bill: LegislativeDocument) {
     bill.SourceUrl ??
     "";
   const sanitizedUrl = sanitizeBillUrl(url, bill);
-  const label = stringFallback([
-    bill.Description,
-    bill.DocumentTypeDescription,
-    bill.DocumentType,
-    bill.DocumentTypeAbbreviation,
-    sanitizedUrl ? "View document" : ""
-  ]);
+
 
   return {
-    label: label || (sanitizedUrl ? "View document" : ""),
+    label: "View document",
     url: sanitizedUrl || undefined
   };
 }
