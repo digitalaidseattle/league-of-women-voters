@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { supabaseClient } from "@digitalaidseattle/supabase";
 import type { LegislativeDocument } from "./bill";
 
