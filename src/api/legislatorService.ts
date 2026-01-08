@@ -43,7 +43,7 @@ class LegislatorService {
             .invoke("legislator-services", {
                 body: {},
             })
-            .then((resp: any) => resp.data);
+            .then((resp: any) => resp.data.filter((item: any) => item !== null && item !== undefined));
     }
 }
 
