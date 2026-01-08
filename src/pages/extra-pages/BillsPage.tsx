@@ -1,20 +1,15 @@
 import {
-  ExpandAltOutlined,
-  HomeOutlined,
   ReloadOutlined,
-  SearchOutlined
+  SearchOutlined,
+  ExpandAltOutlined
 } from "@ant-design/icons";
 import {
   Box,
-  Breadcrumbs,
-  Card,
-  CardContent,
-  CardHeader,
   IconButton,
   InputAdornment,
   Link,
-  Tab,
-  Tabs,
+  ToggleButton,
+  ToggleButtonGroup,
   TextField,
   Toolbar,
   Tooltip,
@@ -23,13 +18,14 @@ import {
 import {
   DataGrid,
   GridColDef,
-  type GridPaginationModel
+  type GridPaginationModel,
+  useGridApiRef
 } from "@mui/x-data-grid";
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { NavLink, useNavigate } from "react-router-dom";
-import type { BillRow, LegislativeDocument } from "../../api/bill";
+import { useNavigate } from "react-router-dom";
 import { LegislatureService } from "../../api/legislatureService";
-import { mapLegislativeDocumentToBillRow, sanitizeBillUrl } from "../../utils/bills";
+import type { BillRow, LegislativeDocument } from "../../api/bill";
+import { BillsService } from "../../utils/bills";
 
 const DEFAULT_DOCUMENT_CLASS = "Bills";
 const BILL_SEARCH_URL = "https://app.leg.wa.gov/billsearch/";
@@ -103,6 +99,7 @@ const columns: GridColDef<BillRow>[] = [
 ];
 
 const BillsPage = () => {
+  const apiRef = useGridApiRef();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [tab, setTab] = useState<TabValue>("all");
@@ -125,7 +122,7 @@ const BillsPage = () => {
             doc.Hyperlink ??
             doc.SourceUrl ??
             "";
-          const sanitizedUrl = sanitizeBillUrl(rawUrl, doc);
+          const sanitizedUrl = BillsService.sanitizeBillUrl(rawUrl, doc);
           console.log("Fetched bill document URL:", sanitizedUrl);
         });
         setRawBills(docs);
@@ -149,120 +146,105 @@ const BillsPage = () => {
 
   const rows = useMemo<BillRow[]>(() => {
     return rawBills
-      .map((bill, index) => mapLegislativeDocumentToBillRow(bill, index))
+      .map((bill, index) => BillsService.mapLegislativeDocumentToBillRow(bill, index))
       .filter(Boolean) as BillRow[];
   }, [rawBills]);
 
-  const filteredRows = useMemo(() => {
-    const loweredQuery = search.trim().toLowerCase();
-    return rows.filter((row) => {
-      const matchesTab =
-        tab === "all" ? true : row.chamber.toLowerCase() === tab;
+  const filterPredicate = useMemo(() => {
+    return BillsService.buildFilterPredicate({ tab, query: search });
+  }, [tab, search]);
 
-      if (!matchesTab) {
-        return false;
-      }
+  const filteredRows = useMemo(() => rows.filter(filterPredicate), [rows, filterPredicate]);
 
-      if (!loweredQuery) {
-        return true;
-      }
+  const handleRowDoubleClick = useCallback((row: BillRow) => {
+    const targetBill =
+      row?.normalizedBillNumber ||
+      row?.billNumber?.replace(/\D+/g, "") ||
+      "";
+    const rawName = row?.raw?.Name ?? "";
+    if (!targetBill) {
+      return;
+    }
+    navigate(`/bill?number=${encodeURIComponent(targetBill)}&name=${encodeURIComponent(rawName)}`);
+  }, [navigate]);
 
-      const haystack = [
-        row.billNumber,
-        row.title,
-        row.committee,
-        row.status,
-        row.history,
-        row.latestDocumentLabel
-      ]
-        .join(" ")
-        .toLowerCase();
+  const handleOpenBillSearch = useCallback(() => {
+    window.open(BILL_SEARCH_URL, "_blank", "noopener");
+  }, []);
 
-      return haystack.includes(loweredQuery);
-    });
-  }, [rows, tab, search]);
-
-  function CustomToolbar() {
-    return (<Toolbar>
-      <Box sx={{ marginTop: 1, flexGrow: 1 }}>
-        <Tabs
-          value={tab}
-          onChange={(_event, value: TabValue) => setTab(value)}
-          aria-label="bill chamber filter"
-          sx={{ mb: 2 }}
-        >
-          {tabs.map((tabOption) => (
-            <Tab key={tabOption.value} label={tabOption.label} value={tabOption.value} />
-          ))}
-        </Tabs>
-      </Box>
-      <TextField
-        value={search}
-        onChange={(event) => setSearch(event.target.value)}
-        size="small"
-        placeholder="Search"
-        sx={{ width: 220, mr: 1.5 }}
-        InputProps={{
-          startAdornment: (
-            <InputAdornment position="start">
-              <SearchOutlined />
-            </InputAdornment>
-          )
+  const BillsToolbar = () => (
+    <Toolbar sx={{ justifyContent: "space-between", gap: 2, p: 1 }}>
+      <ToggleButtonGroup
+        value={tab}
+        exclusive
+        onChange={(_event, value: TabValue | null) => {
+          if (value) {
+            setTab(value);
+          }
         }}
-      />
-      <Tooltip title="Open Bill Search">
-        <IconButton
-          color="primary"
-          onClick={() => window.open(BILL_SEARCH_URL, "_blank", "noopener")}
-        >
-          <ExpandAltOutlined />
-        </IconButton>
-      </Tooltip>
-      <Tooltip title="Refresh">
-        <IconButton color="primary" size="small" onClick={fetchBills}>
-          <ReloadOutlined />
-        </IconButton>
-      </Tooltip>
-    </Toolbar>
-    );
-  }
-
-  return (<>
-    <Breadcrumbs aria-label="breadcrumb">
-      <NavLink to="/" ><IconButton size="medium"><HomeOutlined /></IconButton></NavLink>
-      <Typography color="text.primary">Bills</Typography>
-    </Breadcrumbs>
-    <Card>
-      <CardHeader title="Bills" />
-      <CardContent>
-        <DataGrid
-          autoHeight
-          rows={filteredRows}
-          columns={columns}
-          loading={loading}
-          getRowId={(row) => row.id}
-          paginationModel={paginationModel}
-          onPaginationModelChange={setPaginationModel}
-          pageSizeOptions={[10, 25, 50, 100]}
-          disableRowSelectionOnClick
-          onRowDoubleClick={(params) => {
-            const row = params.row as BillRow;
-            const targetBill =
-              row?.normalizedBillNumber ||
-              row?.billNumber?.replace(/\D+/g, "") ||
-              "";
-            const rawName = row?.raw?.Name ?? "";
-            if (!targetBill) {
-              return;
-            }
-            navigate(`/bill?number=${encodeURIComponent(targetBill)}&name=${encodeURIComponent(rawName)}`);
+        aria-label="bill chamber filter"
+      >
+        {tabs.map((tabOption) => (
+          <ToggleButton
+            key={tabOption.value}
+            value={tabOption.value}
+            aria-label={tabOption.label}
+          >
+            {tabOption.label}
+          </ToggleButton>
+        ))}
+      </ToggleButtonGroup>
+      <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+        <TextField
+          value={search}
+          onChange={(event) => setSearch(event.target.value)}
+          size="small"
+          placeholder="Search"
+          sx={{ width: 220 }}
+          InputProps={{
+            startAdornment: (
+              <InputAdornment position="start">
+                <SearchOutlined />
+              </InputAdornment>
+            )
           }}
-          showToolbar={true}
-          slots={{ toolbar: CustomToolbar }}
         />
-      </CardContent>
-    </Card>
-  </>
+        <Tooltip title="Open Bill Search">
+          <IconButton color="primary" onClick={handleOpenBillSearch}>
+            <ExpandAltOutlined />
+          </IconButton>
+        </Tooltip>
+        <Tooltip title="Refresh">
+          <IconButton color="primary" onClick={fetchBills}>
+            <ReloadOutlined />
+          </IconButton>
+        </Tooltip>
+      </Box>
+    </Toolbar>
+  );
+
+  return (
+    <Box sx={{ marginTop: 1 }}>
+      <Toolbar>
+        <Typography variant="h3" component="div" sx={{ flexGrow: 1 }}>
+          Bills
+        </Typography>
+      </Toolbar>
+      <DataGrid
+        apiRef={apiRef}
+        autoHeight
+        rows={filteredRows}
+        columns={columns}
+        loading={loading}
+        getRowId={(row) => row.id}
+        paginationModel={paginationModel}
+        onPaginationModelChange={setPaginationModel}
+        pageSizeOptions={[10, 25, 50, 100]}
+        disableRowSelectionOnClick
+        onRowDoubleClick={(params) => handleRowDoubleClick(params.row as BillRow)}
+        slots={{ toolbar: BillsToolbar }}
+      />
+    </Box>
   );
 };
 
