@@ -16,7 +16,6 @@ class LegislatorWorker implements ServiceWorker<LegislatorParams> {
   }
 
   getEntities(json: any): any {
-    console.log(json);
     return json;
   }
 
@@ -26,7 +25,7 @@ function getWorker(_params: LegislatorParams): ServiceWorker<LegislatorParams> {
   return new LegislatorWorker();
 }
 
-const API_KEY = Deno.env.get('OPEN_STATES_API_KEY'); //'5c509f44-a7aa-4024-b2f5-615bfb01d81b';
+const API_KEY = Deno.env.get('OPEN_STATES_API_KEY');
 const JURISDITION = 'ocd-jurisdiction/country:us/state:wa/government';
 const PAGE_SIZE = 50;
 
