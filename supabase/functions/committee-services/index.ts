@@ -23,8 +23,8 @@ SOAPAction: "http://WSLWebServices.leg.wa.gov/GetActiveCommitteeMembers"
 // src/supabase/functions/committee-services/index.ts
 
 import type { ServiceWorker } from "../types.ts";
-import { handleCors } from "../../../utils/cors.ts";
-import { runService } from "../../../utils/service_runner.ts";
+import { handleCors } from "../../utils/cors.ts";
+import { runService } from "../../utils/service_runner.ts";
 
 type CommitteeInputParams = {
   operation: string;

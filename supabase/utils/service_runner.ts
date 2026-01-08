@@ -1,7 +1,7 @@
 // src/utils/service_runner.ts
 
 import { XMLParser } from "https://esm.sh/fast-xml-parser@4.3.5";
-import type { ServiceWorker } from "../supabase/functions/types.ts";
+import type { ServiceWorker } from "../functions/types.ts";
 
 // one shared parser for all services
 const parser = new XMLParser({ removeNSPrefix: true });
