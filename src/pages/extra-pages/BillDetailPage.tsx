@@ -6,7 +6,6 @@ import {
 } from "@ant-design/icons";
 import {
   Box,
-  Breadcrumbs,
   IconButton,
   InputAdornment,
   Link,
@@ -26,10 +25,9 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { LegislatureService } from "../../api/legislatureService";
 import type { BillRow } from "../../api/bill";
+import BreadcrumbsNav from "../../components/BreadcrumbsNav";
 import {
-  extractBillNumber,
-  mapLegislativeDocumentToBillRow,
-  summarizeSponsors
+  BillsService
 } from "../../utils/bills";
 
 const DEFAULT_DOCUMENT_CLASS = "Bills";
@@ -130,9 +128,8 @@ const BillDetailPage = () => {
     LegislatureService.getInstance()
       .getBills(DEFAULT_DOCUMENT_CLASS)
       .then((response) => {
-        const docs = Array.isArray(response) ? response : [];
-        const match = docs.find((doc) => {
-          const normalized = extractBillNumber(doc?.Name ?? "", doc);
+        const match = response.find((doc) => {
+          const normalized = BillsService.extractBillNumber(doc?.Name ?? "", doc);
           if (targetNumber && normalized === targetNumber) {
             return true;
           }
@@ -142,11 +139,11 @@ const BillDetailPage = () => {
           return false;
         });
         if (match) {
-          const row = mapLegislativeDocumentToBillRow(match, 0);
+          const row = BillsService.mapLegislativeDocumentToBillRow(match, 0);
           if (row) {
             setBill({
               ...row,
-              sponsors: summarizeSponsors(match)
+              sponsors: BillsService.summarizeSponsors(match)
             });
           } else {
             setBill(null);
@@ -178,7 +175,7 @@ const BillDetailPage = () => {
 
   return (
     <Box sx={{ marginTop: 1 }}>
-      <Breadcrumbs aria-label="breadcrumb" sx={{ mb: 1 }}>
+      <BreadcrumbsNav>
         <Link
           component="button"
           underline="hover"
@@ -188,7 +185,7 @@ const BillDetailPage = () => {
           <LeftOutlined style={{ fontSize: 12, marginRight: 6 }} />
           Back to Bills
         </Link>
-      </Breadcrumbs>
+      </BreadcrumbsNav>
       <Toolbar sx={{ justifyContent: "space-between" }}>
         <Box>
           <Typography variant="h3" component="div">
