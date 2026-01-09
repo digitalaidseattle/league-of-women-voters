@@ -1,5 +1,6 @@
+import { CopyOutlined } from "@ant-design/icons";
 import { PageInfo } from "@digitalaidseattle/supabase";
-import { Link } from "@mui/material";
+import { Box, Button, Link, Snackbar } from "@mui/material";
 import { DataGrid, GridColDef, useGridApiRef } from "@mui/x-data-grid";
 import { useEffect, useState } from "react";
 import { LegislatureService } from "../../../api/legislatureService";
@@ -18,6 +19,7 @@ const MembersGrid = (props: { agency: string, committeeName: string }) => {
     rows: [],
     totalRowCount: 0,
   });
+  const [copyMessage, setCopyMessage] = useState("");
 
   // const [agency, setAgency] = useState<string>("");
   // const [committeeName, setCommitteeName] = useState<string>("");
@@ -65,6 +67,26 @@ const MembersGrid = (props: { agency: string, committeeName: string }) => {
       .catch(error => {
         console.error('Error invoking function:', error);
       });
+  }
+
+  async function copyEmails() {
+    const emails = pageInfo.rows
+      .map((row) => row.Email)
+      .filter((email) => typeof email === "string" && email.trim().length > 0)
+      .join(", ");
+
+    if (!emails) {
+      setCopyMessage("No emails found.");
+      return;
+    }
+
+    try {
+      await navigator.clipboard.writeText(emails);
+      setCopyMessage("All committee emails copied.");
+    } catch (error) {
+      console.error("Failed to copy emails:", error);
+      setCopyMessage("Copy failed. Please try again.");
+    }
   }
 
   const getColumns = (): GridColDef[] => {
@@ -123,15 +145,33 @@ const MembersGrid = (props: { agency: string, committeeName: string }) => {
   };
 
 return (
-  <DataGrid
-    getRowId={(row) => row.Id}
-    apiRef={apiRef}
-    rows={pageInfo.rows}
-    columns={columns}
-    paginationModel={paginationModel}
-    onPaginationModelChange={setPaginationModel}
-    pageSizeOptions={[10, 25, 50, 100]}
-  />
+  <Box>
+    <Box sx={{ display: "flex", justifyContent: "flex-end", mb: 1 }}>
+      <Button
+        variant="text"
+        color="primary"
+        startIcon={<CopyOutlined />}
+        onClick={copyEmails}
+      >
+        Copy all emails
+      </Button>
+    </Box>
+    <DataGrid
+      getRowId={(row) => row.Id}
+      apiRef={apiRef}
+      rows={pageInfo.rows}
+      columns={columns}
+      paginationModel={paginationModel}
+      onPaginationModelChange={setPaginationModel}
+      pageSizeOptions={[10, 25, 50, 100]}
+    />
+    <Snackbar
+      open={Boolean(copyMessage)}
+      autoHideDuration={2000}
+      onClose={() => setCopyMessage("")}
+      message={copyMessage}
+    />
+  </Box>
 )
 }
 
