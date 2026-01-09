@@ -94,6 +94,68 @@ These two colors was used for DAS Admin Template and should be changed for other
 ## Deployment
 The application is deployed at Google's Firebase as a static website.  GitHub's workflow action adds site secrets to the build before deploying.
 
+## Local Set-up
+
+Note: You need to be given access on the supabase project
+
+### Set-up a Supabase Account
+
+- Go to https://supabase.com/ and set up an account using your Digital Aid Seattle Email.
+- Note: You should have been granted access prior to this set-up to be able to access the next part
+- Go to supabase dashboard https://supabase.com/dashboard/organizations
+- Click on "League of Women's Voters WA"
+- Click on "women_voters@digitalaidseattle.org's Project"
+
+#### You will need the project's supabase url and anon key
+
+- On the side menu look for "API Docs" on the right side you can get the supabase url. 
+
+- On the side menu go to Project Setting > API Keys this is where you get the anon key.
+
+### Spinning up the project.
+Clone the project found at https://github.com/digitalaidseattle/league-of-women-voters in your local machine.
+
+#### Create a .env.local  file add these two variables
+
+`VITE_SUPABASE_URL=`
+
+`VITE_SUPABASE_ANON_KEY=`
+
+
+#### Additionally, for this project Google authentication can be added.
+
+`SUPABASE_GOOGLE_CLIENT_ID=`
+`SUPABASE_AUTH_EXTERNAL_GOOGLE_SECRET=`
+
+- This allows the local server to act as the auth service.
+
+#### Copy and paste the url and anon key value accordingly
+
+#### Run these commands
+
+`npm install`
+
+`npm install -g supabase`
+
+#### NOTE: You will need to install docker to start up supabase
+
+#### Run the following commands
+
+`supabase init`
+
+`supabase start`
+
+`npm run dev`
+
+You can stop the containers by running command below
+
+`supabase stop`
+
+
+
+
+
+
 ## FAQ
 ### How do I connect to Supabase?
 Environment variables for the connecting to Supabase must be added to the hosting platform as well as the `.env.local` file.  Squad members must obtain the supabase url and auth_anon_key for accessing the Supabase project.

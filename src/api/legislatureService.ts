@@ -1,12 +1,16 @@
 import { supabaseClient } from "@digitalaidseattle/supabase";
+import type { LegislativeDocument } from "./bill";
 
 
 const CURRENT_BIENNIUM = import.meta.env.VITE_LWVW_CURRENT_BIENNIUM;
+if (!CURRENT_BIENNIUM) {
+  throw new Error("VITE_LWVW_CURRENT_BIENNIUM is required but was not provided.");
+}
 
 class LegislatureService {
   private static instance: LegislatureService;
 
-  private constructor() {}
+  private constructor() { }
 
   public static getInstance(): LegislatureService {
     if (!LegislatureService.instance) {
@@ -18,17 +22,17 @@ class LegislatureService {
   public async getSponsors(): Promise<Member[]> {
     return supabaseClient.functions
       .invoke("sponsors", {
-        body: { biennium: "2023-24" },
+        body: { biennium: CURRENT_BIENNIUM },
       })
-      .then((resp) => resp.data as Member[]);
+      .then((resp: any) => resp.data as Member[]);
   }
 
   public async getCommittees(): Promise<Committee[]> {
     return supabaseClient.functions
       .invoke("committee-services", {
-        body: { operation: 'GetActiveCommittees'},
+        body: { operation: 'GetActiveCommittees' },
       })
-      .then((resp) => resp.data as Committee[]);
+      .then((resp: any) => resp.data as Committee[]);
   }
 
   public async getCommitteeMembers(
@@ -39,7 +43,7 @@ class LegislatureService {
       .invoke("committee-services", {
         body: { operation: 'GetActiveCommitteeMembers', agency: agency, committeeName: committeeName },
       })
-      .then((resp) => resp.data as Member[]);
+      .then((resp: any) => resp.data as Member[]);
   }
 
   public async GetCommitteeReferralsByCommittee(
@@ -50,7 +54,17 @@ class LegislatureService {
       .invoke("committee-services", {
         body: { operation: 'GetCommitteeReferralsByCommittee', biennium: CURRENT_BIENNIUM, agency: agency, committeeName: committeeName },
       })
-      .then((resp) => resp.data as Member[]);
+      .then((resp: any) => resp.data as Member[]);
+  }
+
+  public async getBills(
+    documentClass: string,
+  ): Promise<LegislativeDocument[]> {
+    return supabaseClient.functions
+      .invoke("bills-services", {
+        body: { biennium: CURRENT_BIENNIUM, documentClass },
+      })
+      .then((resp: any) => resp.data as LegislativeDocument[]);
   }
 }
 

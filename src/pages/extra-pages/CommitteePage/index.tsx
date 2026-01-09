@@ -1,10 +1,14 @@
-// material-ui
-
-import { Box, Stack, Tab, Tabs, Toolbar, Typography } from '@mui/material';
+/**
+ *  CommitteePage/index.tsx
+ *
+ *  @copyright 2024 Digital Aid Seattle
+ *
+ */
+import { Box, Card, CardContent, CardHeader, Tab, Tabs } from '@mui/material';
+import { useState } from 'react';
 import { useSearchParams } from "react-router-dom";
 import MembersGrid from './MembersGrid';
 import ReferralsGrid from './ReferralsGrid';
-import { useState } from 'react';
 // project import
 
 interface TabPanelProps {
@@ -47,36 +51,23 @@ const CommitteePage = () => {
   }
 
   return (
-    <Box sx={{ marginTop: 1 }}>
-      <Toolbar>
-        <Stack sx={{ flexGrow: 1 }}>
-          <Typography variant="h3" component="div" sx={{ flexGrow: 1 }}>Agency: {agency}</Typography>
-          <Typography variant="h3" component="div" sx={{ flexGrow: 1 }}>Committee: {committeeName}</Typography>
-        </Stack>
-        {/* <Tooltip title="Export">
-          <IconButton color="primary" onClick={exportData}>
-            <ExportOutlined />
-          </IconButton>
-        </Tooltip>
-        <Tooltip title="Refresh">
-          <IconButton color="primary" onClick={refresh}>
-            <ReloadOutlined />
-          </IconButton>
-        </Tooltip> */}
-      </Toolbar>
-      <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
-        <Tabs value={value} onChange={handleChange} aria-label="basic tabs example">
-          <Tab label="Members" {...a11yProps(0)} />
-          <Tab label="Referrals" {...a11yProps(1)} />
-        </Tabs>
-      </Box>
-      <CustomTabPanel value={value} index={0}>
-        <MembersGrid agency={agency} committeeName={committeeName} />
-      </CustomTabPanel>
-      <CustomTabPanel value={value} index={1}>
-        <ReferralsGrid agency={agency} committeeName={committeeName} />
-      </CustomTabPanel>
-    </Box>
+    <Card>
+      <CardHeader title={`${agency}: ${committeeName}`} />
+      <CardContent>
+        <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
+          <Tabs value={value} onChange={handleChange} aria-label="basic tabs example">
+            <Tab label="Members" {...a11yProps(0)} />
+            <Tab label="Referrals" {...a11yProps(1)} />
+          </Tabs>
+        </Box>
+        <CustomTabPanel value={value} index={0}>
+          <MembersGrid agency={agency} committeeName={committeeName} />
+        </CustomTabPanel>
+        <CustomTabPanel value={value} index={1}>
+          <ReferralsGrid agency={agency} committeeName={committeeName} />
+        </CustomTabPanel>
+      </CardContent>
+    </Card>
   )
 };
 
