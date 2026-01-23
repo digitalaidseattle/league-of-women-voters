@@ -2,7 +2,7 @@ import type {
   BillRow,
   DocumentHistoryLine,
   LegislativeDocument
-} from "../../src/api/bill";
+} from "../api/bill";
 
 function mapLegislativeDocumentToBillRow(
   bill: LegislativeDocument,

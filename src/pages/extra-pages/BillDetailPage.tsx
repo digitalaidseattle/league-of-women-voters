@@ -30,7 +30,7 @@ import {
   extractBillNumber,
   mapLegislativeDocumentToBillRow,
   summarizeSponsors
-} from "../../../supabase/utils/bills";
+} from "../../utils/bills";
 
 const DEFAULT_DOCUMENT_CLASS = "Bills";
 

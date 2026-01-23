@@ -25,7 +25,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { LegislatureService } from "../../api/legislatureService";
 import type { BillRow, LegislativeDocument } from "../../api/bill";
-import { mapLegislativeDocumentToBillRow, sanitizeBillUrl } from "../../../supabase/utils/bills";
+import { mapLegislativeDocumentToBillRow, sanitizeBillUrl } from "../../utils/bills";
 
 const DEFAULT_DOCUMENT_CLASS = "Bills";
 const BILL_SEARCH_URL = "https://app.leg.wa.gov/billsearch/";
