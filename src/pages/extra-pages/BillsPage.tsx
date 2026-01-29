@@ -1,10 +1,12 @@
 import {
   ExpandAltOutlined,
+  HomeOutlined,
   ReloadOutlined,
   SearchOutlined
 } from "@ant-design/icons";
 import {
   Box,
+  Breadcrumbs,
   Card,
   CardContent,
   CardHeader,
@@ -15,16 +17,16 @@ import {
   Tabs,
   TextField,
   Toolbar,
-  Tooltip
+  Tooltip,
+  Typography
 } from "@mui/material";
 import {
   DataGrid,
   GridColDef,
-  type GridPaginationModel,
-  useGridApiRef
+  type GridPaginationModel
 } from "@mui/x-data-grid";
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
 import type { BillRow, LegislativeDocument } from "../../api/bill";
 import { LegislatureService } from "../../api/legislatureService";
 import { mapLegislativeDocumentToBillRow, sanitizeBillUrl } from "../../utils/bills";
@@ -101,7 +103,6 @@ const columns: GridColDef<BillRow>[] = [
 ];
 
 const BillsPage = () => {
-  const apiRef = useGridApiRef();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [tab, setTab] = useState<TabValue>("all");
@@ -226,12 +227,15 @@ const BillsPage = () => {
     );
   }
 
-  return (
+  return (<>
+    <Breadcrumbs aria-label="breadcrumb">
+      <NavLink to="/" ><IconButton size="medium"><HomeOutlined /></IconButton></NavLink>
+      <Typography color="text.primary">Bills</Typography>
+    </Breadcrumbs>
     <Card>
       <CardHeader title="Bills" />
       <CardContent>
         <DataGrid
-          apiRef={apiRef}
           autoHeight
           rows={filteredRows}
           columns={columns}
@@ -258,6 +262,7 @@ const BillsPage = () => {
         />
       </CardContent>
     </Card>
+  </>
   );
 };
 
