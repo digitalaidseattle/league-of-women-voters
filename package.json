@@ -10,7 +10,8 @@
     "preview": "vite preview --port 3000",
     "test": "vitest",
     "test:coverage": "vitest --coverage",
-    "test:unit": "vitest --root src/"
+    "test:unit": "vitest --root src/",
+    "supabase:functions": "supabase functions serve --env-file .env.local"
   },
   "dependencies": {
     "@digitalaidseattle/core": "^1.0.12",

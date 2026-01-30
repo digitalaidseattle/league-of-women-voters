@@ -95,7 +95,7 @@ function extractBillNumber(
 
   return possibilities
     .filter(poss => poss)
-    .map(poss => poss!.replace(/\D+/g, ""))
+    .map(poss => String(poss).replace(/\D+/g, ""))
     .find(poss => poss.length > 0)
 
   // for (const value of possibilities) {

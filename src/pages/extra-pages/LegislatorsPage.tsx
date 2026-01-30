@@ -1,12 +1,12 @@
 // material-ui
-import { ReloadOutlined } from "@ant-design/icons";
+import { HomeOutlined, ReloadOutlined } from "@ant-design/icons";
 import { useContext, useEffect, useState } from 'react';
 
 import { LoadingContext } from "@digitalaidseattle/core";
 import { PageInfo } from "@digitalaidseattle/supabase";
-import { Card, CardContent, CardHeader, IconButton, Tooltip } from '@mui/material';
+import { Breadcrumbs, Card, CardContent, CardHeader, IconButton, Tooltip, Typography } from '@mui/material';
 import { DataGrid, GridColDef, Toolbar, useGridApiRef } from "@mui/x-data-grid";
-import { useNavigate } from "react-router";
+import { NavLink, useNavigate } from "react-router-dom";
 import { LegislatorService } from "../../api/legislatorService";
 // project import
 
@@ -99,23 +99,29 @@ const LegislatorsPage = () => {
   }
 
   return (
-    <Card>
-      <CardHeader title="Legislators" />
-      <CardContent sx={{ padding: 0.5 }}>
-        <DataGrid
-          apiRef={apiRef}
-          rows={pageInfo.rows}
-          columns={columns}
-          paginationModel={paginationModel}
-          onPaginationModelChange={setPaginationModel}
-          pageSizeOptions={[10, 25, 50, 100]}
-          onRowDoubleClick={params => navigate(`/sponsor?id=${params.row.Id}`)}
-          showToolbar={true}
-          slots={{ toolbar: CustomToolbar }}
-          loading={loading}
-        />
-      </CardContent>
-    </Card>
+    <>
+      <Breadcrumbs aria-label="breadcrumb">
+        <NavLink to="/" ><IconButton size="medium"><HomeOutlined /></IconButton></NavLink>
+        <Typography color="text.primary">Legislators</Typography>
+      </Breadcrumbs>
+      <Card>
+        <CardHeader title="Legislators" />
+        <CardContent sx={{ padding: 0.5 }}>
+          <DataGrid
+            apiRef={apiRef}
+            rows={pageInfo.rows}
+            columns={columns}
+            paginationModel={paginationModel}
+            onPaginationModelChange={setPaginationModel}
+            pageSizeOptions={[10, 25, 50, 100]}
+            onRowDoubleClick={params => navigate(`/sponsor?id=${params.row.Id}`)}
+            showToolbar={true}
+            slots={{ toolbar: CustomToolbar }}
+            loading={loading}
+          />
+        </CardContent>
+      </Card>
+    </>
   )
 };
 
