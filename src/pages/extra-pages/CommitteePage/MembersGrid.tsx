@@ -1,6 +1,7 @@
 import { CopyOutlined } from "@ant-design/icons";
+import { useNotifications } from "@digitalaidseattle/core";
 import { PageInfo } from "@digitalaidseattle/supabase";
-import { Box, Button, Link, Snackbar } from "@mui/material";
+import { Box, Button, Link } from "@mui/material";
 import { DataGrid, GridColDef, useGridApiRef } from "@mui/x-data-grid";
 import { useEffect, useState } from "react";
 import { LegislatureService } from "../../../api/legislatureService";
@@ -9,6 +10,7 @@ const PAGE_SIZE = 25;
 
 const MembersGrid = (props: { agency: string, committeeName: string }) => {
   const apiRef = useGridApiRef();
+  const notifications = useNotifications();
   const [paginationModel, setPaginationModel] = useState({
     page: 0,
     pageSize: PAGE_SIZE,
@@ -19,7 +21,6 @@ const MembersGrid = (props: { agency: string, committeeName: string }) => {
     rows: [],
     totalRowCount: 0,
   });
-  const [copyMessage, setCopyMessage] = useState("");
 
   // const [agency, setAgency] = useState<string>("");
   // const [committeeName, setCommitteeName] = useState<string>("");
@@ -33,7 +34,7 @@ const MembersGrid = (props: { agency: string, committeeName: string }) => {
     if (props.committeeName && props.agency) {
       refresh()
     }
-  }, [props]);
+  },[props]);
 
 
   // function exportData() {
@@ -76,16 +77,16 @@ const MembersGrid = (props: { agency: string, committeeName: string }) => {
       .join(", ");
 
     if (!emails) {
-      setCopyMessage("No emails found.");
+      notifications.warn("No emails found.");
       return;
     }
 
     try {
       await navigator.clipboard.writeText(emails);
-      setCopyMessage("All committee emails copied.");
+      notifications.success("All committee emails copied.");
     } catch (error) {
       console.error("Failed to copy emails:", error);
-      setCopyMessage("Copy failed. Please try again.");
+      notifications.error("Copy failed. Please try again.");
     }
   }
 
@@ -164,12 +165,6 @@ return (
       paginationModel={paginationModel}
       onPaginationModelChange={setPaginationModel}
       pageSizeOptions={[10, 25, 50, 100]}
-    />
-    <Snackbar
-      open={Boolean(copyMessage)}
-      autoHideDuration={2000}
-      onClose={() => setCopyMessage("")}
-      message={copyMessage}
     />
   </Box>
 )
