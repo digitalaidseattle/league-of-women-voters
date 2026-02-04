@@ -19,7 +19,6 @@ import {
   DataGrid,
   GridColDef,
   type GridPaginationModel,
-  GridToolbarContainer,
   useGridApiRef
 } from "@mui/x-data-grid";
 import { useCallback, useEffect, useMemo, useState } from "react";
@@ -40,13 +39,6 @@ const tabs = [
 ] as const;
 
 type TabValue = (typeof tabs)[number]["value"];
-
-type BillsToolbarProps = {
-  search: string;
-  onSearchChange: (value: string) => void;
-  onOpenSearch: () => void;
-  onRefresh: () => void;
-};
 
 const columns: GridColDef<BillRow>[] = [
   {
@@ -180,13 +172,8 @@ const BillsPage = () => {
     window.open(BILL_SEARCH_URL, "_blank", "noopener");
   }, []);
 
-  return (
-    <Box sx={{ marginTop: 1 }}>
-      <Toolbar>
-        <Typography variant="h3" component="div" sx={{ flexGrow: 1 }}>
-          Bills
-        </Typography>
-      </Toolbar>
+  const BillsToolbar = () => (
+    <Toolbar sx={{ justifyContent: "space-between", gap: 2, p: 1 }}>
       <ToggleButtonGroup
         value={tab}
         exclusive
@@ -196,7 +183,6 @@ const BillsPage = () => {
           }
         }}
         aria-label="bill chamber filter"
-        sx={{ mb: 2 }}
       >
         {tabs.map((tabOption) => (
           <ToggleButton
@@ -208,6 +194,42 @@ const BillsPage = () => {
           </ToggleButton>
         ))}
       </ToggleButtonGroup>
+      <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+        <TextField
+          value={search}
+          onChange={(event) => setSearch(event.target.value)}
+          size="small"
+          placeholder="Search"
+          sx={{ width: 220 }}
+          InputProps={{
+            startAdornment: (
+              <InputAdornment position="start">
+                <SearchOutlined />
+              </InputAdornment>
+            )
+          }}
+        />
+        <Tooltip title="Open Bill Search">
+          <IconButton color="primary" onClick={handleOpenBillSearch}>
+            <ExpandAltOutlined />
+          </IconButton>
+        </Tooltip>
+        <Tooltip title="Refresh">
+          <IconButton color="primary" onClick={fetchBills}>
+            <ReloadOutlined />
+          </IconButton>
+        </Tooltip>
+      </Box>
+    </Toolbar>
+  );
+
+  return (
+    <Box sx={{ marginTop: 1 }}>
+      <Toolbar>
+        <Typography variant="h3" component="div" sx={{ flexGrow: 1 }}>
+          Bills
+        </Typography>
+      </Toolbar>
       <DataGrid
         apiRef={apiRef}
         autoHeight
@@ -221,50 +243,9 @@ const BillsPage = () => {
         disableRowSelectionOnClick
         onRowDoubleClick={(params) => handleRowDoubleClick(params.row as BillRow)}
         slots={{ toolbar: BillsToolbar }}
-        slotProps={{
-          toolbar: {
-            search,
-            onSearchChange: setSearch,
-            onOpenSearch: handleOpenBillSearch,
-            onRefresh: fetchBills
-          } satisfies BillsToolbarProps
-        }}
       />
     </Box>
   );
 };
-
-function BillsToolbar(props: BillsToolbarProps) {
-  const { search, onSearchChange, onOpenSearch, onRefresh } = props;
-
-  return (
-    <GridToolbarContainer sx={{ justifyContent: "flex-end", gap: 1, p: 1 }}>
-      <TextField
-        value={search}
-        onChange={(event) => onSearchChange(event.target.value)}
-        size="small"
-        placeholder="Search"
-        sx={{ width: 220 }}
-        InputProps={{
-          startAdornment: (
-            <InputAdornment position="start">
-              <SearchOutlined />
-            </InputAdornment>
-          )
-        }}
-      />
-      <Tooltip title="Open Bill Search">
-        <IconButton color="primary" onClick={onOpenSearch}>
-          <ExpandAltOutlined />
-        </IconButton>
-      </Tooltip>
-      <Tooltip title="Refresh">
-        <IconButton color="primary" onClick={onRefresh}>
-          <ReloadOutlined />
-        </IconButton>
-      </Tooltip>
-    </GridToolbarContainer>
-  );
-}
 
 export default BillsPage;
