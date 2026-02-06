@@ -1,10 +1,11 @@
 // material-ui
-import { InfoCircleOutlined, ReloadOutlined } from "@ant-design/icons";
+import { HomeOutlined, ReloadOutlined } from "@ant-design/icons";
 import { useEffect, useState } from 'react';
 
 import { PageInfo } from "@digitalaidseattle/supabase";
-import { Box, IconButton, Toolbar, Tooltip, Typography } from '@mui/material';
-import { DataGrid, GridColDef, useGridApiRef } from "@mui/x-data-grid";
+import { Breadcrumbs, Card, CardContent, CardHeader, IconButton, Tooltip, Typography } from '@mui/material';
+import { DataGrid, GridColDef, Toolbar, useGridApiRef } from "@mui/x-data-grid";
+import { NavLink, useNavigate } from "react-router-dom";
 import { LegislatureService } from '../../api/legislatureService';
 // project import
 
@@ -23,6 +24,8 @@ const CommitteesPage = () => {
     rows: [],
     totalRowCount: 0,
   });
+
+  const navigate = useNavigate()
 
   useEffect(() => {
     setColumns(getColumns());
@@ -47,39 +50,17 @@ const CommitteesPage = () => {
       });
   }
 
+  const openCommittee = (params: any) => {
+    const committee = params.row;
+    navigate(`/committee?agency=${committee.Agency}&committeeName=${encodeURIComponent(committee.Name)}`);
+  };
+
   const getColumns = (): GridColDef[] => {
     return [
-      {
-        field: "Id",
-        headerName: "",
-        width: 100,
-        renderCell: (params) => {
-          return (
-            <Tooltip title="View Members">
-              <IconButton
-                color="primary"
-                onClick={() => {
-                  const committee = params.row;
-                  window.location.href = `/committee-page?agency=${committee.Agency}&committeeName=${encodeURIComponent(committee.Name)}`;
-                }}
-              >
-                <InfoCircleOutlined />
-              </IconButton>
-            </Tooltip>
-          );
-        }
-
-      },
       {
         field: "Name",
         headerName: "Name",
         width: 200,
-        type: "string"
-      },
-      {
-        field: "Acronym",
-        headerName: "Acronym",
-        width: 100,
         type: "string"
       },
       {
@@ -103,28 +84,42 @@ const CommitteesPage = () => {
     ];
   };
 
-  return (
-    <Box sx={{ marginTop: 1 }}>
+
+  function CustomToolbar() {
+    return (
       <Toolbar>
-        <Typography variant="h3" component="div" sx={{ flexGrow: 1 }}>
-          Committees
-        </Typography>
         <Tooltip title="Refresh">
           <IconButton color="primary" onClick={refresh}>
             <ReloadOutlined />
           </IconButton>
         </Tooltip>
       </Toolbar>
-      <DataGrid
-        getRowId={(row) => row.Id}
-        apiRef={apiRef}
-        rows={pageInfo.rows}
-        columns={columns}
-        paginationModel={paginationModel}
-        onPaginationModelChange={setPaginationModel}
-        pageSizeOptions={[10, 25, 50, 100]}
-      />
-    </Box>
+    )
+  }
+
+  return (<>
+    <Breadcrumbs aria-label="breadcrumb">
+      <NavLink to="/" ><IconButton size="medium"><HomeOutlined /></IconButton></NavLink>
+      <Typography color="text.primary">Committees</Typography>
+    </Breadcrumbs>
+    <Card>
+      <CardHeader title="Committees" />
+      <CardContent>
+        <DataGrid
+          getRowId={(row) => row.Id}
+          apiRef={apiRef}
+          rows={pageInfo.rows}
+          columns={columns}
+          paginationModel={paginationModel}
+          onPaginationModelChange={setPaginationModel}
+          pageSizeOptions={[10, 25, 50, 100]}
+          onRowDoubleClick={openCommittee}
+          showToolbar={true}
+          slots={{ toolbar: CustomToolbar }}
+        />
+      </CardContent>
+    </Card>
+  </>
   )
 };
 

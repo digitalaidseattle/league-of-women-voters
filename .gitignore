@@ -25,3 +25,8 @@ coverage
 *.sw?
 .firebase/*
 .env.production
+src-tree.txt
+project-tree.txt
+project-tree.txt
+deps.txt
+*.pem

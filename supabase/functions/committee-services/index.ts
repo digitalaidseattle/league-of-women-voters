@@ -20,45 +20,93 @@ SOAPAction: "http://WSLWebServices.leg.wa.gov/GetActiveCommitteeMembers"
 
  */
 import { XMLParser } from "https://esm.sh/fast-xml-parser@4.3.5";
+import { ServiceWorker } from "../types.ts";
 
-function getLegUrl(
-  operation: string,
-  biennium: string,
-  agency: string,
-  committeeName: string,
-) {
-  const committeeURL =
-    "https://wslwebservices.leg.wa.gov/CommitteeService.asmx";
-  const committeeActionURL =
-    "https://wslwebservices.leg.wa.gov/CommitteeActionService.asmx";
-  switch (operation) {
-    case "GetActiveCommitteeMembers":
-      return `${committeeURL}/GetActiveCommitteeMembers?agency=${
-        encodeURIComponent(agency)
-      }&committeeName=${encodeURIComponent(committeeName)}`;
-    case "GetActiveCommittees":
-      return `${committeeURL}/GetActiveCommittees`;
-    case "GetCommitteeReferralsByCommittee":
-      return `${committeeActionURL}/GetCommitteeReferralsByCommittee?biennium=${
-        encodeURIComponent(biennium)
-      }&agency=${encodeURIComponent(agency)}&committeeName=${
-        encodeURIComponent(committeeName)
-      }`;
-    default:
-      return committeeURL;
+type CommitteeInputParams = {
+  operation: string;
+  biennium?: string;
+  agency?: string;
+  committeeName?: string;
+};
+
+class GetActiveCommitteesWorker implements ServiceWorker<CommitteeInputParams>{
+
+  validate(_params: CommitteeInputParams) {
+    // nothing to check
   }
+
+  getLegUrl(_params: CommitteeInputParams) : string {
+    const committeeURL =
+      "https://wslwebservices.leg.wa.gov/CommitteeService.asmx";
+    return `${committeeURL}/GetActiveCommittees`;
+  }
+
+  getEntities(json: any) : any {
+      return json["ArrayOfCommittee"]["Committee"];
+  }
+
 }
 
-function getEntities(operation: string, json: any) {
-  switch (operation) {
-    case "GetActiveCommitteeMembers":
+class GetActiveCommitteeMembersWorker implements ServiceWorker<CommitteeInputParams>{
+
+  validate(params: CommitteeInputParams) {
+    if (
+      (!params.agency || !params.committeeName)
+    ) {
+      throw new Error(`agency and committeeName are required for operation ${params.operation}`, { cause: "BadRequest" });
+    }
+  }
+
+  getLegUrl(params: CommitteeInputParams) : string {
+    const committeeURL =
+      "https://wslwebservices.leg.wa.gov/CommitteeService.asmx";
+    return `${committeeURL}/GetActiveCommitteeMembers?agency=${
+        encodeURIComponent(params.agency!)
+      }&committeeName=${encodeURIComponent(params.committeeName!)}`;
+  }
+
+  getEntities(json: any) : any {
       return json["ArrayOfMember"]["Member"];
-    case "GetActiveCommittees":
-      return json["ArrayOfCommittee"]["Committee"];
-    case "GetCommitteeReferralsByCommittee":
+  }
+
+}
+
+class GetCommitteeReferralsByCommitteeWorker implements ServiceWorker<CommitteeInputParams>{
+
+  validate(params: CommitteeInputParams) {
+    if (
+      (!params.agency || !params.committeeName)
+    ) {
+      throw new Error(`agency and committeeName are required for operation ${params.operation}`, { cause: "BadRequest" });
+    }
+  }
+
+  getLegUrl(params: CommitteeInputParams) : string {
+    const committeeActionURL =
+      "https://wslwebservices.leg.wa.gov/CommitteeActionService.asmx";
+    return `${committeeActionURL}/GetCommitteeReferralsByCommittee?biennium=${
+          encodeURIComponent(params.biennium!)
+        }&agency=${encodeURIComponent(params.agency!)}&committeeName=${
+          encodeURIComponent(params.committeeName!)
+        }`;
+  }
+
+  getEntities(json: any) : any {
       return json["ArrayOfCommitteeReferral"]["CommitteeReferral"];
+  }
+
+}
+
+function getWorker(params: CommitteeInputParams) {
+  switch(params.operation) {
+    case "GetActiveCommittees":
+      return new GetActiveCommitteesWorker();
+    case "GetActiveCommitteeMembers":
+      return new GetActiveCommitteeMembersWorker();
+    case "GetCommitteeReferralsByCommittee":
+      return new GetCommitteeReferralsByCommitteeWorker();
     default:
-      return [];
+      throw Error(`Unknown operation: ${params.operation}` )
   }
 }
 
@@ -79,23 +127,20 @@ Deno.serve(async (req) => {
     });
   }
 
-  const { operation, biennium, agency, committeeName } = await req.json();
-
-  const url = getLegUrl(
-    operation,
-    biennium,
-    agency,
-    committeeName,
-  );
-
   try {
-    const parser = new XMLParser();
+    const params = await req.json();
+
+    const worker = getWorker(params);
+
+    worker.validate(params);
+    
+    const url = worker.getLegUrl(params);
     const response = await fetch(url);
     const xmlText = await response.text();
+    
+    const parser = new XMLParser();
     const json = parser.parse(xmlText);
-
-    const entities = getEntities(operation, json);
-
+    const entities = worker.getEntities(json);
     return new Response(JSON.stringify(entities), {
       headers: {
         "Content-Type": "application/json",
@@ -103,7 +148,13 @@ Deno.serve(async (req) => {
       },
     });
   } catch (err) {
-    console.error("SOAP request failed:", err);
-    throw err;
+    const statusCode = err.cause === "BadRequest" ? 400 : 500;
+    return new Response(JSON.stringify({ error: err.message || "Internal Server Error" }), {
+      status: statusCode,
+      headers: {
+        "Content-Type": "application/json",
+        "Access-Control-Allow-Origin": origin,
+      },
+    });
   }
 });
