@@ -1,10 +1,16 @@
-// material-ui
+/**
+ *  CommitteePage/index.tsx
+ *
+ *  @copyright 2024 Digital Aid Seattle
+ *
+ */
+import { HomeOutlined } from "@ant-design/icons";
+import { Box, Breadcrumbs, Card, CardContent, CardHeader, IconButton, Tab, Tabs, Typography } from '@mui/material';
+import { useState } from 'react';
+import { NavLink, useSearchParams } from "react-router-dom";
 
-import { Box, Stack, Tab, Tabs, Toolbar, Typography } from '@mui/material';
-import { useSearchParams } from "react-router-dom";
 import MembersGrid from './MembersGrid';
 import ReferralsGrid from './ReferralsGrid';
-import { useState } from 'react';
 // project import
 
 interface TabPanelProps {
@@ -47,36 +53,30 @@ const CommitteePage = () => {
   }
 
   return (
-    <Box sx={{ marginTop: 1 }}>
-      <Toolbar>
-        <Stack sx={{ flexGrow: 1 }}>
-          <Typography variant="h3" component="div" sx={{ flexGrow: 1 }}>Agency: {agency}</Typography>
-          <Typography variant="h3" component="div" sx={{ flexGrow: 1 }}>Committee: {committeeName}</Typography>
-        </Stack>
-        {/* <Tooltip title="Export">
-          <IconButton color="primary" onClick={exportData}>
-            <ExportOutlined />
-          </IconButton>
-        </Tooltip>
-        <Tooltip title="Refresh">
-          <IconButton color="primary" onClick={refresh}>
-            <ReloadOutlined />
-          </IconButton>
-        </Tooltip> */}
-      </Toolbar>
-      <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
-        <Tabs value={value} onChange={handleChange} aria-label="basic tabs example">
-          <Tab label="Members" {...a11yProps(0)} />
-          <Tab label="Referrals" {...a11yProps(1)} />
-        </Tabs>
-      </Box>
-      <CustomTabPanel value={value} index={0}>
-        <MembersGrid agency={agency} committeeName={committeeName} />
-      </CustomTabPanel>
-      <CustomTabPanel value={value} index={1}>
-        <ReferralsGrid agency={agency} committeeName={committeeName} />
-      </CustomTabPanel>
-    </Box>
+    <>
+      <Breadcrumbs aria-label="breadcrumb">
+        <NavLink to="/" ><IconButton size="medium"><HomeOutlined /></IconButton></NavLink>
+        <NavLink to="/committess" >Committee</NavLink>
+        <Typography color="text.primary">Committee Detail</Typography>
+      </Breadcrumbs>
+      <Card>
+        <CardHeader title={`${agency}: ${committeeName}`} />
+        <CardContent>
+          <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
+            <Tabs value={value} onChange={handleChange} aria-label="basic tabs example">
+              <Tab label="Members" {...a11yProps(0)} />
+              <Tab label="Referrals" {...a11yProps(1)} />
+            </Tabs>
+          </Box>
+          <CustomTabPanel value={value} index={0}>
+            <MembersGrid agency={agency} committeeName={committeeName} />
+          </CustomTabPanel>
+          <CustomTabPanel value={value} index={1}>
+            <ReferralsGrid agency={agency} committeeName={committeeName} />
+          </CustomTabPanel>
+        </CardContent>
+      </Card>
+    </>
   )
 };
 
