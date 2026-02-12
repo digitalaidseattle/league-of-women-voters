@@ -168,7 +168,7 @@ class BillsService {
     return committeeCandidate;
   }
 
-  private static inferChamber(bill: LegislativeDocument): BillRow["chamber"] {
+  static inferChamber(bill: LegislativeDocument): BillRow["chamber"] {
     const textual = [
       bill.Chamber,
       bill.OriginatingAgency,
@@ -253,7 +253,7 @@ class BillsService {
     }).format(date);
   }
 
-  private static deriveDocumentLink(bill: LegislativeDocument) {
+  static deriveDocumentLink(bill: LegislativeDocument) {
     const url =
       bill.Url ??
       bill.Hyperlink ??
@@ -273,4 +273,21 @@ class BillsService {
   }
 }
 
-export { BillsService };
+const deriveDocumentLink = (bill: LegislativeDocument) =>
+  BillsService.deriveDocumentLink(bill);
+const extractBillNumber = (
+  candidate?: string | null,
+  bill?: LegislativeDocument
+) => BillsService.extractBillNumber(candidate, bill);
+const inferChamber = (bill: LegislativeDocument) =>
+  BillsService.inferChamber(bill);
+const summarizeSponsors = (bill: LegislativeDocument) =>
+  BillsService.summarizeSponsors(bill);
+
+export {
+  BillsService,
+  deriveDocumentLink,
+  extractBillNumber,
+  inferChamber,
+  summarizeSponsors
+};
