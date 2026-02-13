@@ -26,6 +26,8 @@ import { useNavigate } from "react-router-dom";
 import { LegislatureService } from "../../api/legislatureService";
 import type { BillRow, LegislativeDocument } from "../../api/bill";
 import { mapLegislativeDocumentToBillRow, sanitizeBillUrl } from "../../utils/bills";
+import { mapOpenStatesBillToBillRow } from "../../utils/openStatesBills"
+import { LegBill } from "../../api/openStatesBill";
 
 const DEFAULT_DOCUMENT_CLASS = "Bills";
 const BILL_SEARCH_URL = "https://app.leg.wa.gov/billsearch/";
@@ -65,7 +67,22 @@ const columns: GridColDef<BillRow>[] = [
     field: "status",
     headerName: "Status",
     width: 160,
-    type: "string"
+    type: "string",
+    renderCell: (params) => {
+      const { row } = params;
+      if (row.status && row.status.startsWith("http")) {
+        return (
+          <Link
+            href={row.status}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            Bill Status
+          </Link>
+        );
+      }
+      return row.status;
+    }
   },
   {
     field: "history",
@@ -104,7 +121,7 @@ const BillsPage = () => {
   const [loading, setLoading] = useState(false);
   const [tab, setTab] = useState<TabValue>("all");
   const [search, setSearch] = useState("");
-  const [rawBills, setRawBills] = useState<LegislativeDocument[]>([]);
+  const [rawBills, setRawBills] = useState<LegBill[]>([]);
   const [paginationModel, setPaginationModel] = useState<GridPaginationModel>({
     page: 0,
     pageSize: PAGE_SIZE
@@ -113,17 +130,17 @@ const BillsPage = () => {
   const fetchBills = useCallback(() => {
     setLoading(true);
     LegislatureService.getInstance()
-      .getBills(DEFAULT_DOCUMENT_CLASS)
+      .getOpenStatesBills(1, 8)
       .then((response) => {
         const docs = Array.isArray(response) ? response : [];
-        docs.forEach((doc) => {
-          const rawUrl =
-            doc.Url ??
-            doc.Hyperlink ??
-            doc.SourceUrl ??
-            "";
-          const sanitizedUrl = sanitizeBillUrl(rawUrl, doc);
-          console.log("Fetched bill document URL:", sanitizedUrl);
+        docs.forEach(() => {
+          // const rawUrl =
+          //   doc.Url ??
+          //   doc.Hyperlink ??
+          //   doc.SourceUrl ??
+            // "";
+          // const sanitizedUrl = sanitizeBillUrl(rawUrl, doc);
+         
         });
         setRawBills(docs);
       })
@@ -146,7 +163,7 @@ const BillsPage = () => {
 
   const rows = useMemo<BillRow[]>(() => {
     return rawBills
-      .map((bill, index) => mapLegislativeDocumentToBillRow(bill, index))
+      .map((bill) => mapOpenStatesBillToBillRow (bill))
       .filter(Boolean) as BillRow[];
   }, [rawBills]);
 
@@ -178,7 +195,6 @@ const BillsPage = () => {
       return haystack.includes(loweredQuery);
     });
   }, [rows, tab, search]);
-
   return (
     <Box sx={{ marginTop: 1 }}>
       <Toolbar>
