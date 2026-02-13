@@ -1,135 +1,123 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { ServiceWorker } from "../types.ts";
-
-type BillsParams = {
-  page?: number;
-};
-
 const API_KEY = Deno.env.get("OPEN_STATES_API_KEY");
-const JURISDICTION =
-  "ocd-jurisdiction/country:us/state:wa/government";
+
+const JURISDICTION = "ocd-jurisdiction/country:us/state:wa/government";
+
 const PAGE_SIZE = 20;
+const DEFAULT_PAGES = 8;
+const REQUEST_DELAY = 6500;
 
-class BillsWorker implements ServiceWorker<BillsParams> {
-  validate(_params: BillsParams) {
-    if (!API_KEY) {
-      throw new Error("Missing OPEN_STATES_API_KEY env var", {
-        cause: "BadRequest",
-      });
-    }
-  }
+// ✅ Include all headers that Supabase client sends
+const ALLOWED_HEADERS = "authorization, x-client-info, apikey, content-type";
 
-  getLegUrl(params: BillsParams): string {
-    const page = params.page ?? 1;
-    return `https://v3.openstates.org/bills?jurisdiction=${encodeURIComponent(
-      JURISDICTION,
-    )}&sort=updated_desc&page=${page}&per_page=${PAGE_SIZE}&apikey=${API_KEY}`;
-  }
-
-  getEntities(json: any): any[] {
-    const results = json?.results ?? [];
-
-    return results.map((bill: any) => {
-      const identifier: string = bill?.identifier ?? "";
-      const session: string = bill?.session ?? "";
-
-      // "HB 1091" -> "1091"
-      const billNumber =
-        identifier.split(" ").pop() ?? "";
-
-      // "2025-2026" -> "2025"
-      const year =
-        typeof session === "string" && session.length >= 4
-          ? session.slice(0, 4)
-          : "";
-
-      const Url = `https://app.leg.wa.gov/BillSummary/?BillNumber=${encodeURIComponent(
-        billNumber,
-      )}&Year=${encodeURIComponent(year)}&Initiative=false`;
-
-      return {
-        ...bill,
-        Url,
-      };
-    });
-  }
+function sleep(ms: number) {
+  return new Promise((r) => setTimeout(r, ms));
 }
 
-function getWorker(_params: BillsParams): ServiceWorker<BillsParams> {
-  return new BillsWorker();
+function buildUrl(identifier?: string, session?: string) {
+  if (!identifier || !session) return null;
+  const billNumber = identifier.split(" ").pop();
+  const year = session.slice(0, 4);
+  if (!billNumber || !year) return null;
+
+  return `https://app.leg.wa.gov/BillSummary/?BillNumber=${encodeURIComponent(
+    billNumber,
+  )}&Year=${encodeURIComponent(year)}&Initiative=false`;
+}
+
+// ✅ Helper function for consistent CORS headers
+function corsHeaders(origin: string) {
+  return {
+    "Access-Control-Allow-Origin": origin,
+    "Access-Control-Allow-Methods": "POST, OPTIONS",
+    "Access-Control-Allow-Headers": ALLOWED_HEADERS,
+    "Access-Control-Max-Age": "86400",
+    "Content-Type": "application/json",
+  };
 }
 
 Deno.serve(async (req) => {
   const origin = req.headers.get("origin") || "*";
 
-  // CORS preflight
+  // ✅ Handle OPTIONS preflight
   if (req.method === "OPTIONS") {
     return new Response(null, {
       status: 204,
-      headers: {
-        "Access-Control-Allow-Origin": origin,
-        "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
-        "Access-Control-Allow-Headers":
-          "Content-Type, Authorization, apikey, x-client-info",
-        "Access-Control-Max-Age": "86400",
-      },
+      headers: corsHeaders(origin),
     });
   }
 
   try {
-    const params = await req.json();
-    const worker = getWorker(params);
+    if (!API_KEY) {
+      throw new Error("OPEN_STATES_API_KEY not set");
+    }
 
-    worker.validate(params);
+    let body: any = {};
+    try {
+      body = await req.json();
+    } catch {
+      body = {};
+    }
 
-    let all: any[] = [];
+    const { page = 1, limit =  DEFAULT_PAGES } = body;
+    const startPage = Number(page);
+    const numPages = Number(limit);
+    const endPage = startPage + numPages - 1;
 
-    // Fetch first 20 pages (OpenStates pagination)
-    for (let page = 1; page <= 20; page++) {
-      const resp = await fetch(
-        worker.getLegUrl({ page }),
-        {
-          headers: {
-            "Accept": "application/json",
-          },
+    const allBills: any[] = [];
+
+    for (let p = startPage; p <= endPage; p++) {
+      const url = `https://v3.openstates.org/bills?jurisdiction=${encodeURIComponent(
+        JURISDICTION,
+      )}&sort=updated_desc&page=${p}&per_page=${PAGE_SIZE}`;
+
+      const resp = await fetch(url, {
+        headers: {
+          Accept: "application/json",
+          "X-API-KEY": API_KEY!,
         },
-      );
+      });
 
       if (!resp.ok) {
-        throw new Error(
-          `OpenStates request failed: ${resp.status}`,
-        );
+        const text = await resp.text();
+        console.error("OpenStates error body:", text);
+        throw new Error(`OpenStates failed ${resp.status}: ${text}`);
       }
 
       const json = await resp.json();
-      const entities = worker.getEntities(json);
+      const results = json?.results ?? [];
 
-      all = all.concat(entities);
+      if (results.length === 0) break;
+
+      const enriched = results.map((bill: any) => ({
+        ...bill,
+        Url: buildUrl(bill.identifier, bill.session),
+      }));
+
+      allBills.push(...enriched);
+
+      // ✅ Only add delay if there are more pages
+      if (p < endPage && results.length === PAGE_SIZE) {
+        await sleep(REQUEST_DELAY);
+      }
     }
 
-    return new Response(JSON.stringify(all), {
-      headers: {
-        "Content-Type": "application/json",
-        "Access-Control-Allow-Origin": origin,
-      },
+    return new Response(JSON.stringify(allBills), {
+      status: 200,
+      headers: corsHeaders(origin),
     });
   } catch (err: any) {
-    console.error("OpenStates request failed:", err);
-
-    const status =
-      err?.cause === "BadRequest" ? 400 : 500;
+    console.error("Edge function error:", err);
 
     return new Response(
-      JSON.stringify({
-        error: err.message || "Internal Server Error",
-      }),
+      JSON.stringify({ 
+        error: err.message,
+        details: err.stack 
+      }), 
       {
-        status,
-        headers: {
-          "Content-Type": "application/json",
-          "Access-Control-Allow-Origin": origin,
-        },
-      },
+        status: 500,
+        headers: corsHeaders(req.headers.get("origin") || "*"),
+      }
     );
   }
 });

@@ -48,7 +48,7 @@ type BillRow = {
   normalizedBillNumber: string;
   committee: string;
   title: string;
-  status: string;
+  status?: string;
   history: string;
   latestDocumentLabel: string;
   latestDocumentUrl?: string;
