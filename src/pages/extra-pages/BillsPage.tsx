@@ -26,7 +26,7 @@ import { useNavigate } from "react-router-dom";
 import { LegislatureService } from "../../api/legislatureService";
 import type { BillRow, LegislativeDocument } from "../../api/bill";
 import { mapLegislativeDocumentToBillRow, sanitizeBillUrl } from "../../utils/bills";
-import { mapOpenStatesBillToBillRow } from "../../utils/openStatesBills"
+import { mapOpenStatesBillToBillRow } from "../../utils/openStateBills"
 import { LegBill } from "../../api/openStatesBill";
 
 const DEFAULT_DOCUMENT_CLASS = "Bills";
@@ -162,6 +162,7 @@ const BillsPage = () => {
   }, [tab, search]);
 
   const rows = useMemo<BillRow[]>(() => {
+    console.log(rawBills)
     return rawBills
       .map((bill) => mapOpenStatesBillToBillRow (bill))
       .filter(Boolean) as BillRow[];
