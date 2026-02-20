@@ -1,11 +1,11 @@
 // material-ui
-import { ReloadOutlined } from "@ant-design/icons";
 import { useEffect, useState } from 'react';
+import { NavLink, useNavigate } from "react-router-dom";
+import { HomeOutlined, ReloadOutlined } from "@ant-design/icons";
+import { Breadcrumbs, Card, CardContent, CardHeader, IconButton, Tooltip, Typography } from '@mui/material';
+import { DataGrid, GridColDef, Toolbar, useGridApiRef } from "@mui/x-data-grid";
 
 import { PageInfo } from "@digitalaidseattle/supabase";
-import { Card, CardContent, CardHeader, IconButton, Tooltip } from '@mui/material';
-import { DataGrid, GridColDef, Toolbar, useGridApiRef } from "@mui/x-data-grid";
-import { useNavigate } from "react-router";
 import { LegislatureService } from '../../api/legislatureService';
 // project import
 
@@ -103,10 +103,14 @@ const SponsorsPage = () => {
     )
   }
 
-  return (
+  return (<>
+    <Breadcrumbs aria-label="breadcrumb">
+      <NavLink to="/" ><IconButton size="medium"><HomeOutlined /></IconButton></NavLink>
+      <Typography color="text.primary">Sponsors</Typography>
+    </Breadcrumbs>
     <Card>
       <CardHeader title="Sponsors" />
-      <CardContent sx={{ padding: 0.5 }}>
+      <CardContent>
         <DataGrid
           getRowId={(row) => row.Id}
           apiRef={apiRef}
@@ -121,6 +125,7 @@ const SponsorsPage = () => {
         />
       </CardContent>
     </Card>
+  </>
   )
 };
 

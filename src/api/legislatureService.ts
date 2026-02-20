@@ -71,7 +71,7 @@ class LegislatureService {
   }
   public async getOpenStatesBills(
   page: number = 1,
-  limit: number = 8
+  limit: number = 5
 ): Promise<LegBill[]> {
   try {
     const { data, error } = await supabaseClient.functions.invoke(

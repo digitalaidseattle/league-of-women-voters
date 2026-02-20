@@ -12,6 +12,7 @@ import BillsPage from './extra-pages/BillsPage';
 import BillDetailPage from './extra-pages/BillDetailPage';
 import SponsorPage from './extra-pages/SponsorPage';
 import SponsorsPage from './extra-pages/SponsorsPage';
+import LegislatorsPage from './extra-pages/LegislatorsPage';
 
 const routes = [
   {
@@ -45,6 +46,10 @@ const routes = [
       {
         path: "sponsor",
         element: <SponsorPage />,
+      },
+      {
+        path: "legislators",
+        element: <LegislatorsPage />,
       },
       {
         path: "privacy",

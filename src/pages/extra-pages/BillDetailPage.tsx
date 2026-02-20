@@ -1,8 +1,8 @@
 import {
-  ReloadOutlined,
-  SearchOutlined,
   ExpandAltOutlined,
-  LeftOutlined
+  HomeOutlined,
+  ReloadOutlined,
+  SearchOutlined
 } from "@ant-design/icons";
 import {
   Box,
@@ -23,9 +23,9 @@ import {
   useGridApiRef
 } from "@mui/x-data-grid";
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { useNavigate, useSearchParams } from "react-router-dom";
-import { LegislatureService } from "../../api/legislatureService";
+import { NavLink, useNavigate, useSearchParams } from "react-router-dom";
 import type { BillRow } from "../../api/bill";
+import { LegislatureService } from "../../api/legislatureService";
 import {
   extractBillNumber,
   mapLegislativeDocumentToBillRow,
@@ -177,17 +177,11 @@ const BillDetailPage = () => {
   }, [bill]);
 
   return (
-    <Box sx={{ marginTop: 1 }}>
-      <Breadcrumbs aria-label="breadcrumb" sx={{ mb: 1 }}>
-        <Link
-          component="button"
-          underline="hover"
-          color="inherit"
-          onClick={() => navigate("/bills")}
-        >
-          <LeftOutlined style={{ fontSize: 12, marginRight: 6 }} />
-          Back to Bills
-        </Link>
+    <>
+      <Breadcrumbs aria-label="breadcrumb">
+        <NavLink to="/" ><IconButton size="medium"><HomeOutlined /></IconButton></NavLink>
+        <NavLink to="/bills" >Bills</NavLink>
+        <Typography color="text.primary">Bill Detail</Typography>
       </Breadcrumbs>
       <Toolbar sx={{ justifyContent: "space-between" }}>
         <Box>
@@ -245,7 +239,7 @@ const BillDetailPage = () => {
         disableRowSelectionOnClick
         hideFooter
       />
-    </Box>
+    </>
   );
 };
 

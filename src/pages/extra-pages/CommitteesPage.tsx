@@ -1,11 +1,11 @@
 // material-ui
-import { ReloadOutlined } from "@ant-design/icons";
+import { HomeOutlined, ReloadOutlined } from "@ant-design/icons";
 import { useEffect, useState } from 'react';
 
 import { PageInfo } from "@digitalaidseattle/supabase";
-import { Card, CardContent, CardHeader, IconButton, Tooltip } from '@mui/material';
+import { Breadcrumbs, Card, CardContent, CardHeader, IconButton, Tooltip, Typography } from '@mui/material';
 import { DataGrid, GridColDef, Toolbar, useGridApiRef } from "@mui/x-data-grid";
-import { useNavigate } from "react-router";
+import { NavLink, useNavigate } from "react-router-dom";
 import { LegislatureService } from '../../api/legislatureService';
 // project import
 
@@ -97,10 +97,14 @@ const CommitteesPage = () => {
     )
   }
 
-  return (
+  return (<>
+    <Breadcrumbs aria-label="breadcrumb">
+      <NavLink to="/" ><IconButton size="medium"><HomeOutlined /></IconButton></NavLink>
+      <Typography color="text.primary">Committees</Typography>
+    </Breadcrumbs>
     <Card>
       <CardHeader title="Committees" />
-      <CardContent sx={{ padding: 0.5 }}>
+      <CardContent>
         <DataGrid
           getRowId={(row) => row.Id}
           apiRef={apiRef}
@@ -115,9 +119,7 @@ const CommitteesPage = () => {
         />
       </CardContent>
     </Card>
-
-
-
+  </>
   )
 };
 
