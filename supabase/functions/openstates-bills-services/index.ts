@@ -4,15 +4,13 @@ const API_KEY = Deno.env.get("OPEN_STATES_API_KEY");
 const JURISDICTION = "ocd-jurisdiction/country:us/state:wa/government";
 
 const PAGE_SIZE = 20;
-const DEFAULT_PAGES = 8;
-const REQUEST_DELAY = 6500;
+const DEFAULT_PAGES = 5;
+
 
 // ✅ Include all headers that Supabase client sends
 const ALLOWED_HEADERS = "authorization, x-client-info, apikey, content-type";
 
-function sleep(ms: number) {
-  return new Promise((r) => setTimeout(r, ms));
-}
+
 
 function buildUrl(identifier?: string, session?: string) {
   if (!identifier || !session) return null;
@@ -97,9 +95,9 @@ Deno.serve(async (req) => {
       allBills.push(...enriched);
 
       // ✅ Only add delay if there are more pages
-      if (p < endPage && results.length === PAGE_SIZE) {
-        await sleep(REQUEST_DELAY);
-      }
+      // if (p < endPage && results.length === PAGE_SIZE) {
+      //   await sleep(REQUEST_DELAY);
+      // }
     }
 
     return new Response(JSON.stringify(allBills), {

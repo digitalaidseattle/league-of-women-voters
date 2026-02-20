@@ -24,12 +24,11 @@ import {
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { LegislatureService } from "../../api/legislatureService";
-import type { BillRow, LegislativeDocument } from "../../api/bill";
-import { mapLegislativeDocumentToBillRow, sanitizeBillUrl } from "../../utils/bills";
+import type { BillRow  } from "../../api/bill";
 import { mapOpenStatesBillToBillRow } from "../../utils/openStateBills"
 import { LegBill } from "../../api/openStatesBill";
 
-const DEFAULT_DOCUMENT_CLASS = "Bills";
+
 const BILL_SEARCH_URL = "https://app.leg.wa.gov/billsearch/";
 const PAGE_SIZE = 25;
 
@@ -134,12 +133,6 @@ const BillsPage = () => {
       .then((response) => {
         const docs = Array.isArray(response) ? response : [];
         docs.forEach(() => {
-          // const rawUrl =
-          //   doc.Url ??
-          //   doc.Hyperlink ??
-          //   doc.SourceUrl ??
-            // "";
-          // const sanitizedUrl = sanitizeBillUrl(rawUrl, doc);
          
         });
         setRawBills(docs);
@@ -162,7 +155,6 @@ const BillsPage = () => {
   }, [tab, search]);
 
   const rows = useMemo<BillRow[]>(() => {
-    console.log(rawBills)
     return rawBills
       .map((bill) => mapOpenStatesBillToBillRow (bill))
       .filter(Boolean) as BillRow[];
