@@ -30,3 +30,4 @@ project-tree.txt
 project-tree.txt
 deps.txt
 *.pem
+.env

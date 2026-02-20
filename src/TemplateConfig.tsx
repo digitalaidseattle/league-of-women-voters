@@ -14,6 +14,7 @@ export const TemplateConfig = () => {
         id: 'example',
         type: 'group',
         children: [
+
             {
                 id: 'committees',
                 title: 'Committees',

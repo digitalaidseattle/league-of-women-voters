@@ -4,9 +4,11 @@
  *  @copyright 2024 Digital Aid Seattle
  *
  */
-import { Box, Card, CardContent, CardHeader, Tab, Tabs } from '@mui/material';
+import { HomeOutlined } from "@ant-design/icons";
+import { Box, Breadcrumbs, Card, CardContent, CardHeader, IconButton, Tab, Tabs, Typography } from '@mui/material';
 import { useState } from 'react';
-import { useSearchParams } from "react-router-dom";
+import { NavLink, useSearchParams } from "react-router-dom";
+
 import MembersGrid from './MembersGrid';
 import ReferralsGrid from './ReferralsGrid';
 // project import
@@ -51,23 +53,30 @@ const CommitteePage = () => {
   }
 
   return (
-    <Card>
-      <CardHeader title={`${agency}: ${committeeName}`} />
-      <CardContent>
-        <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
-          <Tabs value={value} onChange={handleChange} aria-label="basic tabs example">
-            <Tab label="Members" {...a11yProps(0)} />
-            <Tab label="Referrals" {...a11yProps(1)} />
-          </Tabs>
-        </Box>
-        <CustomTabPanel value={value} index={0}>
-          <MembersGrid agency={agency} committeeName={committeeName} />
-        </CustomTabPanel>
-        <CustomTabPanel value={value} index={1}>
-          <ReferralsGrid agency={agency} committeeName={committeeName} />
-        </CustomTabPanel>
-      </CardContent>
-    </Card>
+    <>
+      <Breadcrumbs aria-label="breadcrumb">
+        <NavLink to="/" ><IconButton size="medium"><HomeOutlined /></IconButton></NavLink>
+        <NavLink to="/committess" >Committee</NavLink>
+        <Typography color="text.primary">Committee Detail</Typography>
+      </Breadcrumbs>
+      <Card>
+        <CardHeader title={`${agency}: ${committeeName}`} />
+        <CardContent>
+          <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
+            <Tabs value={value} onChange={handleChange} aria-label="basic tabs example">
+              <Tab label="Members" {...a11yProps(0)} />
+              <Tab label="Referrals" {...a11yProps(1)} />
+            </Tabs>
+          </Box>
+          <CustomTabPanel value={value} index={0}>
+            <MembersGrid agency={agency} committeeName={committeeName} />
+          </CustomTabPanel>
+          <CustomTabPanel value={value} index={1}>
+            <ReferralsGrid agency={agency} committeeName={committeeName} />
+          </CustomTabPanel>
+        </CardContent>
+      </Card>
+    </>
   )
 };
 

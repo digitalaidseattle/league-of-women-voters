@@ -23,17 +23,14 @@ import {
 import {
   DataGrid,
   GridColDef,
-  type GridPaginationModel,
-  useGridApiRef
+  type GridPaginationModel
 } from "@mui/x-data-grid";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
+import type { BillRow } from "../../api/bill";
 import { LegislatureService } from "../../api/legislatureService";
-import type { BillRow  } from "../../api/bill";
-import { mapOpenStatesBillToBillRow } from "../../utils/openStateBills"
+import { mapOpenStatesBillToBillRow } from "../../utils/openStateBills";
 import { LegBill } from "../../api/openStatesBill";
-
-
 const BILL_SEARCH_URL = "https://app.leg.wa.gov/billsearch/";
 const PAGE_SIZE = 25;
 
@@ -120,7 +117,6 @@ const columns: GridColDef<BillRow>[] = [
 ];
 
 const BillsPage = () => {
-  const apiRef = useGridApiRef();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [tab, setTab] = useState<TabValue>("all");
@@ -134,11 +130,10 @@ const BillsPage = () => {
   const fetchBills = useCallback(() => {
     setLoading(true);
     LegislatureService.getInstance()
-      .getOpenStatesBills(1, 8)
+      .getOpenStatesBills(1, 5)
       .then((response) => {
         const docs = Array.isArray(response) ? response : [];
         docs.forEach(() => {
-         
         });
         setRawBills(docs);
       })
@@ -161,7 +156,7 @@ const BillsPage = () => {
 
   const rows = useMemo<BillRow[]>(() => {
     return rawBills
-      .map((bill) => mapOpenStatesBillToBillRow (bill))
+      .map((bill) => mapOpenStatesBillToBillRow(bill))
       .filter(Boolean) as BillRow[];
   }, [rawBills]);
 

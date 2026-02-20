@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { ServiceWorker } from "../types.ts";
 
 
@@ -57,8 +58,8 @@ Deno.serve(async (req) => {
     // TODO figure out looping
     // Calling 3 times because max-page is 50 and WA leg has 148 reps.
     for (let page = 1; page <= 3; page++) {
-      let resp = await fetch(`https://v3.openstates.org/people?apikey=${API_KEY}&jurisdiction=${JURISDITION}&per_page=${PAGE_SIZE}&page=${page}`);
-      let json = await resp.json();
+      const resp = await fetch(`https://v3.openstates.org/people?apikey=${API_KEY}&jurisdiction=${JURISDITION}&per_page=${PAGE_SIZE}&page=${page}`);
+      const json = await resp.json();
       all = all.concat(json.results);
     }
 

@@ -9,7 +9,6 @@ if (!CURRENT_BIENNIUM) {
   throw new Error("VITE_LWVW_CURRENT_BIENNIUM is required but was not provided.");
 }
 
-
 class LegislatureService {
   private static instance: LegislatureService;
 
@@ -67,11 +66,12 @@ class LegislatureService {
       .invoke("bills-services", {
         body: { biennium: CURRENT_BIENNIUM, documentClass },
       })
-      .then((resp) => resp.data as LegislativeDocument[]);
+      .then((resp: any) => resp.data as LegislativeDocument[]);
   }
+  
   public async getOpenStatesBills(
   page: number = 1,
-  limit: number = 5
+  limit: number = 8
 ): Promise<LegBill[]> {
   try {
     const { data, error } = await supabaseClient.functions.invoke(
