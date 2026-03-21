@@ -28,10 +28,9 @@ import {
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
 import type { BillRow, LegislativeDocument } from "../../api/bill";
-import { LegislatureService } from "../../api/legislatureService";
-import { mapLegislativeDocumentToBillRow, sanitizeBillUrl } from "../../utils/bills";
+import { BillService } from "../../api/billService";
+import { mapLegislativeDocumentToBillRow } from "../../utils/bills";
 
-const DEFAULT_DOCUMENT_CLASS = "Bills";
 const BILL_SEARCH_URL = "https://app.leg.wa.gov/billsearch/";
 const PAGE_SIZE = 25;
 
@@ -115,19 +114,18 @@ const BillsPage = () => {
 
   const fetchBills = useCallback(() => {
     setLoading(true);
-    LegislatureService.getInstance()
-      .getBills(DEFAULT_DOCUMENT_CLASS)
+    BillService.getInstance()
+      .getBills()
       .then((response) => {
         const docs = Array.isArray(response) ? response : [];
-        docs.forEach((doc) => {
-          const rawUrl =
-            doc.Url ??
-            doc.Hyperlink ??
-            doc.SourceUrl ??
-            "";
-          const sanitizedUrl = sanitizeBillUrl(rawUrl, doc);
-          console.log("Fetched bill document URL:", sanitizedUrl);
-        });
+        // docs.forEach((doc) => {
+        //   const rawUrl =
+        //     doc.Url ??
+        //     doc.Hyperlink ??
+        //     doc.SourceUrl ??
+        //     "";
+        //   const sanitizedUrl = sanitizeBillUrl(rawUrl, doc);
+        // });
         setRawBills(docs);
       })
       .catch((error) => {

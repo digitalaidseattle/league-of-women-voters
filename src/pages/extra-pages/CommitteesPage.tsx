@@ -40,11 +40,14 @@ const CommitteesPage = () => {
     })
     LegislatureService.getInstance()
       .getCommittees()
-      .then(response =>
-        setPageInfo({
-          rows: response,
-          totalRowCount: response.length,
-        }))
+      .then(response => {
+        if (response) {
+          setPageInfo({
+            rows: response,
+            totalRowCount: response.length,
+          })
+        }
+      })
       .catch(error => {
         console.error('Error invoking function:', error);
       });

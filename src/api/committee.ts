@@ -8,6 +8,7 @@ type Committee = {
   LongName: string;
   Name: string;
   Phone: string;
+  Members: Member[];
 };
 
 type Member = {

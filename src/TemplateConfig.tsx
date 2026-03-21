@@ -23,10 +23,10 @@ export const TemplateConfig = () => {
                 icon: <TeamOutlined />
             } as MenuItem,
             {
-                id: 'sponsors',
-                title: 'Sponsors',
+                id: 'legislators',
+                title: 'Legislators',
                 type: 'item',
-                url: '/sponsors',
+                url: '/legislators',
                 icon: <TeamOutlined />
             } as MenuItem,
             {
@@ -35,13 +35,6 @@ export const TemplateConfig = () => {
                 type: 'item',
                 url: '/bills',
                 icon: <FileTextOutlined />
-            } as MenuItem,
-            {
-                id: 'legislators',
-                title: 'Legislators',
-                type: 'item',
-                url: '/legislators',
-                icon: <TeamOutlined />
             } as MenuItem
         ]
     } as MenuItem;

@@ -39,6 +39,7 @@ type LegislativeDocument = {
       | DocumentHistoryLine[]
       | null;
   };
+  PrimeSponsorID?: number;
   [key: string]: unknown;
 };
 

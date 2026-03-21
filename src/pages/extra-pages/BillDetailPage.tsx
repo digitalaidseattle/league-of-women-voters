@@ -1,3 +1,6 @@
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { NavLink, useNavigate, useSearchParams } from "react-router-dom";
+
 import {
   ExpandAltOutlined,
   HomeOutlined,
@@ -22,17 +25,13 @@ import {
   type GridColDef,
   useGridApiRef
 } from "@mui/x-data-grid";
-import { useCallback, useEffect, useMemo, useState } from "react";
-import { NavLink, useNavigate, useSearchParams } from "react-router-dom";
 import type { BillRow } from "../../api/bill";
-import { LegislatureService } from "../../api/legislatureService";
+import { BillService } from "../../api/billService";
 import {
   extractBillNumber,
   mapLegislativeDocumentToBillRow,
   summarizeSponsors
 } from "../../utils/bills";
-
-const DEFAULT_DOCUMENT_CLASS = "Bills";
 
 type BillDetailRow = BillRow & {
   sponsors: string;
@@ -127,8 +126,8 @@ const BillDetailPage = () => {
       return;
     }
     setLoading(true);
-    LegislatureService.getInstance()
-      .getBills(DEFAULT_DOCUMENT_CLASS)
+    BillService.getInstance()
+      .getBills()
       .then((response) => {
         const docs = Array.isArray(response) ? response : [];
         const match = docs.find((doc) => {

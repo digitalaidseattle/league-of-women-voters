@@ -1,3 +1,4 @@
+import { Identifier } from "@digitalaidseattle/core";
 import { supabaseClient } from "@digitalaidseattle/supabase";
 
 // const example = {
@@ -28,6 +29,7 @@ import { supabaseClient } from "@digitalaidseattle/supabase";
 //     openstates_url: "https://openstates.org/person/hunter-abell-78DeKxlZCawQBTcU5qPysZ/"
 // }
 
+
 class LegislatorService {
     private static instance: LegislatorService;
 
@@ -38,12 +40,44 @@ class LegislatorService {
         return LegislatorService.instance;
     }
 
-    async getAll(): Promise<any> {
-        return supabaseClient.functions
-            .invoke("legislator-services", {
-                body: {},
-            })
-            .then((resp: any) => resp.data.filter((item: any) => item !== null && item !== undefined));
+    biennium: string;
+    cache: any[] | null = null;
+
+    constructor() {
+        const current = import.meta.env.VITE_LWVW_CURRENT_BIENNIUM;
+        if (current) {
+            this.biennium = current;
+        } else {
+            throw new Error("VITE_LWVW_CURRENT_BIENNIUM is required, but was not provided.");
+        }
+    }
+
+    async getAll(): Promise<Member[]> {
+        if (this.cache === null) {
+            return supabaseClient.functions
+                .invoke("sponsors", {
+                    body: { biennium: this.biennium },
+                })
+                .then((resp: any) => {
+                    const all = resp.data.filter((item: any) => item !== null && item !== undefined);
+                    this.cache = all;
+                    return this.cache;
+                });
+
+        }
+        return this.cache;
+    }
+
+    async getById(id: Identifier): Promise<Member> {
+        return this.getAll()
+            .then(all => {
+                const found = all.find(legislator => legislator.Id === Number(id));
+                if (!found) {
+                    throw new Error(`Could not find legilator for id = ${id}`);
+                } else {
+                    return found;
+                }
+            });
     }
 }
 

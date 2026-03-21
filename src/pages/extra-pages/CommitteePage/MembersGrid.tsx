@@ -1,5 +1,5 @@
 import { PageInfo } from "@digitalaidseattle/supabase";
-import { Link } from "@mui/material";
+import { Link } from "react-router-dom";
 import { DataGrid, GridColDef, useGridApiRef } from "@mui/x-data-grid";
 import { useEffect, useState } from "react";
 import { LegislatureService } from "../../../api/legislatureService";
@@ -81,10 +81,9 @@ const MembersGrid = (props: { agency: string, committeeName: string }) => {
         width: 200,
         type: "string",
         renderCell: (params) => {
-          const sponsor = params.row;
-          console.log('Rendering sponsor:', sponsor);
+          const legislator = params.row;
           return (
-              <Link href={`/sponsor?id=${sponsor.Id}`}>{sponsor.Name}</Link>
+              <Link to={`/legislator/${legislator.Id}`}>{legislator.Name}</Link>
           );
         }
       },
