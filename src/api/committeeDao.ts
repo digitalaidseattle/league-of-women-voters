@@ -4,7 +4,7 @@
  *  @copyright 2025 Digital Aid Seattle
  *
  */
-import { createClient, SupabaseClient } from '@supabase/supabase-js';
+import { SupabaseClient } from '@supabase/supabase-js';
 import { getConfiguration } from './configuration';
 
 export class CommitteeDao {
