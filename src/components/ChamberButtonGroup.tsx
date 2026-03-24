@@ -5,7 +5,6 @@
 *
 */
 import { Box, Tab, Tabs } from '@mui/material';
-import { useEffect, useState } from 'react';
 
 const CHAMBER_TABS = [
     { label: "All", value: "all" },
@@ -14,23 +13,19 @@ const CHAMBER_TABS = [
     { label: "Joint", value: "joint" }
 ] as const;
 
-export function ChamberButtonGroup({ chamber, onChange }: { chamber: string, onChange: (value: string) => void }) {
-    const [tab, setTab] = useState<string>('all');
+export type CHAMBER_TYPE = (typeof CHAMBER_TABS)[number]["value"];
 
-    useEffect(() => {
-        setTab(chamber ?? 'all')
-    }, [chamber]);
+export function ChamberButtonGroup({ chamber, onChange }: { chamber: CHAMBER_TYPE, onChange: (value: CHAMBER_TYPE) => void }) {
 
-    function handleChange(value: string): void {
-        setTab(value);
+    function handleChange(value: CHAMBER_TYPE): void {
         onChange(value);
     }
 
     return (
         <Box sx={{ marginTop: 1, flexGrow: 1 }}>
             <Tabs
-                value={tab}
-                onChange={(_event, value: string) => handleChange(value)}
+                value={chamber}
+                onChange={(_event, value: string) => handleChange(value as CHAMBER_TYPE)}
                 aria-label="bill chamber filter"
                 sx={{ mb: 2 }}
             >

@@ -1,5 +1,3 @@
-// This is mainly for documentation purposes, as the API is not used directly in the codebase.
-
 
 type Committee = {
   Acronym: string;
@@ -41,4 +39,9 @@ type Referral = {
   legislationInfo: LegislationInfo;
   committee: Committee;
   ReferredDate: string;
+};
+
+
+type Sponsor = Member & {
+  Type: string;
 };

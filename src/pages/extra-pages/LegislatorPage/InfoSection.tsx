@@ -12,16 +12,16 @@ export function InfoSection({ legislator }: { legislator: Member }) {
   return (
     <Paper sx={{ padding: 2, height: "100%" }}>
       <Grid container>
-        <Grid size={3}>{LEGISLATORS_CONSTANTS.name_label}: </Grid>
-        <Grid size={9}>{legislator.Name}</Grid>
-        <Grid size={3}>{LEGISLATORS_CONSTANTS.email_label}:</Grid>
-        <Grid size={9}>{legislator.Email}</Grid>
-        <Grid size={3}>{LEGISLATORS_CONSTANTS.phone_label}:</Grid>
-        <Grid size={9}>{legislator.Phone}</Grid>
-        <Grid size={3}>{LEGISLATORS_CONSTANTS.address_label}:</Grid>
-        <Grid size={9}>## Address ##</Grid>
-        <Grid size={3}>{LEGISLATORS_CONSTANTS.legislative_asst_label}:</Grid>
-        <Grid size={9}>## Legislative Asst ##</Grid>
+        <Grid size={4}>{LEGISLATORS_CONSTANTS.name_label}: </Grid>
+        <Grid size={8}>{legislator.Name}</Grid>
+        <Grid size={4}>{LEGISLATORS_CONSTANTS.email_label}:</Grid>
+        <Grid size={8}>{legislator.Email}</Grid>
+        <Grid size={4}>{LEGISLATORS_CONSTANTS.phone_label}:</Grid>
+        <Grid size={8}>{legislator.Phone}</Grid>
+        <Grid size={4}>{LEGISLATORS_CONSTANTS.address_label}:</Grid>
+        <Grid size={8}>## Address ##</Grid>
+        <Grid size={4}>{LEGISLATORS_CONSTANTS.legislative_asst_label}:</Grid>
+        <Grid size={8}>## Legislative Asst ##</Grid>
       </Grid>
     </Paper>
   )

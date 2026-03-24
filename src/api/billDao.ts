@@ -75,9 +75,11 @@ export class BillDao {
   SubstituteVersion: 0
   */
   public async getBillDetails(billNumber: string): Promise<any> {
+    const noPeriod = `${billNumber}`.split('.')[0];
+    const noDash = `${noPeriod}`.split('-')[0];
     const { error, data } = await this.client.functions
       .invoke("legislation-services", {
-        body: { operation: "GetLegislation", biennium: this.biennium, billNumber: billNumber }
+        body: { operation: "GetLegislation", biennium: this.biennium, billNumber: noDash }
       })
     if (error) {
       throw error;
@@ -85,5 +87,15 @@ export class BillDao {
     return data;
   }
 
+  public async getBillSponsors(billNumber: string): Promise<Sponsor[]> {
+    const { error, data } = await this.client.functions
+      .invoke("legislation-services", {
+        body: { operation: "GetSponsors", biennium: this.biennium, billNumber: billNumber }
+      })
+    if (error) {
+      throw error;
+    }
+    return Array.isArray(data) ? data : [data];
+  }
 }
 

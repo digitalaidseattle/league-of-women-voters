@@ -1,5 +1,6 @@
 
-import { createClient, SupabaseClient } from '@supabase/supabase-js';
+import { supabaseClient } from '@digitalaidseattle/supabase';
+import { SupabaseClient } from '@supabase/supabase-js';
 
 
 type Configuration = {
@@ -10,12 +11,12 @@ type Configuration = {
 let _configuration: Configuration;
 
 
-export function initConfiguration(opts: {
+export function initConfiguration(_opts: {
     projectUrl: string
     anonKey: string
 }) {
     _configuration = {
-        client: createClient(opts.projectUrl, opts.anonKey)
+        client: supabaseClient // createClient(opts.projectUrl, opts.anonKey)
     }
 }
 

@@ -8,7 +8,6 @@
 import {
   HomeOutlined
 } from "@ant-design/icons";
-import { Identifier } from "@digitalaidseattle/core";
 import { Breadcrumbs, Card, CardContent, CardHeader, Grid, IconButton, Typography } from '@mui/material';
 import { useEffect, useState } from "react";
 import { NavLink, useParams } from "react-router-dom";
@@ -25,9 +24,8 @@ const LegislatorPage = () => {
   const [legislator, setLegislator] = useState<Member>()
 
   useEffect(() => {
-    console.log('id', id);
     LegislatorService.getInstance()
-      .getById(id as Identifier)
+      .getById(Number(id))
       .then(leg => setLegislator(leg))
   }, [id])
   return (

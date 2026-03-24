@@ -30,7 +30,7 @@ export class CommitteeDao {
     this.client = getConfiguration().client;
   }
 
-  public async getCommittees(): Promise<Committee[]> {
+  public async getAll(): Promise<Committee[]> {
     return this.client.functions
       .invoke("committee-services", {
         body: { operation: 'GetActiveCommittees' },
@@ -42,15 +42,6 @@ export class CommitteeDao {
         return resp.data;
       });
 
-  }
-
-  public async findCommitteesByMember(member: Member): Promise<Committee[]> {
-    return this.getCommittees()
-      .then(committees => {
-        return (committees ?? []).filter(committee => {
-          return committee.Members.find(mem => mem.Name === member.Name) !== undefined
-        })
-      })
   }
 
   public async getCommitteeMembers(

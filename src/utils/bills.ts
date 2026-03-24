@@ -139,27 +139,10 @@ function deriveCommittee(bill: LegislativeDocument) {
 }
 
 function inferChamber(bill: LegislativeDocument): BillRow["chamber"] {
-  const textual = [
-    bill.Chamber,
-    bill.OriginatingAgency,
-    bill.Agency
-  ]
-    .map((value) =>
-      typeof value === "string" ? value.toLowerCase() : undefined
-    )
-    .filter(Boolean) as string[];
 
-  if (textual.some((value) => value.includes("joint"))) {
-    return "Joint";
-  }
-  if (textual.some((value) => value.includes("house"))) {
-    return "House";
-  }
-  if (textual.some((value) => value.includes("senate"))) {
-    return "Senate";
-  }
+  const name = (bill.BillId as string ?? "").toUpperCase();
+  console.log(name, bill)
 
-  const name = (bill.Name ?? "").toUpperCase();
   if (name.startsWith("HB")) {
     return "House";
   }
@@ -167,7 +150,7 @@ function inferChamber(bill: LegislativeDocument): BillRow["chamber"] {
     return "Joint";
   }
 
-  if (name.startsWith("SB")) {
+  if (["ESSB", "SSB", "SB", "2SSB", "E2SSB"].some((prefix) => name.startsWith(prefix))) {
     return "Senate";
   }
   if (["SJR", "SJM", "SCR"].some((prefix) => name.startsWith(prefix))) {
@@ -228,9 +211,9 @@ function deriveDocumentLink(bill: LegislativeDocument) {
     bill.SourceUrl ??
     "";
   const sanitizedUrl = sanitizeBillUrl(url, bill);
-  
+
   return {
-    label:  "View document",
+    label: "View document",
     url: sanitizedUrl || undefined
   };
 }
@@ -240,14 +223,9 @@ function displayValue(value: string) {
 }
 
 function summarizeSponsors(bill: LegislativeDocument): string {
-  const sponsorField = bill.Sponsors;
-  if (!sponsorField) {
-    return "";
-  }
-  if (typeof sponsorField === "string") {
-    return sponsorField;
-  }
-  return Array.isArray(sponsorField) ? sponsorField.join(", ") : "";
+  return (bill.Sponsors ?? [])
+    ?.map(sponsor => sponsor.Name)
+    .join(',');
 }
 
 export {

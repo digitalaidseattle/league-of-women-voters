@@ -20,33 +20,31 @@ export class BillService {
     return BillService.instance;
   }
 
-  billsCache: LegislativeDocument[] = [];
-
   private constructor() {
   }
 
-  async refreshCache(): Promise<void> {
-    const bills = await BillDao.getInstance().getBills(DEFAULT_DOCUMENT_CLASS);
-    // Removing for now, failing at WALeg at high rate
-    // for (const bill of bills) {
-    //   try {
-    //     const billDetails = await BillDao.getInstance().getBillDetails(bill.Name!);
-    //     bill.PrimeSponsorID = billDetails.PrimeSponsorID;
-    //   } catch (error) {
-    //     console.error('refreshCache', error);
-    //     throw error
-    //   }
-    // }
-    this.billsCache = bills;
+  async getAll(documentClass?: string): Promise<LegislativeDocument[]> {
+    return BillDao.getInstance().getBills(documentClass ?? DEFAULT_DOCUMENT_CLASS);
   }
 
-  public async getBills(): Promise<LegislativeDocument[]> {
-    return this.billsCache;
+  async getById(id: string): Promise<LegislativeDocument> {
+    const bills = await this.getAll()
+    const found = bills.find(bill => bill.Id === id);
+    if (found) {
+      return found;
+    }
+    throw new Error(`Could not find bill for id = ${id}`);
   }
 
-  public async findBillsBySponsor(sponsor: Member): Promise<LegislativeDocument[]> {
-    return this.billsCache.filter(b => b.PrimeSponsorID === sponsor.Id)
+  // FIXME bills need Sponsors populated
+  async findBillsBySponsor(sponsor: Member): Promise<LegislativeDocument[]> {
+    const bills = await this.getAll();
+    return bills.filter(b => {
+      const sponsorIds = (b.Sponsors ?? []).map(s => s.Id);
+      return sponsorIds.includes(sponsor.Id);
+    })
   }
+
+
 
 }
-

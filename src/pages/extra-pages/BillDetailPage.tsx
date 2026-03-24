@@ -127,7 +127,7 @@ const BillDetailPage = () => {
     }
     setLoading(true);
     BillService.getInstance()
-      .getBills()
+      .getAll()
       .then((response) => {
         const docs = Array.isArray(response) ? response : [];
         const match = docs.find((doc) => {

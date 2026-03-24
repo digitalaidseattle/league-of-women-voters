@@ -11,42 +11,29 @@ class LegislatureService {
     return LegislatureService.instance;
   }
 
-  committeeCache: Committee[] = [];
-
   private constructor() {
   }
 
-  async refreshCache(): Promise<void> {
-    const committees = await CommitteeDao.getInstance().getCommittees();
-    committees.forEach(async committee => {
-      const members = await CommitteeDao.getInstance().getCommitteeMembers(committee.Agency, committee.Name);
-      committee.Members = members;
-    })
-    this.committeeCache = committees;
+  async getCommittees(): Promise<Committee[]> {
+    return CommitteeDao.getInstance().getAll();
   }
 
-  public async getCommittees(): Promise<Committee[]> {
-    return this.committeeCache;
+  // FIXME members need to be added to committees
+  async findCommitteesByMember(member: Member): Promise<Committee[]> {
+    const committees = await this.getCommittees();
+    return committees.filter(committee =>
+      (committee.Members ?? []).find(mem => mem.Name === member.Name) !== undefined
+    )
   }
 
-  public async findCommitteesByMember(member: Member): Promise<Committee[]> {
-    return this.getCommittees()
-      .then(committees => {
-        return (committees ?? []).filter(committee => {
-          return committee.Members.find(mem => mem.Name === member.Name) !== undefined
-        })
-      })
-  }
-
-  public async getCommitteeMembers(
+  async getCommitteeMembers(
     agency: string,
     committeeName: string,
   ): Promise<Member[]> {
-    // TODO replace with cache lookup
     return CommitteeDao.getInstance().getCommitteeMembers(agency, committeeName);
   }
 
-  public async GetCommitteeReferralsByCommittee(
+  async GetCommitteeReferralsByCommittee(
     agency: string,
     committeeName: string,
   ): Promise<Member[]> {

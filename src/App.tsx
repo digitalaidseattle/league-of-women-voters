@@ -4,7 +4,7 @@
  *  @copyright 2024 Digital Aid Seattle
  *
  */
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { RouterProvider, createBrowserRouter } from 'react-router-dom';
 
 import {
@@ -16,13 +16,12 @@ import { LayoutConfigurationProvider } from "@digitalaidseattle/mui";
 import { SupabaseAuthService, SupabaseStorageService } from '@digitalaidseattle/supabase';
 
 // project import
-import { BillService } from "./api/billService";
-import { LegislatureService } from "./api/legislatureService";
-import "./App.css";
-import { LoadingOverlay } from "./components/LoadingOverlay";
+import { initConfiguration } from './api/configuration';
 import { routes } from './pages/routes';
 import { TemplateConfig } from './TemplateConfig';
-import { initConfiguration } from './api/configuration';
+
+// Styles
+import "./App.css";
 
 // ==============================|| APP - THEME, ROUTER, LOCAL  ||============================== //
 
@@ -37,26 +36,12 @@ const App: React.FC = () => {
     }
   );
 
-  const [initialized, setInitialized] = useState(false);
-  // This fills the cache
-  useEffect(() => {
-    if (!initialized) {
-      Promise.all([
-        BillService.getInstance().refreshCache(),
-        LegislatureService.getInstance().refreshCache()
-      ])
-        .catch(error => console.error(error))
-        .finally(() => setInitialized(true));
-    }
-  }, [])
-
   return (
     <AuthServiceProvider authService={new SupabaseAuthService()} >
       <StorageServiceProvider storageService={new SupabaseStorageService()} >
         <UserContextProvider>
           <LayoutConfigurationProvider configuration={TemplateConfig()}>
-            <LoadingOverlay loading={!initialized} />
-            {initialized && <RouterProvider router={router} />}
+            <RouterProvider router={router} />
           </LayoutConfigurationProvider>
         </UserContextProvider>
       </StorageServiceProvider>

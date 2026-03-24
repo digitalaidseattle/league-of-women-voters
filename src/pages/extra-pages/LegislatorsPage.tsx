@@ -8,7 +8,8 @@ import { DataGrid, GridColDef, Toolbar, useGridApiRef } from "@mui/x-data-grid";
 
 import { PageInfo } from "@digitalaidseattle/supabase";
 import { LegislatorService } from '../../api/legislatorService';
-import { ChamberButtonGroup } from "../../components/ChamberButtonGroup";
+import { CHAMBER_TYPE, ChamberButtonGroup } from "../../components/ChamberButtonGroup";
+import { LoadingOverlay } from '../../components/LoadingOverlay';
 // project import
 
 // ==============================|| SAMPLE PAGE ||============================== //
@@ -25,41 +26,43 @@ export const LegislatorsPage = () => {
     rows: [],
     totalRowCount: 0,
   });
+  const [initialized, setInitialized] = useState(false);
 
-  const [chamber, setChamber] = useState<string>('all');
+  const [chamber, setChamber] = useState<CHAMBER_TYPE>('all');
 
   useEffect(() => {
-    setColumns(getColumns());
-    refresh()
-  }, []);
+    if (!initialized) {
+      setColumns(getColumns());
+      refresh();
+    }
+  }, [initialized]);
 
   useEffect(() => {
     refresh();
   }, [chamber]);
 
   function refresh() {
-    setPageInfo({
-      rows: [],
-      totalRowCount: 0,
-    })
+    setInitialized(false);
+    setPageInfo({ rows: [], totalRowCount: 0, });
     LegislatorService.getInstance()
       .getAll()
-      .then(response =>
+      .then(legislators => {
+        const rows = legislators.filter(filterPredicate);
         setPageInfo({
-          rows: response.filter(filterPredicate),
-          totalRowCount: response.length,
-        }))
-      .catch(error => {
-        console.error('Error invoking function:', error);
-      });
+          rows: rows,
+          totalRowCount: rows.length,
+        });
+        setInitialized(true);
+      })
+
   }
 
-  function filterPredicate(leg: Member): boolean {
+  function filterPredicate(legislator: Member): boolean {
     switch (chamber) {
       case 'house':
-        return leg.Agency === 'House'
+        return legislator.Agency === 'House'
       case 'senate':
-        return leg.Agency === 'Senate'
+        return legislator.Agency === 'Senate'
       case 'all':
       case 'joint':
       default:
@@ -67,7 +70,7 @@ export const LegislatorsPage = () => {
     }
   }
 
-  function handleChmberChange(value: string): void {
+  function handleChamberChange(value: CHAMBER_TYPE): void {
     setChamber(value);
     refresh();
   }
@@ -114,13 +117,14 @@ export const LegislatorsPage = () => {
   };
 
   function CustomToolbar() {
-
-    return (<Toolbar>
-      <ChamberButtonGroup chamber={chamber} onChange={handleChmberChange} />
-    </Toolbar>
+    return (
+      <Toolbar>
+        <ChamberButtonGroup chamber={chamber} onChange={handleChamberChange} />
+      </Toolbar>
     );
   }
   return (<>
+    <LoadingOverlay loading={!initialized} />
     <Breadcrumbs aria-label="breadcrumb">
       <NavLink to="/" ><IconButton size="medium"><HomeOutlined /></IconButton></NavLink>
       <Typography color="text.primary">Legislators</Typography>

@@ -4,7 +4,7 @@
 * @copyright 2026 Digital Aid Seattle
 */
 import React from "react";
-import { Box, CircularProgress, Typography } from "@mui/material";
+import { Box, CircularProgress, Stack, Typography } from "@mui/material";
 
 export const LoadingOverlay = ({ loading, message }: { loading: boolean, message?: string }) => {
 
@@ -20,13 +20,18 @@ export const LoadingOverlay = ({ loading, message }: { loading: boolean, message
 
                     backgroundColor: "rgba(255, 255, 255, 0.5)", // transparent white overlay
                     backdropFilter: "blur(2px)",                 // optional: subtle blur
-                    zIndex: 1300,                                // above most content
+                    zIndex: 2000,                                // above most content
                 }}
             >
-                <Box>
+                <Stack sx={{
+                    display: 'flex',
+                    alignItems: 'center', // Aligns children vertically in a row direction
+                    justifyContent: 'center',
+                    gap: 5
+                }}>
                     <CircularProgress size={100} />
                     <Typography>{message}</Typography>
-                </Box>
+                </Stack>
             </Box>
         </React.Fragment>
     )
