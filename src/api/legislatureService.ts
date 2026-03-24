@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { CommitteeDao } from "./committeeDao";
+import { CommitteesDB } from "./database/CommitteesDB";
 
 class LegislatureService {
   private static instance: LegislatureService;
@@ -18,10 +19,10 @@ class LegislatureService {
     return CommitteeDao.getInstance().getAll();
   }
 
-  // FIXME members need to be added to committees
   async findCommitteesByMember(member: Member): Promise<Committee[]> {
-    const committees = await this.getCommittees();
-    return committees.filter(committee =>
+    const dbCommittees = await CommitteesDB.getInstance().getAll();
+    const mapped = dbCommittees.map(db => db.committee as Committee);
+    return mapped.filter(committee =>
       (committee.Members ?? []).find(mem => mem.Name === member.Name) !== undefined
     )
   }

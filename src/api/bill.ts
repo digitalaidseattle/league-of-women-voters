@@ -9,6 +9,7 @@ type DocumentHistoryLine = {
 
 type LegislativeDocument = {
   Id: string;
+  BillId: string;
   Name?: string;
   Biennium?: string;
   Description?: string;

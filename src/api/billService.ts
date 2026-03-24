@@ -7,6 +7,7 @@
 
 import type { LegislativeDocument } from "./bill";
 import { BillDao } from './billDao';
+import { BillsDB } from "./database/BillsDB";
 
 const DEFAULT_DOCUMENT_CLASS = "Bills";
 
@@ -38,8 +39,9 @@ export class BillService {
 
   // FIXME bills need Sponsors populated
   async findBillsBySponsor(sponsor: Member): Promise<LegislativeDocument[]> {
-    const bills = await this.getAll();
-    return bills.filter(b => {
+    const dbBills = await BillsDB.getInstance().getAll();
+    const mapped = dbBills.map(db => db.bill as LegislativeDocument);
+    return mapped.filter(b => {
       const sponsorIds = (b.Sponsors ?? []).map(s => s.Id);
       return sponsorIds.includes(sponsor.Id);
     })
