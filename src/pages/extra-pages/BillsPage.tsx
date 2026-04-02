@@ -30,7 +30,7 @@ import { NavLink, useNavigate } from "react-router-dom";
 import type { BillRow } from "../../api/bill";
 import { LegislatureService } from "../../api/legislatureService";
 import { mapOpenStatesBillToBillRow } from "../../utils/openStateBills";
-import { LegBill } from "../../api/openStatesBill";
+import { LegislativeBill } from "../../api/openStatesBill";
 const BILL_SEARCH_URL = "https://app.leg.wa.gov/billsearch/";
 const PAGE_SIZE = 25;
 
@@ -54,7 +54,7 @@ const columns: GridColDef<BillRow>[] = [
     field: "committee",
     headerName: "Committee",
     flex: 1,
-    minWidth: 220,
+    width: 120,
     type: "string"
   },
   {
@@ -62,6 +62,13 @@ const columns: GridColDef<BillRow>[] = [
     headerName: "Title",
     flex: 1,
     minWidth: 260,
+    type: "string"
+  },
+  {
+    field: "history",
+    headerName: "Bill History",
+    flex: 1,
+    minWidth: 240,
     type: "string"
   },
   {
@@ -84,13 +91,6 @@ const columns: GridColDef<BillRow>[] = [
       }
       return row.status;
     }
-  },
-  {
-    field: "history",
-    headerName: "Bill History",
-    flex: 1,
-    minWidth: 240,
-    type: "string"
   },
   {
     field: "latestDocumentLabel",
@@ -121,7 +121,7 @@ const BillsPage = () => {
   const [loading, setLoading] = useState(false);
   const [tab, setTab] = useState<TabValue>("all");
   const [search, setSearch] = useState("");
-  const [rawBills, setRawBills] = useState<LegBill[]>([]);
+  const [rawBills, setRawBills] = useState<LegislativeBill[]>([]);
   const [paginationModel, setPaginationModel] = useState<GridPaginationModel>({
     page: 0,
     pageSize: PAGE_SIZE
@@ -130,9 +130,9 @@ const BillsPage = () => {
   const fetchBills = useCallback(() => {
     setLoading(true);
     LegislatureService.getInstance()
-      .getOpenStatesBills(1, 5)
+      .getOpenStatesBills()
       .then((response) => {
-        const docs = Array.isArray(response) ? response : [];
+        const docs = response ? response : [];
         docs.forEach(() => {
         });
         setRawBills(docs);
@@ -178,9 +178,10 @@ const BillsPage = () => {
         row.billNumber,
         row.title,
         row.committee,
+        row.latestDocumentLabel,
         row.status,
-        row.history,
-        row.latestDocumentLabel
+        row.history
+        
       ]
         .join(" ")
         .toLowerCase();

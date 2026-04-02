@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { supabaseClient } from "@digitalaidseattle/supabase";
 import type { LegislativeDocument } from "./bill";
-import type { LegBill } from "./openStatesBill";
+import type { LegislativeBill } from "./openStatesBill";
 
 
 const CURRENT_BIENNIUM = import.meta.env.VITE_LWVW_CURRENT_BIENNIUM;
@@ -69,17 +69,14 @@ class LegislatureService {
       .then((resp: any) => resp.data as LegislativeDocument[]);
   }
   
-  public async getOpenStatesBills(
-  page: number = 1,
-  limit: number = 8
-): Promise<LegBill[]> {
+  public async getOpenStatesBills(): Promise<LegislativeBill[]> {
   try {
     const { data, error } = await supabaseClient.functions.invoke(
       "openstates-bills-services",
       {
         body: {
-          page,
-          limit
+          page : 1,
+          limit: 5,
         },
       }
     );
@@ -98,7 +95,7 @@ class LegislatureService {
     const bills = Array.isArray(data) ? data : (data.bills || data.results || []);
     
     console.log("Fetched bills:", bills);
-    return bills as LegBill[];
+    return bills as LegislativeBill[];
     
   } catch (error) {
     console.error("Error in getOpenStatesBills:", error);

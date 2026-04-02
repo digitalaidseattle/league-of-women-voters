@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { supabaseClient } from "@digitalaidseattle/supabase";
 
 // const example = {

@@ -1,4 +1,4 @@
-export interface LegBill {
+export interface LegislativeBill {
   // Custom enriched field
   Url?: string;
   
