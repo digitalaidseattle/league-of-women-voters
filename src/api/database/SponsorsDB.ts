@@ -20,8 +20,14 @@ export class SponsorsDB extends SupabaseDAO<DBSponsor> {
 
 
     constructor() {
-        super(getConfiguration().client, 'Sponsors')
+        super(getConfiguration().client, 'Sponsors', {
+            mapper:
+                (json) => ({
+                    ...json.sponsor,
+                    Address: json.sponsor.address,
+                    Assistant: json.sponsor.assistant,
+                })
+        })
     }
-
 
 }

@@ -2,18 +2,20 @@ import { NavLink } from "react-router-dom";
 
 // material-ui
 import { HomeOutlined } from "@ant-design/icons";
+import { useNotifications } from "@digitalaidseattle/core";
 import { Breadcrumbs, Button, Card, CardContent, CardHeader, IconButton, Stack, Typography } from '@mui/material';
 import { useState } from "react";
-import { SponsorsDB } from "../api/database/SponsorsDB";
-import { LegislatorService } from "../api/legislatorService";
-import { LoadingOverlay } from "../components/LoadingOverlay";
-import { useNotifications } from "@digitalaidseattle/core";
-import { LegislatureService } from "../api/legislatureService";
-import { CommitteesDB } from "../api/database/CommitteesDB";
-import { BillService } from "../api/billService";
-import { BillsDB } from "../api/database/BillsDB";
 import { BillDao } from "../api/billDao";
+import { BillService } from "../api/billService";
 import { CommitteeDao } from "../api/committeeDao";
+import { FirebaseAiService, Project, ProjectContext } from "../api/content-generation/FirebaseAiService";
+import { BillsDB } from "../api/database/BillsDB";
+import { CommitteesDB } from "../api/database/CommitteesDB";
+import { DBSponsor, SponsorsDB } from "../api/database/SponsorsDB";
+import { LegislatorService } from "../api/legislatorService";
+import { LegislatureService } from "../api/legislatureService";
+import { PassThruDao } from "../api/passThruDao";
+import { LoadingOverlay } from "../components/LoadingOverlay";
 
 // project import
 
@@ -146,6 +148,130 @@ export const AdminPage = () => {
       });
   }
 
+  async function scrapeLegislatorInfo(): Promise<void> {
+
+    const prompt = "Parse the provided page and find the Address and Legislative assisant. Return the results in structure JSON";
+    setLoading(true);
+    SponsorsDB.getInstance()
+      .getAll()
+      .then(async dbSponsors => {
+
+        for (const dbSponsor of dbSponsors) {
+          const sponsor = dbSponsor.sponsor;
+          const url = `https://leg.wa.gov/legislators/member/${sponsor.FirstName}-${sponsor.LastName}`
+
+          const pageText = await PassThruDao.getInstance()
+            .getHtml(url)
+
+          const context: ProjectContext = {
+            type: 'text',
+            name: 'website',
+            value: pageText,
+            tokenCount: 0,
+          }
+          const project: Project = {
+            name: 'chair-query',
+            rating: 5,
+            tags: [],
+            template: '',
+            prompt: prompt,
+            contexts: [context],
+            outputs: [{ name: 'Address' }, { name: 'LegislativeAssistant' }],
+            tokenCount: 0,
+            modelType: 'gemini-2.5-flash-lite',
+          }
+
+          try {
+            FirebaseAiService.getInstance()
+              .parameterizedQuery(project, 'gemini-2.5-flash-lite')
+              .then(async result => {
+                const info = JSON.parse(await result.response.text());
+                console.log(info)
+                const address = info["address"] ?? info['Address'];
+                const assistant = info["legislative_assistant"] ?? JSON.stringify(info['Legislative_assistant']);
+
+                const updated: DBSponsor = {
+                  ...dbSponsor,
+                  sponsor: {
+                    ...sponsor,
+                    Address: address,
+                    assistant: assistant
+                  }
+                };
+                console.log(updated);
+                await SponsorsDB.getInstance()
+                  .upsert(updated);
+              })
+          } catch (err) {
+            throw err;
+          }
+
+        }
+      })
+      .catch(error => {
+        console.log(error);
+        notify.error('Failed to load.')
+      })
+      .finally(() => {
+        setLoading(false)
+        notify.success('Loaded committe members.')
+      });
+  }
+
+  async function scrapeCommitteInfo(): Promise<void> {
+
+    const prompt = "Parse the provided page and list the committee leadership in structured JSON";
+
+
+    // setLoading(true);
+    CommitteesDB.getInstance()
+      .getAll()
+      .then(async dbCommittees => {
+
+        for (const committee of dbCommittees) {
+          const url = committee.committee.Agency === 'House'
+            ? `https://leg.wa.gov/about-the-legislature/committees/house-of-representatives/${committee.committee.Acronym}`
+            : committee.committee.Agency === 'Senate'
+              ? `https://leg.wa.gov/about-the-legislature/committees/senate/${committee.committee.Acronym}`
+              : `https://leg.wa.gov/about-the-legislature/committees/joint/${committee.committee.Acronym}`
+
+          const pageText = await PassThruDao.getInstance()
+            .getHtml(url)
+
+          const context: ProjectContext = {
+            type: 'text',
+            name: 'website',
+            value: pageText,
+            tokenCount: 0,
+          }
+          const project: Project = {
+            name: 'chair-query',
+            rating: 5,
+            tags: [],
+            template: '',
+            prompt: prompt,
+            contexts: [context],
+            outputs: [{ name: 'Chair' }, { name: 'Vice Chair' }, { name: 'Ranking Member' }],
+            tokenCount: 0,
+            modelType: 'gemini-2.5-flash-lite',
+          }
+
+          FirebaseAiService.getInstance()
+            .parameterizedQuery(project, 'gemini-2.5-flash-lite')
+            .then(async result => {
+              console.log('***AI response**', committee.committee.Acronym, result.response.text());
+            })
+        }
+      })
+      .catch(error => {
+        console.log(error);
+        notify.error('Failed to load.')
+      })
+      .finally(() => {
+        setLoading(false)
+        notify.success('Loaded committe members.')
+      });
+  }
 
   return (<>
     <LoadingOverlay loading={loading} />
@@ -162,6 +288,8 @@ export const AdminPage = () => {
           <Button onClick={loadBills}>Load Bills</Button>
           <Button onClick={loadBillSponsors}>Load Bill Sponsors</Button>
           <Button onClick={loadCommitteMembers}>Load Committee Members</Button>
+          <Button onClick={scrapeLegislatorInfo}>Scrape Legislator Info</Button>
+          <Button onClick={scrapeCommitteInfo}>Scrape Committee Info</Button>
         </Stack>
       </CardContent>
     </Card>

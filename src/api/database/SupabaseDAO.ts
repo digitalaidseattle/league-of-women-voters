@@ -8,6 +8,7 @@
 import { Identifier } from "@digitalaidseattle/core";
 import { PageInfo, QueryModel } from "@digitalaidseattle/supabase";
 import { SupabaseClient } from "@supabase/supabase-js";
+import { DAO } from "../DAO";
 
 export type DataAccessOptions<T> = {
     count?: number;
@@ -15,7 +16,7 @@ export type DataAccessOptions<T> = {
     mapper?: (json: any) => T;
 }
 
-abstract class SupabaseDAO<T> {
+abstract class SupabaseDAO<T> implements DAO<T> {
 
     client: SupabaseClient;
     tableName = '';

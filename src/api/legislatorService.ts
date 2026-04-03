@@ -1,5 +1,6 @@
 import { Identifier } from "@digitalaidseattle/core";
-import { LegislatorDao } from "./legislatorDao";
+import { DAO } from "./DAO";
+import { DBSponsor, SponsorsDB } from "./database/SponsorsDB";
 
 class LegislatorService {
     private static instance: LegislatorService;
@@ -12,6 +13,7 @@ class LegislatorService {
     }
 
     biennium: string;
+    dao: DAO<DBSponsor>;
 
     constructor() {
         const current = import.meta.env.VITE_LWVW_CURRENT_BIENNIUM;
@@ -20,14 +22,17 @@ class LegislatorService {
         } else {
             throw new Error("VITE_LWVW_CURRENT_BIENNIUM is required, but was not provided.");
         }
+        this.dao = SponsorsDB.getInstance();
     }
 
     async getAll(): Promise<Member[]> {
-        return LegislatorDao.getInstance().getAll()
+        return SponsorsDB.getInstance().getAll()
+            .then(dbSponsors => dbSponsors.map(sponsorDB => sponsorDB.sponsor));
     }
 
     async getById(id: Identifier): Promise<Member> {
-        return LegislatorDao.getInstance().getById(id)
+        return SponsorsDB.getInstance().getById(id)
+            .then(sponsorDB => sponsorDB.sponsor as Member);
     }
 }
 

@@ -21,6 +21,8 @@ type Member = {
   Email: string;
   FirstName: string;
   LastName: string;
+  Address?: string;
+  Assistant?: string | string[];
 };
 
 type LegislationInfo = {

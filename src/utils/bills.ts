@@ -141,7 +141,6 @@ function deriveCommittee(bill: LegislativeDocument) {
 function inferChamber(bill: LegislativeDocument): BillRow["chamber"] {
 
   const name = (bill.BillId as string ?? "").toUpperCase();
-  console.log(name, bill)
 
   if (name.startsWith("HB")) {
     return "House";

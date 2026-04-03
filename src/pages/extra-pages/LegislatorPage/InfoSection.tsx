@@ -19,9 +19,9 @@ export function InfoSection({ legislator }: { legislator: Member }) {
         <Grid size={4}>{LEGISLATORS_CONSTANTS.phone_label}:</Grid>
         <Grid size={8}>{legislator.Phone}</Grid>
         <Grid size={4}>{LEGISLATORS_CONSTANTS.address_label}:</Grid>
-        <Grid size={8}>## Address ##</Grid>
+        <Grid size={8}>{legislator.Address}</Grid>
         <Grid size={4}>{LEGISLATORS_CONSTANTS.legislative_asst_label}:</Grid>
-        <Grid size={8}>## Legislative Asst ##</Grid>
+        <Grid size={8}>{legislator.Assistant}</Grid>
       </Grid>
     </Paper>
   )
