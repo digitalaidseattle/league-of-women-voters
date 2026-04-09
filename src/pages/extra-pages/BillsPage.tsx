@@ -5,6 +5,9 @@ import {
 } from "@ant-design/icons";
 import {
   Box,
+  Card,
+  CardContent,
+  CardHeader,
   IconButton,
   InputAdornment,
   Link,
@@ -30,6 +33,15 @@ import { BillsService } from "../../utils/bills";
 const DEFAULT_DOCUMENT_CLASS = "Bills";
 const BILL_SEARCH_URL = "https://app.leg.wa.gov/billsearch/";
 const PAGE_SIZE = 25;
+
+const billsPageStyles = {
+  card: {
+    mt: 1
+  },
+  cardContent: {
+    pt: 0
+  }
+} as const;
 
 const tabs = [
   { label: "All", value: "all" },
@@ -224,27 +236,27 @@ const BillsPage = () => {
   );
 
   return (
-    <Box sx={{ marginTop: 1 }}>
-      <Toolbar>
-        <Typography variant="h3" component="div" sx={{ flexGrow: 1 }}>
-          Bills
-        </Typography>
-      </Toolbar>
-      <DataGrid
-        apiRef={apiRef}
-        autoHeight
-        rows={filteredRows}
-        columns={columns}
-        loading={loading}
-        getRowId={(row) => row.id}
-        paginationModel={paginationModel}
-        onPaginationModelChange={setPaginationModel}
-        pageSizeOptions={[10, 25, 50, 100]}
-        disableRowSelectionOnClick
-        onRowDoubleClick={(params) => handleRowDoubleClick(params.row as BillRow)}
-        slots={{ toolbar: BillsToolbar }}
+    <Card sx={billsPageStyles.card}>
+      <CardHeader
+        title={<Typography variant="h3">Bills</Typography>}
       />
-    </Box>
+      <CardContent sx={billsPageStyles.cardContent}>
+        <DataGrid
+          apiRef={apiRef}
+          autoHeight
+          rows={filteredRows}
+          columns={columns}
+          loading={loading}
+          getRowId={(row) => row.id}
+          paginationModel={paginationModel}
+          onPaginationModelChange={setPaginationModel}
+          pageSizeOptions={[10, 25, 50, 100]}
+          disableRowSelectionOnClick
+          onRowDoubleClick={(params) => handleRowDoubleClick(params.row as BillRow)}
+          slots={{ toolbar: BillsToolbar }}
+        />
+      </CardContent>
+    </Card>
   );
 };
 
