@@ -1,3 +1,6 @@
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { NavLink, useNavigate, useSearchParams } from "react-router-dom";
+
 import {
   ReloadOutlined,
   SearchOutlined,
@@ -29,8 +32,6 @@ import BreadcrumbsNav from "../../components/BreadcrumbsNav";
 import {
   BillsService
 } from "../../utils/bills";
-
-const DEFAULT_DOCUMENT_CLASS = "Bills";
 
 type BillDetailRow = BillRow & {
   sponsors: string;
@@ -125,8 +126,8 @@ const BillDetailPage = () => {
       return;
     }
     setLoading(true);
-    LegislatureService.getInstance()
-      .getBills(DEFAULT_DOCUMENT_CLASS)
+    BillService.getInstance()
+      .getAll()
       .then((response) => {
         const match = response.find((doc) => {
           const normalized = BillsService.extractBillNumber(doc?.Name ?? "", doc);

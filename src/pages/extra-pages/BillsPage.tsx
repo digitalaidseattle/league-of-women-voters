@@ -3,6 +3,7 @@ import {
   SearchOutlined,
   ExpandAltOutlined
 } from "@ant-design/icons";
+import { PageInfo } from "@digitalaidseattle/supabase";
 import {
   Box,
   Card,
@@ -30,7 +31,6 @@ import { LegislatureService } from "../../api/legislatureService";
 import type { BillRow, LegislativeDocument } from "../../api/bill";
 import { BillsService } from "../../utils/bills";
 
-const DEFAULT_DOCUMENT_CLASS = "Bills";
 const BILL_SEARCH_URL = "https://app.leg.wa.gov/billsearch/";
 const PAGE_SIZE = 25;
 
@@ -113,140 +113,126 @@ const columns: GridColDef<BillRow>[] = [
 const BillsPage = () => {
   const apiRef = useGridApiRef();
   const navigate = useNavigate();
-  const [loading, setLoading] = useState(false);
-  const [tab, setTab] = useState<TabValue>("all");
+  const [tab, setTab] = useState<CHAMBER_TYPE>('all');
   const [search, setSearch] = useState("");
-  const [rawBills, setRawBills] = useState<LegislativeDocument[]>([]);
-  const [paginationModel, setPaginationModel] = useState<GridPaginationModel>({
-    page: 0,
-    pageSize: PAGE_SIZE
-  });
+  const [paginationModel, setPaginationModel] = useState<GridPaginationModel>({ page: 0, pageSize: PAGE_SIZE });
+  const [bills, setBills] = useState<BillRow[]>([]);
+  const [pageInfo, setPageInfo] = useState<PageInfo<BillRow>>({ rows: [], totalRowCount: 0, });
+  const { loading, setLoading } = useContext(LoadingContext);
 
-  const fetchBills = useCallback(() => {
+  useEffect(() => {
+    fetchData();
+  }, []);
+
+  useEffect(() => {
+    filter();
+  }, [bills, tab, search]);
+
+  function fetchData() {
     setLoading(true);
-    LegislatureService.getInstance()
-      .getBills(DEFAULT_DOCUMENT_CLASS)
-      .then((response) => {
-        const docs = Array.isArray(response) ? response : [];
-        docs.forEach((doc) => {
-          const rawUrl =
-            doc.Url ??
-            doc.Hyperlink ??
-            doc.SourceUrl ??
-            "";
-          const sanitizedUrl = BillsService.sanitizeBillUrl(rawUrl, doc);
-          console.log("Fetched bill document URL:", sanitizedUrl);
-        });
-        setRawBills(docs);
+    BillService.getInstance()
+      .getAll()
+      .then(data => {
+        const mapped = data
+          .map((bill, index) => mapLegislativeDocumentToBillRow(bill, index)!)
+          .filter(b => b !== undefined);
+        setBills(mapped);
       })
-      .catch((error) => {
-        console.error("Error loading bills:", error);
-        setRawBills([]);
-      })
-      .finally(() => {
-        setLoading(false);
-      });
-  }, []);
+      .finally(() => setLoading(false));
+  };
 
-  useEffect(() => {
-    fetchBills();
-  }, [fetchBills]);
-
-  useEffect(() => {
+  function filter() {
     setPaginationModel((prev) => ({ ...prev, page: 0 }));
-  }, [tab, search]);
+    setPageInfo({
+      rows: [],
+      totalRowCount: 0,
+    });
+    const rows = bills
+      .filter(row => rowFilter(row));
+    setPageInfo({
+      rows: rows,
+      totalRowCount: rows.length,
+    });
+  };
 
-  const rows = useMemo<BillRow[]>(() => {
-    return rawBills
-      .map((bill, index) => BillsService.mapLegislativeDocumentToBillRow(bill, index))
-      .filter(Boolean) as BillRow[];
-  }, [rawBills]);
+  function rowFilter(bill: BillRow): boolean {
+    const matchesTab =
+      tab === "all" ? true : bill.chamber.toLowerCase() === tab;
 
-  const filterPredicate = useMemo(() => {
-    return BillsService.buildFilterPredicate({ tab, query: search });
-  }, [tab, search]);
-
-  const filteredRows = useMemo(() => rows.filter(filterPredicate), [rows, filterPredicate]);
-
-  const handleRowDoubleClick = useCallback((row: BillRow) => {
-    const targetBill =
-      row?.normalizedBillNumber ||
-      row?.billNumber?.replace(/\D+/g, "") ||
-      "";
-    const rawName = row?.raw?.Name ?? "";
-    if (!targetBill) {
-      return;
+    if (!matchesTab) {
+      return false;
     }
-    navigate(`/bill?number=${encodeURIComponent(targetBill)}&name=${encodeURIComponent(rawName)}`);
-  }, [navigate]);
 
-  const handleOpenBillSearch = useCallback(() => {
-    window.open(BILL_SEARCH_URL, "_blank", "noopener");
-  }, []);
+    const loweredQuery = search.trim().toLowerCase();
+    if (!loweredQuery) {
+      return true;
+    }
 
-  const BillsToolbar = () => (
-    <Toolbar sx={{ justifyContent: "space-between", gap: 2, p: 1 }}>
-      <ToggleButtonGroup
-        value={tab}
-        exclusive
-        onChange={(_event, value: TabValue | null) => {
-          if (value) {
-            setTab(value);
-          }
-        }}
-        aria-label="bill chamber filter"
-      >
-        {tabs.map((tabOption) => (
-          <ToggleButton
-            key={tabOption.value}
-            value={tabOption.value}
-            aria-label={tabOption.label}
-          >
-            {tabOption.label}
-          </ToggleButton>
-        ))}
-      </ToggleButtonGroup>
-      <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-        <TextField
-          value={search}
-          onChange={(event) => setSearch(event.target.value)}
-          size="small"
-          placeholder="Search"
-          sx={{ width: 220 }}
-          InputProps={{
+    const haystack = [
+      bill.billNumber,
+      bill.title,
+      bill.committee,
+      bill.status,
+      bill.history,
+      bill.latestDocumentLabel
+    ]
+      .join(" ")
+      .toLowerCase();
+
+    return haystack.includes(loweredQuery);
+  }
+
+  function CustomToolbar() {
+    return (<Toolbar>
+      <ChamberButtonGroup chamber={tab} onChange={setTab} />
+
+      <TextField
+        value={search}
+        onChange={(event) => setSearch(event.target.value)}
+        size="small"
+        placeholder="Search"
+        sx={{ width: 220, mr: 1.5 }}
+        slotProps={{
+          input: {
             startAdornment: (
               <InputAdornment position="start">
                 <SearchOutlined />
               </InputAdornment>
             )
-          }}
-        />
-        <Tooltip title="Open Bill Search">
-          <IconButton color="primary" onClick={handleOpenBillSearch}>
-            <ExpandAltOutlined />
-          </IconButton>
-        </Tooltip>
-        <Tooltip title="Refresh">
-          <IconButton color="primary" onClick={fetchBills}>
-            <ReloadOutlined />
-          </IconButton>
-        </Tooltip>
-      </Box>
+          }
+        }}
+      />
+      <Tooltip title="Open Bill Search">
+        <IconButton
+          color="primary"
+          onClick={() => window.open(BILL_SEARCH_URL, "_blank", "noopener")}
+        >
+          <ExpandAltOutlined />
+        </IconButton>
+      </Tooltip>
+      <Tooltip title="Refresh">
+        <IconButton color="primary" size="small" onClick={fetchData}>
+          <ReloadOutlined />
+        </IconButton>
+      </Tooltip>
     </Toolbar>
   );
 
-  return (
-    <Card sx={billsPageStyles.card}>
-      <CardHeader
-        title={<Typography variant="h3">Bills</Typography>}
-      />
-      <CardContent sx={billsPageStyles.cardContent}>
+  return (<>
+    <LoadingOverlay loading={loading} />
+    <Breadcrumbs aria-label="breadcrumb">
+      <NavLink to="/" ><IconButton size="medium"><HomeOutlined /></IconButton></NavLink>
+      <Typography color="text.primary">Bills</Typography>
+    </Breadcrumbs>
+    <Card>
+      <CardHeader title="Bills" />
+      <CardContent>
         <DataGrid
           apiRef={apiRef}
           autoHeight
-          rows={filteredRows}
+          // rows={filteredRows}
+          rows={pageInfo.rows}
           columns={columns}
-          loading={loading}
           getRowId={(row) => row.id}
           paginationModel={paginationModel}
           onPaginationModelChange={setPaginationModel}

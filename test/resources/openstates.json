@@ -1,0 +1,263 @@
+[
+    {
+        "id": "ocd-bill/add62004-c6f3-4a3b-9aec-d2c44150285a",
+        "session": "2025-2026",
+        "jurisdiction": {
+            "id": "ocd-jurisdiction/country:us/state:wa/government",
+            "name": "Washington",
+            "classification": "state"
+        },
+        "from_organization": {
+            "id": "ocd-organization/ddae63d3-9f3e-4c46-a00f-703fe21b54d1",
+            "name": "Senate",
+            "classification": "upper"
+        },
+        "identifier": "SB 6309",
+        "title": "Providing for enhanced municipal permitting tools for high capacity transit projects.",
+        "classification": [
+            "bill"
+        ],
+        "subject": [],
+        "extras": {},
+        "created_at": "2026-01-27T05:12:08.172336+00:00",
+        "updated_at": "2026-02-27T06:58:26.810100+00:00",
+        "openstates_url": "https://openstates.org/wa/bills/2025-2026/SB6309/",
+        "first_action_date": "2026-01-26",
+        "latest_action_date": "2026-02-25",
+        "latest_action_description": "Referred to Rules 2 Review.",
+        "latest_passage_date": "",
+        "Url": "https://app.leg.wa.gov/BillSummary/?BillNumber=6309&Year=2025&Initiative=false"
+    },
+    {
+        "id": "ocd-bill/2150368a-3a84-4eca-bf7d-b0c032ae1217",
+        "session": "2025-2026",
+        "jurisdiction": {
+            "id": "ocd-jurisdiction/country:us/state:wa/government",
+            "name": "Washington",
+            "classification": "state"
+        },
+        "from_organization": {
+            "id": "ocd-organization/ddae63d3-9f3e-4c46-a00f-703fe21b54d1",
+            "name": "Senate",
+            "classification": "upper"
+        },
+        "identifier": "SB 6155",
+        "title": "Concerning special parking privileges for persons with disabilities.",
+        "classification": [
+            "bill"
+        ],
+        "subject": [],
+        "extras": {},
+        "created_at": "2026-01-15T19:17:11.459220+00:00",
+        "updated_at": "2026-02-27T06:58:26.205876+00:00",
+        "openstates_url": "https://openstates.org/wa/bills/2025-2026/SB6155/",
+        "first_action_date": "2026-01-15",
+        "latest_action_date": "2026-02-26",
+        "latest_action_description": "Senate Rules \"X\" file.",
+        "latest_passage_date": "",
+        "Url": "https://app.leg.wa.gov/BillSummary/?BillNumber=6155&Year=2025&Initiative=false"
+    },
+    {
+        "id": "ocd-bill/111504a9-6320-4c53-ba63-298f68f6debc",
+        "session": "2025-2026",
+        "jurisdiction": {
+            "id": "ocd-jurisdiction/country:us/state:wa/government",
+            "name": "Washington",
+            "classification": "state"
+        },
+        "from_organization": {
+            "id": "ocd-organization/ddae63d3-9f3e-4c46-a00f-703fe21b54d1",
+            "name": "Senate",
+            "classification": "upper"
+        },
+        "identifier": "SB 5922",
+        "title": "Authorizing transportation vehicle fund transfers.",
+        "classification": [
+            "bill"
+        ],
+        "subject": [],
+        "extras": {},
+        "created_at": "2025-12-20T05:17:37.799985+00:00",
+        "updated_at": "2026-02-27T06:58:24.572412+00:00",
+        "openstates_url": "https://openstates.org/wa/bills/2025-2026/SB5922/",
+        "first_action_date": "2025-12-19",
+        "latest_action_date": "2026-02-27",
+        "latest_action_description": "Scheduled for executive session in the House Committee on Appropriations at 10:30 AM (Subject to change).",
+        "latest_passage_date": "",
+        "Url": "https://app.leg.wa.gov/BillSummary/?BillNumber=5922&Year=2025&Initiative=false"
+    },
+    {
+        "id": "ocd-bill/9e9af540-28de-427f-ac51-127a7ce01336",
+        "session": "2025-2026",
+        "jurisdiction": {
+            "id": "ocd-jurisdiction/country:us/state:wa/government",
+            "name": "Washington",
+            "classification": "state"
+        },
+        "from_organization": {
+            "id": "ocd-organization/ddae63d3-9f3e-4c46-a00f-703fe21b54d1",
+            "name": "Senate",
+            "classification": "upper"
+        },
+        "identifier": "SB 6177",
+        "title": "Modifying the legislative evaluation and accountability program website.",
+        "classification": [
+            "bill"
+        ],
+        "subject": [],
+        "extras": {},
+        "created_at": "2026-01-15T19:05:58.918501+00:00",
+        "updated_at": "2026-02-27T06:58:20.118328+00:00",
+        "openstates_url": "https://openstates.org/wa/bills/2025-2026/SB6177/",
+        "first_action_date": "2026-01-15",
+        "latest_action_date": "2026-02-26",
+        "latest_action_description": "Senate Rules \"X\" file.",
+        "latest_passage_date": "",
+        "Url": "https://app.leg.wa.gov/BillSummary/?BillNumber=6177&Year=2025&Initiative=false"
+    },
+    {
+        "id": "ocd-bill/ea7a1caf-978b-4d93-803c-b238ec5cf5c3",
+        "session": "2025-2026",
+        "jurisdiction": {
+            "id": "ocd-jurisdiction/country:us/state:wa/government",
+            "name": "Washington",
+            "classification": "state"
+        },
+        "from_organization": {
+            "id": "ocd-organization/ddae63d3-9f3e-4c46-a00f-703fe21b54d1",
+            "name": "Senate",
+            "classification": "upper"
+        },
+        "identifier": "SB 6130",
+        "title": "Celebrating national voter registration day.",
+        "classification": [
+            "bill"
+        ],
+        "subject": [],
+        "extras": {},
+        "created_at": "2026-01-14T19:14:23.202078+00:00",
+        "updated_at": "2026-02-27T06:58:15.319104+00:00",
+        "openstates_url": "https://openstates.org/wa/bills/2025-2026/SB6130/",
+        "first_action_date": "2026-01-14",
+        "latest_action_date": "2026-02-26",
+        "latest_action_description": "Senate Rules \"X\" file.",
+        "latest_passage_date": "",
+        "Url": "https://app.leg.wa.gov/BillSummary/?BillNumber=6130&Year=2025&Initiative=false"
+    },
+    {
+        "id": "ocd-bill/d0ff09ba-623d-49a9-ab40-5f88c3517e7a",
+        "session": "2025-2026",
+        "jurisdiction": {
+            "id": "ocd-jurisdiction/country:us/state:wa/government",
+            "name": "Washington",
+            "classification": "state"
+        },
+        "from_organization": {
+            "id": "ocd-organization/ddae63d3-9f3e-4c46-a00f-703fe21b54d1",
+            "name": "Senate",
+            "classification": "upper"
+        },
+        "identifier": "SB 6076",
+        "title": "Streamlining consumer-owned utility procurement requirements for clean energy generation, energy storage, transmission, and distribution projects.",
+        "classification": [
+            "bill"
+        ],
+        "subject": [],
+        "extras": {},
+        "created_at": "2026-01-14T04:26:52.653356+00:00",
+        "updated_at": "2026-02-27T06:58:13.361128+00:00",
+        "openstates_url": "https://openstates.org/wa/bills/2025-2026/SB6076/",
+        "first_action_date": "2026-01-13",
+        "latest_action_date": "2026-02-27",
+        "latest_action_description": "Scheduled for public hearing in the House Committee on Capital Budget at 9:00 AM (Subject to change).",
+        "latest_passage_date": "",
+        "Url": "https://app.leg.wa.gov/BillSummary/?BillNumber=6076&Year=2025&Initiative=false"
+    },
+    {
+        "id": "ocd-bill/5f2214d5-2a14-4b90-a340-e90ba53f1a02",
+        "session": "2025-2026",
+        "jurisdiction": {
+            "id": "ocd-jurisdiction/country:us/state:wa/government",
+            "name": "Washington",
+            "classification": "state"
+        },
+        "from_organization": {
+            "id": "ocd-organization/ddae63d3-9f3e-4c46-a00f-703fe21b54d1",
+            "name": "Senate",
+            "classification": "upper"
+        },
+        "identifier": "SB 5249",
+        "title": "Concerning siting kit homes.",
+        "classification": [
+            "bill"
+        ],
+        "subject": [],
+        "extras": {},
+        "created_at": "2025-01-14T17:53:17.788967+00:00",
+        "updated_at": "2026-02-27T06:57:55.131751+00:00",
+        "openstates_url": "https://openstates.org/wa/bills/2025-2026/SB5249/",
+        "first_action_date": "2025-01-14",
+        "latest_action_date": "2026-02-26",
+        "latest_action_description": "Senate Rules \"X\" file.",
+        "latest_passage_date": "",
+        "Url": "https://app.leg.wa.gov/BillSummary/?BillNumber=5249&Year=2025&Initiative=false"
+    },
+    {
+        "id": "ocd-bill/cbf6f9bf-c782-43ef-b9d8-e1f2ab1f0604",
+        "session": "2025-2026",
+        "jurisdiction": {
+            "id": "ocd-jurisdiction/country:us/state:wa/government",
+            "name": "Washington",
+            "classification": "state"
+        },
+        "from_organization": {
+            "id": "ocd-organization/7417a716-eba8-4437-a6e9-df14694bcb79",
+            "name": "House",
+            "classification": "lower"
+        },
+        "identifier": "HB 1906",
+        "title": "Increasing transparency and consumer protection in water system rates.",
+        "classification": [
+            "bill"
+        ],
+        "subject": [],
+        "extras": {},
+        "created_at": "2025-02-10T19:42:59.377856+00:00",
+        "updated_at": "2026-02-27T06:57:49.986643+00:00",
+        "openstates_url": "https://openstates.org/wa/bills/2025-2026/HB1906/",
+        "first_action_date": "2025-02-10",
+        "latest_action_date": "2026-02-26",
+        "latest_action_description": "Public hearing in the Senate Committee on Ways & Means at 1:30 PM.",
+        "latest_passage_date": "",
+        "Url": "https://app.leg.wa.gov/BillSummary/?BillNumber=1906&Year=2025&Initiative=false"
+    },
+    {
+        "id": "ocd-bill/8cdc1918-dbd3-476e-ad43-98604be9a294",
+        "session": "2025-2026",
+        "jurisdiction": {
+            "id": "ocd-jurisdiction/country:us/state:wa/government",
+            "name": "Washington",
+            "classification": "state"
+        },
+        "from_organization": {
+            "id": "ocd-organization/ddae63d3-9f3e-4c46-a00f-703fe21b54d1",
+            "name": "Senate",
+            "classification": "upper"
+        },
+        "identifier": "SB 5328",
+        "title": "Establishing a new chapter for the licensing and regulation of businesses providing earned wage access services.",
+        "classification": [
+            "bill"
+        ],
+        "subject": [],
+        "extras": {},
+        "created_at": "2025-01-17T18:11:14.199247+00:00",
+        "updated_at": "2026-02-27T06:57:47.633972+00:00",
+        "openstates_url": "https://openstates.org/wa/bills/2025-2026/SB5328/",
+        "first_action_date": "2025-01-17",
+        "latest_action_date": "2026-02-26",
+        "latest_action_description": "Senate Rules \"X\" file.",
+        "latest_passage_date": "",
+        "Url": "https://app.leg.wa.gov/BillSummary/?BillNumber=5328&Year=2025&Initiative=false"
+    }
+]
