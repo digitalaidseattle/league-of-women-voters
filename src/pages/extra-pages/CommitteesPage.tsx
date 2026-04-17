@@ -4,9 +4,10 @@ import { useEffect, useState } from 'react';
 
 import { PageInfo } from "@digitalaidseattle/supabase";
 import { Breadcrumbs, Card, CardContent, CardHeader, IconButton, Tooltip, Typography } from '@mui/material';
-import { DataGrid, GridColDef, Toolbar, useGridApiRef } from "@mui/x-data-grid";
+import { DataGrid, GridColDef, useGridApiRef } from "@mui/x-data-grid";
 import { NavLink, useNavigate } from "react-router-dom";
 import { LegislatureService } from '../../api/legislatureService';
+import { LoadingOverlay } from "../../components/LoadingOverlay";
 // project import
 
 // ==============================|| SAMPLE PAGE ||============================== //
@@ -26,28 +27,31 @@ const CommitteesPage = () => {
   });
 
   const navigate = useNavigate()
+  const [initialized, setInitialized] = useState(false);
 
   useEffect(() => {
-    setColumns(getColumns());
-    refresh()
-  }, []);
-
+    if (!initialized) {
+      setColumns(getColumns());
+      refresh();
+    }
+  }, [initialized]);
 
   function refresh() {
+    setInitialized(false);
     setPageInfo({
       rows: [],
       totalRowCount: 0,
-    })
+    });
     LegislatureService.getInstance()
       .getCommittees()
-      .then(response =>
+      .then(data => {
         setPageInfo({
-          rows: response,
-          totalRowCount: response.length,
-        }))
-      .catch(error => {
-        console.error('Error invoking function:', error);
-      });
+          rows: data,
+          totalRowCount: data.length,
+        });
+      }).finally(() => {
+        setInitialized(true);
+      })
   }
 
   const openCommittee = (params: any) => {
@@ -84,26 +88,19 @@ const CommitteesPage = () => {
     ];
   };
 
-
-  function CustomToolbar() {
-    return (
-      <Toolbar>
-        <Tooltip title="Refresh">
-          <IconButton color="primary" onClick={refresh}>
-            <ReloadOutlined />
-          </IconButton>
-        </Tooltip>
-      </Toolbar>
-    )
-  }
-
   return (<>
+    <LoadingOverlay loading={!initialized} />
     <Breadcrumbs aria-label="breadcrumb">
       <NavLink to="/" ><IconButton size="medium"><HomeOutlined /></IconButton></NavLink>
       <Typography color="text.primary">Committees</Typography>
     </Breadcrumbs>
-    <Card>
-      <CardHeader title="Committees" />
+    <Card sx={{ height: '100%' }}>
+      <CardHeader title="Committees"
+        action={<Tooltip title="Refresh">
+          <IconButton color="primary" onClick={refresh}>
+            <ReloadOutlined />
+          </IconButton>
+        </Tooltip>} />
       <CardContent>
         <DataGrid
           getRowId={(row) => row.Id}
@@ -114,8 +111,6 @@ const CommitteesPage = () => {
           onPaginationModelChange={setPaginationModel}
           pageSizeOptions={[10, 25, 50, 100]}
           onRowDoubleClick={openCommittee}
-          showToolbar={true}
-          slots={{ toolbar: CustomToolbar }}
         />
       </CardContent>
     </Card>

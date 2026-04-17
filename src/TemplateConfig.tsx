@@ -2,7 +2,8 @@
 
 import {
     FileTextOutlined,
-    TeamOutlined
+    TeamOutlined,
+    UserOutlined
 } from '@ant-design/icons';
 import logo from "./assets/images/LWV_Logo2_500x337_rgb.jpg";
 
@@ -23,11 +24,11 @@ export const TemplateConfig = () => {
                 icon: <TeamOutlined />
             } as MenuItem,
             {
-                id: 'sponsors',
-                title: 'Sponsors',
+                id: 'legislators',
+                title: 'Legislators',
                 type: 'item',
-                url: '/sponsors',
-                icon: <TeamOutlined />
+                url: '/legislators',
+                icon: <UserOutlined />
             } as MenuItem,
             {
                 id: 'bills',
@@ -35,13 +36,6 @@ export const TemplateConfig = () => {
                 type: 'item',
                 url: '/bills',
                 icon: <FileTextOutlined />
-            } as MenuItem,
-            {
-                id: 'legislators',
-                title: 'Legislators',
-                type: 'item',
-                url: '/legislators',
-                icon: <TeamOutlined />
             } as MenuItem
         ]
     } as MenuItem;
