@@ -5,12 +5,12 @@ import {
   MarkdownPage,
   MinimalLayout
 } from "@digitalaidseattle/mui";
-import BillDetailPage from './extra-pages/BillDetailPage';
-import { BillsPage } from './extra-pages/BillsPage';
 import CommitteePage from './extra-pages/CommitteePage';
 import CommitteesPage from './extra-pages/CommitteesPage';
 import SponsorPage from './extra-pages/LegislatorPage';
 import { LegislatorsPage } from './extra-pages/LegislatorsPage';
+import { BillsPage } from "./extra-pages/BillsPage";
+import { BillPage } from "./BillPage";
 
 const routes = [
   {
@@ -34,8 +34,8 @@ const routes = [
         element: <BillsPage />,
       },
       {
-        path: "bill",
-        element: <BillDetailPage />,
+        path: "bill/:id",
+        element: <BillPage />,
       },
       {
         path: "legislators",

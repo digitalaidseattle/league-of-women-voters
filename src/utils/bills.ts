@@ -48,8 +48,9 @@ class BillsService {
     const { label: latestDocumentLabel, url: latestDocumentUrl } =
       BillsService.deriveDocumentLink(bill);
 
+    console.log(bill)
     return {
-      id: [billNumber, bill.Biennium ?? index].join("-"),
+      id: bill.Name!, //[billNumber, bill.Biennium ?? index].join("-"),
       billNumber: BillsService.displayValue(billNumber),
       normalizedBillNumber,
       committee: BillsService.displayValue(committee),
@@ -158,8 +159,8 @@ class BillsService {
       Array.isArray(bill.CommitteeNames?.CommitteeName)
         ? bill.CommitteeNames?.CommitteeName?.[0]
         : typeof bill.CommitteeNames?.CommitteeName === "string"
-        ? bill.CommitteeNames.CommitteeName
-        : undefined,
+          ? bill.CommitteeNames.CommitteeName
+          : undefined,
       bill.CommitteeName,
       bill.OriginatingAgency,
       bill.Agency

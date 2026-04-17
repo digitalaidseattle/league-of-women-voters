@@ -27,9 +27,9 @@ const LegislatorPage = () => {
     LegislatorService.getInstance()
       .getById(Number(id))
       .then(leg => setLegislator(leg))
-  }, [id])
-  return (
+  }, [id]);
 
+  return (
     <>
       <Breadcrumbs aria-label="breadcrumb">
         <NavLink to="/" ><IconButton size="medium"><HomeOutlined /></IconButton></NavLink>

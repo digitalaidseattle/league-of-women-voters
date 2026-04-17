@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import { NavLink, useNavigate } from "react-router-dom";
 
 // material-ui
@@ -10,6 +10,7 @@ import { PageInfo } from "@digitalaidseattle/supabase";
 import { LegislatorService } from '../../api/legislatorService';
 import { CHAMBER_TYPE, ChamberButtonGroup } from "../../components/ChamberButtonGroup";
 import { LoadingOverlay } from '../../components/LoadingOverlay';
+import { LoadingContext } from '@digitalaidseattle/core';
 // project import
 
 // ==============================|| SAMPLE PAGE ||============================== //
@@ -19,64 +20,17 @@ export const LegislatorsPage = () => {
   const apiRef = useGridApiRef();
   const navigate = useNavigate();
 
-  const [columns, setColumns] = useState<GridColDef[]>([]);
   const [paginationModel, setPaginationModel] = useState({ page: 0, pageSize: PAGE_SIZE });
+  const { loading, setLoading } = useContext(LoadingContext);
 
   const [pageInfo, setPageInfo] = useState<PageInfo<Member>>({
     rows: [],
     totalRowCount: 0,
   });
-  const [initialized, setInitialized] = useState(false);
-
   const [chamber, setChamber] = useState<CHAMBER_TYPE>('all');
 
-  useEffect(() => {
-    if (!initialized) {
-      setColumns(getColumns());
-      refresh();
-    }
-  }, [initialized]);
-
-  useEffect(() => {
-    refresh();
-  }, [chamber]);
-
-  function refresh() {
-    setInitialized(false);
-    setPageInfo({ rows: [], totalRowCount: 0, });
-    LegislatorService.getInstance()
-      .getAll()
-      .then(legislators => {
-        const rows = legislators.filter(filterPredicate);
-        setPageInfo({
-          rows: rows,
-          totalRowCount: rows.length,
-        });
-        setInitialized(true);
-      })
-
-  }
-
-  function filterPredicate(legislator: Member): boolean {
-    switch (chamber) {
-      case 'house':
-        return legislator.Agency === 'House'
-      case 'senate':
-        return legislator.Agency === 'Senate'
-      case 'all':
-      case 'joint':
-      default:
-        return true;
-    }
-  }
-
-  function handleChamberChange(value: CHAMBER_TYPE): void {
-    setChamber(value);
-    refresh();
-  }
-
-  const getColumns = (): GridColDef[] => {
-    return [
+  const columns: GridColDef[] =
+    [
       {
         field: "Name",
         headerName: "Name",
@@ -114,45 +68,76 @@ export const LegislatorsPage = () => {
         type: "string"
       }
     ];
-  };
+
+  useEffect(() => {
+    refresh();
+  }, [chamber]);
+
+  function refresh() {
+    setLoading(false);
+    setPageInfo({ rows: [], totalRowCount: 0, });
+    LegislatorService.getInstance()
+      .getAll()
+      .then(legislators => {
+        const rows = legislators.filter(filterPredicate);
+        setPageInfo({
+          rows: rows,
+          totalRowCount: rows.length,
+        });
+      })
+      .finally(() => setLoading(false))
+  }
+
+  function filterPredicate(legislator: Member): boolean {
+    switch (chamber) {
+      case 'house':
+        return legislator.Agency === 'House'
+      case 'senate':
+        return legislator.Agency === 'Senate'
+      case 'all':
+      case 'joint':
+      default:
+        return true;
+    }
+  }
+
+  function handleChamberChange(value: CHAMBER_TYPE): void {
+    setChamber(value);
+  }
 
   function CustomToolbar() {
     return (
       <Toolbar>
         <ChamberButtonGroup chamber={chamber} onChange={handleChamberChange} />
+        <Tooltip title="Refresh">
+          <IconButton color="primary" onClick={refresh}>
+            <ReloadOutlined />
+          </IconButton>
+        </Tooltip>
       </Toolbar>
     );
   }
   return (<>
-    <LoadingOverlay loading={!initialized} />
+    <LoadingOverlay loading={loading} />
     <Breadcrumbs aria-label="breadcrumb">
       <NavLink to="/" ><IconButton size="medium"><HomeOutlined /></IconButton></NavLink>
       <Typography color="text.primary">Legislators</Typography>
     </Breadcrumbs>
     <Card>
-      <CardHeader title="Legislators"
-        action={
-          <Tooltip title="Refresh">
-            <IconButton color="primary" onClick={refresh}>
-              <ReloadOutlined />
-            </IconButton>
-          </Tooltip>
-        }
+      <CardHeader title="Legislators" />
+      <DataGrid
+        apiRef={apiRef}
+        autoHeight
+        rows={pageInfo.rows}
+        columns={columns}
+        getRowId={(row) => row.Id}
+        paginationModel={paginationModel}
+        onPaginationModelChange={setPaginationModel}
+        pageSizeOptions={[10, 25, 50, 100]}
+        onRowDoubleClick={params => navigate(`/legislator/${params.row.Id}`)}
+        showToolbar={true}
+        slots={{ toolbar: CustomToolbar }}
       />
-      <CardContent>
-        <DataGrid
-          getRowId={(row) => row.Id}
-          apiRef={apiRef}
-          rows={pageInfo.rows}
-          columns={columns}
-          paginationModel={paginationModel}
-          onPaginationModelChange={setPaginationModel}
-          pageSizeOptions={[10, 25, 50, 100]}
-          onRowDoubleClick={params => navigate(`/legislator/${params.row.Id}`)}
-          showToolbar={true}
-          slots={{ toolbar: CustomToolbar }}
-        />
-      </CardContent>
     </Card>
   </>
   )
