@@ -2,14 +2,13 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { NavLink, useNavigate, useSearchParams } from "react-router-dom";
 
 import {
-  ExpandAltOutlined,
-  HomeOutlined,
   ReloadOutlined,
-  SearchOutlined
+  SearchOutlined,
+  ExpandAltOutlined,
+  LeftOutlined
 } from "@ant-design/icons";
 import {
   Box,
-  Breadcrumbs,
   IconButton,
   InputAdornment,
   Link,
@@ -25,12 +24,13 @@ import {
   type GridColDef,
   useGridApiRef
 } from "@mui/x-data-grid";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { useNavigate, useSearchParams } from "react-router-dom";
+import { LegislatureService } from "../../api/legislatureService";
 import type { BillRow } from "../../api/bill";
-import { BillService } from "../../api/billService";
+import BreadcrumbsNav from "../../components/BreadcrumbsNav";
 import {
-  extractBillNumber,
-  mapLegislativeDocumentToBillRow,
-  summarizeSponsors
+  BillsService
 } from "../../utils/bills";
 
 type BillDetailRow = BillRow & {
@@ -129,9 +129,8 @@ const BillDetailPage = () => {
     BillService.getInstance()
       .getAll()
       .then((response) => {
-        const docs = Array.isArray(response) ? response : [];
-        const match = docs.find((doc) => {
-          const normalized = extractBillNumber(doc?.Name ?? "", doc);
+        const match = response.find((doc) => {
+          const normalized = BillsService.extractBillNumber(doc?.Name ?? "", doc);
           if (targetNumber && normalized === targetNumber) {
             return true;
           }
@@ -141,11 +140,11 @@ const BillDetailPage = () => {
           return false;
         });
         if (match) {
-          const row = mapLegislativeDocumentToBillRow(match, 0);
+          const row = BillsService.mapLegislativeDocumentToBillRow(match, 0);
           if (row) {
             setBill({
               ...row,
-              sponsors: summarizeSponsors(match)
+              sponsors: BillsService.summarizeSponsors(match)
             });
           } else {
             setBill(null);
@@ -176,12 +175,18 @@ const BillDetailPage = () => {
   }, [bill]);
 
   return (
-    <>
-      <Breadcrumbs aria-label="breadcrumb">
-        <NavLink to="/" ><IconButton size="medium"><HomeOutlined /></IconButton></NavLink>
-        <NavLink to="/bills" >Bills</NavLink>
-        <Typography color="text.primary">Bill Detail</Typography>
-      </Breadcrumbs>
+    <Box sx={{ marginTop: 1 }}>
+      <BreadcrumbsNav>
+        <Link
+          component="button"
+          underline="hover"
+          color="inherit"
+          onClick={() => navigate("/bills")}
+        >
+          <LeftOutlined style={{ fontSize: 12, marginRight: 6 }} />
+          Back to Bills
+        </Link>
+      </BreadcrumbsNav>
       <Toolbar sx={{ justifyContent: "space-between" }}>
         <Box>
           <Typography variant="h3" component="div">
@@ -238,7 +243,7 @@ const BillDetailPage = () => {
         disableRowSelectionOnClick
         hideFooter
       />
-    </>
+    </Box>
   );
 };
 

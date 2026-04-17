@@ -1,4 +1,7 @@
+import { CopyOutlined } from "@ant-design/icons";
+import { useNotifications } from "@digitalaidseattle/core";
 import { PageInfo } from "@digitalaidseattle/supabase";
+import { Box, Button } from "@mui/material";
 import { Link } from "react-router-dom";
 import { DataGrid, GridColDef, useGridApiRef } from "@mui/x-data-grid";
 import { useContext, useEffect, useState } from "react";
@@ -10,6 +13,7 @@ const PAGE_SIZE = 25;
 
 const MembersGrid = (props: { agency: string, committeeName: string }) => {
   const apiRef = useGridApiRef();
+  const notifications = useNotifications();
   const [paginationModel, setPaginationModel] = useState({
     page: 0,
     pageSize: PAGE_SIZE,
@@ -33,7 +37,7 @@ const MembersGrid = (props: { agency: string, committeeName: string }) => {
     if (props.committeeName && props.agency) {
       refresh()
     }
-  }, [props]);
+  },[props]);
 
 
   // function exportData() {
@@ -69,6 +73,26 @@ const MembersGrid = (props: { agency: string, committeeName: string }) => {
         console.error('Error invoking function:', error);
       })
       .finally(() => setLoading(false));
+  }
+
+  async function copyEmails() {
+    const emails = pageInfo.rows
+      .map((row) => row.Email)
+      .filter((email) => typeof email === "string" && email.trim().length > 0)
+      .join(", ");
+
+    if (!emails) {
+      notifications.warn("No emails found.");
+      return;
+    }
+
+    try {
+      await navigator.clipboard.writeText(emails);
+      notifications.success("All committee emails copied.");
+    } catch (error) {
+      console.error("Failed to copy emails:", error);
+      notifications.error("Copy failed. Please try again.");
+    }
   }
 
   const getColumns = (): GridColDef[] => {
@@ -125,20 +149,29 @@ const MembersGrid = (props: { agency: string, committeeName: string }) => {
     ];
   };
 
-  return (
-    <>
-      <LoadingOverlay loading={loading} />
-      <DataGrid
-        getRowId={(row) => row.Id}
-        apiRef={apiRef}
-        rows={pageInfo.rows}
-        columns={columns}
-        paginationModel={paginationModel}
-        onPaginationModelChange={setPaginationModel}
-        pageSizeOptions={[10, 25, 50, 100]}
-      />
-    </>
-  )
+return (
+  <Box>
+    <Box sx={{ display: "flex", justifyContent: "flex-end", mb: 1 }}>
+      <Button
+        variant="text"
+        color="primary"
+        startIcon={<CopyOutlined />}
+        onClick={copyEmails}
+      >
+        Copy all emails
+      </Button>
+    </Box>
+    <DataGrid
+      getRowId={(row) => row.Id}
+      apiRef={apiRef}
+      rows={pageInfo.rows}
+      columns={columns}
+      paginationModel={paginationModel}
+      onPaginationModelChange={setPaginationModel}
+      pageSizeOptions={[10, 25, 50, 100]}
+    />
+  </Box>
+)
 }
 
 export default MembersGrid;

@@ -1,18 +1,19 @@
 import {
-  ExpandAltOutlined,
-  HomeOutlined,
   ReloadOutlined,
-  SearchOutlined
+  SearchOutlined,
+  ExpandAltOutlined
 } from "@ant-design/icons";
 import { PageInfo } from "@digitalaidseattle/supabase";
 import {
-  Breadcrumbs,
+  Box,
   Card,
   CardContent,
   CardHeader,
   IconButton,
   InputAdornment,
   Link,
+  ToggleButton,
+  ToggleButtonGroup,
   TextField,
   Toolbar,
   Tooltip,
@@ -21,19 +22,35 @@ import {
 import {
   DataGrid,
   GridColDef,
-  type GridPaginationModel
+  type GridPaginationModel,
+  useGridApiRef
 } from "@mui/x-data-grid";
-import { useContext, useEffect, useState } from "react";
-import { NavLink, useNavigate } from "react-router-dom";
-import type { BillRow } from "../../api/bill";
-import { BillService } from "../../api/billService";
-import { CHAMBER_TYPE, ChamberButtonGroup } from "../../components/ChamberButtonGroup";
-import { LoadingOverlay } from "../../components/LoadingOverlay";
-import { mapLegislativeDocumentToBillRow } from "../../utils/bills";
-import { LoadingContext } from "@digitalaidseattle/core";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { LegislatureService } from "../../api/legislatureService";
+import type { BillRow, LegislativeDocument } from "../../api/bill";
+import { BillsService } from "../../utils/bills";
 
 const BILL_SEARCH_URL = "https://app.leg.wa.gov/billsearch/";
 const PAGE_SIZE = 25;
+
+const billsPageStyles = {
+  card: {
+    mt: 1
+  },
+  cardContent: {
+    pt: 0
+  }
+} as const;
+
+const tabs = [
+  { label: "All", value: "all" },
+  { label: "House", value: "house" },
+  { label: "Senate", value: "senate" },
+  { label: "Joint", value: "joint" }
+] as const;
+
+type TabValue = (typeof tabs)[number]["value"];
 
 const columns: GridColDef<BillRow>[] = [
   {
@@ -94,6 +111,7 @@ const columns: GridColDef<BillRow>[] = [
 ];
 
 const BillsPage = () => {
+  const apiRef = useGridApiRef();
   const navigate = useNavigate();
   const [tab, setTab] = useState<CHAMBER_TYPE>('all');
   const [search, setSearch] = useState("");
@@ -198,8 +216,7 @@ const BillsPage = () => {
         </IconButton>
       </Tooltip>
     </Toolbar>
-    );
-  }
+  );
 
   return (<>
     <LoadingOverlay loading={loading} />
@@ -211,6 +228,7 @@ const BillsPage = () => {
       <CardHeader title="Bills" />
       <CardContent>
         <DataGrid
+          apiRef={apiRef}
           autoHeight
           // rows={filteredRows}
           rows={pageInfo.rows}
@@ -220,24 +238,11 @@ const BillsPage = () => {
           onPaginationModelChange={setPaginationModel}
           pageSizeOptions={[10, 25, 50, 100]}
           disableRowSelectionOnClick
-          onRowDoubleClick={(params) => {
-            const row = params.row as BillRow;
-            const targetBill =
-              row?.normalizedBillNumber ||
-              row?.billNumber?.replace(/\D+/g, "") ||
-              "";
-            const rawName = row?.raw?.Name ?? "";
-            if (!targetBill) {
-              return;
-            }
-            navigate(`/bill?number=${encodeURIComponent(targetBill)}&name=${encodeURIComponent(rawName)}`);
-          }}
-          showToolbar={true}
-          slots={{ toolbar: CustomToolbar }}
+          onRowDoubleClick={(params) => handleRowDoubleClick(params.row as BillRow)}
+          slots={{ toolbar: BillsToolbar }}
         />
       </CardContent>
     </Card>
-  </>
   );
 };
 
