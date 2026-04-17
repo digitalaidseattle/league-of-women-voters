@@ -1,13 +1,17 @@
+import { CopyOutlined } from "@ant-design/icons";
+import { LoadingContext, useNotifications } from "@digitalaidseattle/core";
 import { PageInfo } from "@digitalaidseattle/supabase";
-import { Link } from "@mui/material";
+import { Box, Button } from "@mui/material";
 import { DataGrid, GridColDef, useGridApiRef } from "@mui/x-data-grid";
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 import { LegislatureService } from "../../../api/legislatureService";
 
 const PAGE_SIZE = 25;
 
 const MembersGrid = (props: { agency: string, committeeName: string }) => {
   const apiRef = useGridApiRef();
+  const notifications = useNotifications();
   const [paginationModel, setPaginationModel] = useState({
     page: 0,
     pageSize: PAGE_SIZE,
@@ -18,7 +22,7 @@ const MembersGrid = (props: { agency: string, committeeName: string }) => {
     rows: [],
     totalRowCount: 0,
   });
-
+  const { setLoading } = useContext(LoadingContext);
   // const [agency, setAgency] = useState<string>("");
   // const [committeeName, setCommitteeName] = useState<string>("");
 
@@ -31,7 +35,7 @@ const MembersGrid = (props: { agency: string, committeeName: string }) => {
     if (props.committeeName && props.agency) {
       refresh()
     }
-  }, [props]);
+  },[props]);
 
 
   // function exportData() {
@@ -50,6 +54,7 @@ const MembersGrid = (props: { agency: string, committeeName: string }) => {
   // }
 
   function refresh() {
+    setLoading(true);
     setPageInfo({
       rows: [],
       totalRowCount: 0,
@@ -64,7 +69,28 @@ const MembersGrid = (props: { agency: string, committeeName: string }) => {
       })
       .catch(error => {
         console.error('Error invoking function:', error);
-      });
+      })
+      .finally(() => setLoading(false));
+  }
+
+  async function copyEmails() {
+    const emails = pageInfo.rows
+      .map((row) => row.Email)
+      .filter((email) => typeof email === "string" && email.trim().length > 0)
+      .join(", ");
+
+    if (!emails) {
+      notifications.warn("No emails found.");
+      return;
+    }
+
+    try {
+      await navigator.clipboard.writeText(emails);
+      notifications.success("All committee emails copied.");
+    } catch (error) {
+      console.error("Failed to copy emails:", error);
+      notifications.error("Copy failed. Please try again.");
+    }
   }
 
   const getColumns = (): GridColDef[] => {
@@ -81,57 +107,68 @@ const MembersGrid = (props: { agency: string, committeeName: string }) => {
         width: 200,
         type: "string",
         renderCell: (params) => {
-          const sponsor = params.row;
-          console.log('Rendering sponsor:', sponsor);
+          const legislator = params.row;
           return (
-              <Link href={`/sponsor?id=${sponsor.Id}`}>{sponsor.Name}</Link>
+            <Link to={`/legislator/${legislator.Id}`}>{legislator.Name}</Link>
           );
         }
       },
 
-{
-  field: "Agency",
-    headerName: "Agency",
-      width: 100,
+      {
+        field: "Agency",
+        headerName: "Agency",
+        width: 100,
         type: "string"
-},
-{
-  field: "Party",
-    headerName: "Party",
-      width: 100,
+      },
+      {
+        field: "Party",
+        headerName: "Party",
+        width: 100,
         type: "string"
-},
-{
-  field: "District",
-    headerName: "District",
-      width: 100,
+      },
+      {
+        field: "District",
+        headerName: "District",
+        width: 100,
         type: "number"
-},
-{
-  field: "Email",
-    headerName: "Email",
-      width: 200,
+      },
+      {
+        field: "Email",
+        headerName: "Email",
+        width: 200,
         type: "string"
-},
-{
-  field: "LongName",
-    headerName: "Long Name",
-      width: 300,
+      },
+      {
+        field: "LongName",
+        headerName: "Long Name",
+        width: 300,
         type: "string"
-}
+      }
     ];
   };
 
 return (
-  <DataGrid
-    getRowId={(row) => row.Id}
-    apiRef={apiRef}
-    rows={pageInfo.rows}
-    columns={columns}
-    paginationModel={paginationModel}
-    onPaginationModelChange={setPaginationModel}
-    pageSizeOptions={[10, 25, 50, 100]}
-  />
+  <Box>
+    <Box sx={{ display: "flex", justifyContent: "flex-end", mb: 1 }}>
+      <Button
+        variant="text"
+        color="primary"
+        startIcon={<CopyOutlined />}
+        onClick={copyEmails}
+      >
+        Copy all emails
+      </Button>
+    </Box>
+    <DataGrid
+      getRowId={(row) => row.Id}
+      apiRef={apiRef}
+      rows={pageInfo.rows}
+      columns={columns}
+      paginationModel={paginationModel}
+      onPaginationModelChange={setPaginationModel}
+      pageSizeOptions={[10, 25, 50, 100]}
+    />
+  </Box>
 )
 }
 

@@ -1,5 +1,3 @@
-import CommitteesPage from './extra-pages/CommitteesPage';
-
 import {
   Error,
   Login,
@@ -7,12 +5,12 @@ import {
   MarkdownPage,
   MinimalLayout
 } from "@digitalaidseattle/mui";
-import CommitteePage from './extra-pages/CommitteePage';
-import BillsPage from './extra-pages/BillsPage';
 import BillDetailPage from './extra-pages/BillDetailPage';
-import SponsorPage from './extra-pages/SponsorPage';
-import SponsorsPage from './extra-pages/SponsorsPage';
-import LegislatorsPage from './extra-pages/LegislatorsPage';
+import { BillsPage } from './extra-pages/BillsPage';
+import CommitteePage from './extra-pages/CommitteePage';
+import CommitteesPage from './extra-pages/CommitteesPage';
+import SponsorPage from './extra-pages/LegislatorPage';
+import { LegislatorsPage } from './extra-pages/LegislatorsPage';
 
 const routes = [
   {
@@ -40,20 +38,16 @@ const routes = [
         element: <BillDetailPage />,
       },
       {
-        path: "sponsors",
-        element: <SponsorsPage />,
-      },
-      {
-        path: "sponsor",
-        element: <SponsorPage />,
-      },
-      {
         path: "legislators",
         element: <LegislatorsPage />,
       },
       {
+        path: "legislator/:id",
+        element: <SponsorPage />,
+      },
+      {
         path: "privacy",
-        element: <MarkdownPage filepath='privacy.md'/>,
+        element: <MarkdownPage filepath='privacy.md' />,
       }
     ]
   },

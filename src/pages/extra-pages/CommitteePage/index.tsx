@@ -56,7 +56,7 @@ const CommitteePage = () => {
     <>
       <Breadcrumbs aria-label="breadcrumb">
         <NavLink to="/" ><IconButton size="medium"><HomeOutlined /></IconButton></NavLink>
-        <NavLink to="/committess" >Committee</NavLink>
+        <NavLink to="/committees" >Committees</NavLink>
         <Typography color="text.primary">Committee Detail</Typography>
       </Breadcrumbs>
       <Card>

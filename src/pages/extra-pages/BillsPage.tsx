@@ -4,8 +4,9 @@ import {
   ReloadOutlined,
   SearchOutlined
 } from "@ant-design/icons";
+import { LoadingContext } from "@digitalaidseattle/core";
+import { PageInfo } from "@digitalaidseattle/supabase";
 import {
-  Box,
   Breadcrumbs,
   Card,
   CardContent,
@@ -13,8 +14,6 @@ import {
   IconButton,
   InputAdornment,
   Link,
-  Tab,
-  Tabs,
   TextField,
   Toolbar,
   Tooltip,
@@ -23,25 +22,19 @@ import {
 import {
   DataGrid,
   GridColDef,
-  type GridPaginationModel
+  type GridPaginationModel,
+  useGridApiRef
 } from "@mui/x-data-grid";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
 import type { BillRow } from "../../api/bill";
-import { LegislatureService } from "../../api/legislatureService";
-import { mapOpenStatesBillToBillRow } from "../../utils/openStateBills";
-import { LegislativeBill } from "../../api/openStatesBill";
+import { BillService } from "../../api/billService";
+import { CHAMBER_TYPE, ChamberButtonGroup } from "../../components/ChamberButtonGroup";
+import { LoadingOverlay } from "../../components/LoadingOverlay";
+import { BillsService } from "../../utils/bills";
+
 const BILL_SEARCH_URL = "https://app.leg.wa.gov/billsearch/";
 const PAGE_SIZE = 25;
-
-const tabs = [
-  { label: "All", value: "all" },
-  { label: "House", value: "house" },
-  { label: "Senate", value: "senate" },
-  { label: "Joint", value: "joint" }
-] as const;
-
-type TabValue = (typeof tabs)[number]["value"];
 
 const columns: GridColDef<BillRow>[] = [
   {
@@ -116,106 +109,96 @@ const columns: GridColDef<BillRow>[] = [
   }
 ];
 
-const BillsPage = () => {
+export const BillsPage = () => {
+  const apiRef = useGridApiRef();
   const navigate = useNavigate();
-  const [loading, setLoading] = useState(false);
-  const [tab, setTab] = useState<TabValue>("all");
+  const [tab, setTab] = useState<CHAMBER_TYPE>('all');
   const [search, setSearch] = useState("");
-  const [rawBills, setRawBills] = useState<LegislativeBill[]>([]);
-  const [paginationModel, setPaginationModel] = useState<GridPaginationModel>({
-    page: 0,
-    pageSize: PAGE_SIZE
-  });
+  const [paginationModel, setPaginationModel] = useState<GridPaginationModel>({ page: 0, pageSize: PAGE_SIZE });
+  const [bills, setBills] = useState<BillRow[]>([]);
+  const [pageInfo, setPageInfo] = useState<PageInfo<BillRow>>({ rows: [], totalRowCount: 0, });
+  const { loading, setLoading } = useContext(LoadingContext);
 
-  const fetchBills = useCallback(() => {
-    setLoading(true);
-    LegislatureService.getInstance()
-      .getOpenStatesBills()
-      .then((response) => {
-        const docs = response ? response : [];
-        docs.forEach(() => {
-        });
-        setRawBills(docs);
-      })
-      .catch((error) => {
-        console.error("Error loading bills:", error);
-        setRawBills([]);
-      })
-      .finally(() => {
-        setLoading(false);
-      });
+  useEffect(() => {
+    fetchData();
   }, []);
 
   useEffect(() => {
-    fetchBills();
-  }, [fetchBills]);
+    filter();
+  }, [bills, tab, search]);
 
-  useEffect(() => {
+  function fetchData() {
+    setLoading(true);
+    BillService.getInstance()
+      .getAll()
+      .then(data => {
+        const mapped = data
+          .map((bill, index) => BillsService.mapLegislativeDocumentToBillRow(bill, index)!)
+          .filter(b => b !== undefined);
+        setBills(mapped);
+      })
+      .finally(() => setLoading(false));
+  };
+
+  function filter() {
     setPaginationModel((prev) => ({ ...prev, page: 0 }));
-  }, [tab, search]);
-
-  const rows = useMemo<BillRow[]>(() => {
-    return rawBills
-      .map((bill) => mapOpenStatesBillToBillRow(bill))
-      .filter(Boolean) as BillRow[];
-  }, [rawBills]);
-
-  const filteredRows = useMemo(() => {
-    const loweredQuery = search.trim().toLowerCase();
-    return rows.filter((row) => {
-      const matchesTab =
-        tab === "all" ? true : row.chamber.toLowerCase() === tab;
-
-      if (!matchesTab) {
-        return false;
-      }
-
-      if (!loweredQuery) {
-        return true;
-      }
-
-      const haystack = [
-        row.billNumber,
-        row.title,
-        row.committee,
-        row.latestDocumentLabel,
-        row.status,
-        row.history
-        
-      ]
-        .join(" ")
-        .toLowerCase();
-
-      return haystack.includes(loweredQuery);
+    setPageInfo({
+      rows: [],
+      totalRowCount: 0,
     });
-  }, [rows, tab, search]);
+    const rows = bills
+      .filter(row => rowFilter(row));
+    setPageInfo({
+      rows: rows,
+      totalRowCount: rows.length,
+    });
+  };
+
+  function rowFilter(bill: BillRow): boolean {
+    const matchesTab =
+      tab === "all" ? true : bill.chamber.toLowerCase() === tab;
+
+    if (!matchesTab) {
+      return false;
+    }
+
+    const loweredQuery = search.trim().toLowerCase();
+    if (!loweredQuery) {
+      return true;
+    }
+
+    const haystack = [
+      bill.billNumber,
+      bill.title,
+      bill.committee,
+      bill.status,
+      bill.history,
+      bill.latestDocumentLabel
+    ]
+      .join(" ")
+      .toLowerCase();
+
+    return haystack.includes(loweredQuery);
+  }
 
   function CustomToolbar() {
     return (<Toolbar>
-      <Box sx={{ marginTop: 1, flexGrow: 1 }}>
-        <Tabs
-          value={tab}
-          onChange={(_event, value: TabValue) => setTab(value)}
-          aria-label="bill chamber filter"
-          sx={{ mb: 2 }}
-        >
-          {tabs.map((tabOption) => (
-            <Tab key={tabOption.value} label={tabOption.label} value={tabOption.value} />
-          ))}
-        </Tabs>
-      </Box>
+      <ChamberButtonGroup chamber={tab} onChange={setTab} />
+
       <TextField
         value={search}
         onChange={(event) => setSearch(event.target.value)}
         size="small"
         placeholder="Search"
         sx={{ width: 220, mr: 1.5 }}
-        InputProps={{
-          startAdornment: (
-            <InputAdornment position="start">
-              <SearchOutlined />
-            </InputAdornment>
-          )
+        slotProps={{
+          input: {
+            startAdornment: (
+              <InputAdornment position="start">
+                <SearchOutlined />
+              </InputAdornment>
+            )
+          }
         }}
       />
       <Tooltip title="Open Bill Search">
@@ -227,7 +210,7 @@ const BillsPage = () => {
         </IconButton>
       </Tooltip>
       <Tooltip title="Refresh">
-        <IconButton color="primary" size="small" onClick={fetchBills}>
+        <IconButton color="primary" size="small" onClick={fetchData}>
           <ReloadOutlined />
         </IconButton>
       </Tooltip>
@@ -235,7 +218,13 @@ const BillsPage = () => {
     );
   }
 
+  function handleRowDoubleClick(row: BillRow): void {
+    // FIXME need to match proper route
+    navigate(`/bill/${row.id}`)
+  }
+
   return (<>
+    <LoadingOverlay loading={loading} />
     <Breadcrumbs aria-label="breadcrumb">
       <NavLink to="/" ><IconButton size="medium"><HomeOutlined /></IconButton></NavLink>
       <Typography color="text.primary">Bills</Typography>
@@ -244,34 +233,21 @@ const BillsPage = () => {
       <CardHeader title="Bills" />
       <CardContent>
         <DataGrid
+          apiRef={apiRef}
           autoHeight
-          rows={filteredRows}
+          // rows={filteredRows}
+          rows={pageInfo.rows}
           columns={columns}
-          loading={loading}
           getRowId={(row) => row.id}
           paginationModel={paginationModel}
           onPaginationModelChange={setPaginationModel}
           pageSizeOptions={[10, 25, 50, 100]}
           disableRowSelectionOnClick
-          onRowDoubleClick={(params) => {
-            const row = params.row as BillRow;
-            const targetBill =
-              row?.normalizedBillNumber ||
-              row?.billNumber?.replace(/\D+/g, "") ||
-              "";
-            const rawName = row?.raw?.Name ?? "";
-            if (!targetBill) {
-              return;
-            }
-            navigate(`/bill?number=${encodeURIComponent(targetBill)}&name=${encodeURIComponent(rawName)}`);
-          }}
-          showToolbar={true}
+          onRowDoubleClick={(params) => handleRowDoubleClick(params.row as BillRow)}
           slots={{ toolbar: CustomToolbar }}
         />
       </CardContent>
     </Card>
   </>
   );
-};
-
-export default BillsPage;
+}
