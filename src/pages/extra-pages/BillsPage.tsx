@@ -1,19 +1,19 @@
 import {
+  ExpandAltOutlined,
+  HomeOutlined,
   ReloadOutlined,
-  SearchOutlined,
-  ExpandAltOutlined
+  SearchOutlined
 } from "@ant-design/icons";
+import { LoadingContext } from "@digitalaidseattle/core";
 import { PageInfo } from "@digitalaidseattle/supabase";
 import {
-  Box,
+  Breadcrumbs,
   Card,
   CardContent,
   CardHeader,
   IconButton,
   InputAdornment,
   Link,
-  ToggleButton,
-  ToggleButtonGroup,
   TextField,
   Toolbar,
   Tooltip,
@@ -25,32 +25,16 @@ import {
   type GridPaginationModel,
   useGridApiRef
 } from "@mui/x-data-grid";
-import { useCallback, useEffect, useMemo, useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { LegislatureService } from "../../api/legislatureService";
-import type { BillRow, LegislativeDocument } from "../../api/bill";
+import { useContext, useEffect, useState } from "react";
+import { NavLink, useNavigate } from "react-router-dom";
+import type { BillRow } from "../../api/bill";
+import { BillService } from "../../api/billService";
+import { CHAMBER_TYPE, ChamberButtonGroup } from "../../components/ChamberButtonGroup";
+import { LoadingOverlay } from "../../components/LoadingOverlay";
 import { BillsService } from "../../utils/bills";
 
 const BILL_SEARCH_URL = "https://app.leg.wa.gov/billsearch/";
 const PAGE_SIZE = 25;
-
-const billsPageStyles = {
-  card: {
-    mt: 1
-  },
-  cardContent: {
-    pt: 0
-  }
-} as const;
-
-const tabs = [
-  { label: "All", value: "all" },
-  { label: "House", value: "house" },
-  { label: "Senate", value: "senate" },
-  { label: "Joint", value: "joint" }
-] as const;
-
-type TabValue = (typeof tabs)[number]["value"];
 
 const columns: GridColDef<BillRow>[] = [
   {
@@ -110,7 +94,7 @@ const columns: GridColDef<BillRow>[] = [
   }
 ];
 
-const BillsPage = () => {
+export const BillsPage = () => {
   const apiRef = useGridApiRef();
   const navigate = useNavigate();
   const [tab, setTab] = useState<CHAMBER_TYPE>('all');
@@ -134,7 +118,7 @@ const BillsPage = () => {
       .getAll()
       .then(data => {
         const mapped = data
-          .map((bill, index) => mapLegislativeDocumentToBillRow(bill, index)!)
+          .map((bill, index) => BillsService.mapLegislativeDocumentToBillRow(bill, index)!)
           .filter(b => b !== undefined);
         setBills(mapped);
       })
@@ -216,7 +200,13 @@ const BillsPage = () => {
         </IconButton>
       </Tooltip>
     </Toolbar>
-  );
+    );
+  }
+
+  function handleRowDoubleClick(row: BillRow): void {
+    // FIXME need to match proper route
+    navigate(`/bill/${row.id}`)
+  }
 
   return (<>
     <LoadingOverlay loading={loading} />
@@ -239,11 +229,10 @@ const BillsPage = () => {
           pageSizeOptions={[10, 25, 50, 100]}
           disableRowSelectionOnClick
           onRowDoubleClick={(params) => handleRowDoubleClick(params.row as BillRow)}
-          slots={{ toolbar: BillsToolbar }}
+          slots={{ toolbar: CustomToolbar }}
         />
       </CardContent>
     </Card>
+  </>
   );
-};
-
-export default BillsPage;
+}

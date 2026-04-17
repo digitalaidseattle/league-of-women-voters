@@ -1,13 +1,11 @@
 import { CopyOutlined } from "@ant-design/icons";
-import { useNotifications } from "@digitalaidseattle/core";
+import { LoadingContext, useNotifications } from "@digitalaidseattle/core";
 import { PageInfo } from "@digitalaidseattle/supabase";
 import { Box, Button } from "@mui/material";
-import { Link } from "react-router-dom";
 import { DataGrid, GridColDef, useGridApiRef } from "@mui/x-data-grid";
 import { useContext, useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 import { LegislatureService } from "../../../api/legislatureService";
-import { LoadingOverlay } from "../../../components/LoadingOverlay";
-import { LoadingContext } from "@digitalaidseattle/core";
 
 const PAGE_SIZE = 25;
 
@@ -24,7 +22,7 @@ const MembersGrid = (props: { agency: string, committeeName: string }) => {
     rows: [],
     totalRowCount: 0,
   });
-  const { loading, setLoading } = useContext(LoadingContext);
+  const { setLoading } = useContext(LoadingContext);
   // const [agency, setAgency] = useState<string>("");
   // const [committeeName, setCommitteeName] = useState<string>("");
 

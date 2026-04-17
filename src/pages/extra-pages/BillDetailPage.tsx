@@ -1,11 +1,11 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { NavLink, useNavigate, useSearchParams } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 
 import {
-  ReloadOutlined,
-  SearchOutlined,
   ExpandAltOutlined,
-  LeftOutlined
+  LeftOutlined,
+  ReloadOutlined,
+  SearchOutlined
 } from "@ant-design/icons";
 import {
   Box,
@@ -24,14 +24,12 @@ import {
   type GridColDef,
   useGridApiRef
 } from "@mui/x-data-grid";
-import { useCallback, useEffect, useMemo, useState } from "react";
-import { useNavigate, useSearchParams } from "react-router-dom";
-import { LegislatureService } from "../../api/legislatureService";
 import type { BillRow } from "../../api/bill";
 import BreadcrumbsNav from "../../components/BreadcrumbsNav";
 import {
   BillsService
 } from "../../utils/bills";
+import { BillService } from "../../api/billService";
 
 type BillDetailRow = BillRow & {
   sponsors: string;
