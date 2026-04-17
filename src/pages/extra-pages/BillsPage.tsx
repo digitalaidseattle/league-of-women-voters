@@ -47,7 +47,7 @@ const columns: GridColDef<BillRow>[] = [
     field: "committee",
     headerName: "Committee",
     flex: 1,
-    minWidth: 220,
+    width: 120,
     type: "string"
   },
   {
@@ -58,17 +58,32 @@ const columns: GridColDef<BillRow>[] = [
     type: "string"
   },
   {
-    field: "status",
-    headerName: "Status",
-    width: 160,
-    type: "string"
-  },
-  {
     field: "history",
     headerName: "Bill History",
     flex: 1,
     minWidth: 240,
     type: "string"
+  },
+  {
+    field: "status",
+    headerName: "Status",
+    width: 160,
+    type: "string",
+    renderCell: (params) => {
+      const { row } = params;
+      if (row.status && row.status.startsWith("http")) {
+        return (
+          <Link
+            href={row.status}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            Bill Status
+          </Link>
+        );
+      }
+      return row.status;
+    }
   },
   {
     field: "latestDocumentLabel",
