@@ -1,6 +1,5 @@
 import { CopyOutlined } from "@ant-design/icons";
-import { useNotifications } from "@digitalaidseattle/core";
-import { PageInfo } from "@digitalaidseattle/supabase";
+import { PageInfo, useNotifications } from "@digitalaidseattle/core";
 import { Box, Button } from "@mui/material";
 import { DataGrid, GridColDef, useGridApiRef } from "@mui/x-data-grid";
 import { useEffect, useState } from "react";
@@ -108,8 +107,8 @@ const MembersGrid = (props: { committee: Committee }) => {
 
   async function copyEmails() {
     const emails = pageInfo.rows
-      .map((row) => row.Email)
-      .filter((email) => typeof email === "string" && email.trim().length > 0)
+      .map((row: any) => row.Email)
+      .filter((email: string) => typeof email === "string" && email.trim().length > 0)
       .join(", ");
 
     if (!emails) {

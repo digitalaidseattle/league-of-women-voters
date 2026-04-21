@@ -5,8 +5,7 @@
  *
  */
 
-import { Identifier } from "@digitalaidseattle/core";
-import { PageInfo, QueryModel } from "@digitalaidseattle/supabase";
+import { Identifier, PageInfo, QueryModel } from "@digitalaidseattle/core";
 import { SupabaseClient } from "@supabase/supabase-js";
 import { DAO } from "../DAO";
 
@@ -179,7 +178,7 @@ abstract class SupabaseDAO<T> implements DAO<T> {
 
             const { data, error } = await this.client
                 .from(this.tableName)
-                .update(updatedFields)
+                .update(updatedFields as any)
                 .eq('id', entityId)
                 .select(select)
                 .single();

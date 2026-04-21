@@ -1,6 +1,6 @@
 
 import { Identifier } from "@digitalaidseattle/core";
-import { supabaseClient } from "@digitalaidseattle/supabase";
+import { SupabaseConfiguration } from "@digitalaidseattle/supabase";
 
 export class LegislatorDao {
 
@@ -26,7 +26,7 @@ export class LegislatorDao {
     }
 
     async getAll(): Promise<Member[]> {
-        return supabaseClient.functions
+        return SupabaseConfiguration.getInstance().getSupabaseClient().functions
             .invoke("sponsors", {
                 body: { biennium: this.biennium },
             })

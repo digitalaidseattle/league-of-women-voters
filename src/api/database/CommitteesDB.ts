@@ -1,6 +1,6 @@
 import { Identifier } from "@digitalaidseattle/core";
-import { getConfiguration } from "../configuration";
 import { SupabaseDAO } from "./SupabaseDAO";
+import { SupabaseConfiguration } from "@digitalaidseattle/supabase";
 
 export type DBCommittee = {
     id: Identifier,
@@ -19,8 +19,10 @@ export class CommitteesDB extends SupabaseDAO<Committee> {
         return CommitteesDB.instance;
     }
 
+
     constructor() {
-        super(getConfiguration().client, 'Committees',
+        const client = SupabaseConfiguration.getInstance().getSupabaseClient();
+        super(client, 'Committees',
             {
                 json2Entity:
                     (json) => ({

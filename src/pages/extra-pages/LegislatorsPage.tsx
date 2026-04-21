@@ -7,7 +7,7 @@ import { Breadcrumbs, Card, CardHeader, IconButton, Tooltip, Typography } from '
 import { DataGrid, GridColDef, Toolbar, useGridApiRef } from "@mui/x-data-grid";
 
 import { LoadingContext } from '@digitalaidseattle/core';
-import { PageInfo } from "@digitalaidseattle/supabase";
+import { PageInfo } from "@digitalaidseattle/core";
 import { LegislatorService } from '../../api/legislatorService';
 import { CHAMBER_TYPE, ChamberButtonGroup } from "../../components/ChamberButtonGroup";
 import { LoadingOverlay } from '../../components/LoadingOverlay';

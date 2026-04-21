@@ -1,5 +1,5 @@
 import { Identifier } from "@digitalaidseattle/core";
-import { getConfiguration } from "../configuration";
+import { SupabaseConfiguration } from "@digitalaidseattle/supabase";
 import { SupabaseDAO } from "./SupabaseDAO";
 
 export type DBBill = {
@@ -20,7 +20,8 @@ export class BillsDB extends SupabaseDAO<DBBill> {
 
 
     constructor() {
-        super(getConfiguration().client, 'Bills')
+        const client = SupabaseConfiguration.getInstance().getSupabaseClient();
+        super(client, 'Bills')
     }
 
 

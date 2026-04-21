@@ -1,5 +1,5 @@
+import { SupabaseConfiguration } from "@digitalaidseattle/supabase";
 
-import { supabaseClient } from "@digitalaidseattle/supabase";
 
 export class HtmlDao {
 
@@ -16,7 +16,8 @@ export class HtmlDao {
     }
 
     async getHtml(url: string): Promise<string> {
-        return supabaseClient.functions
+        const client = SupabaseConfiguration.getInstance().getSupabaseClient();
+        return client.functions
             .invoke("legislature-services", {
                 body: { url: url },
             })

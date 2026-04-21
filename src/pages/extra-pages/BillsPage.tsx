@@ -25,8 +25,7 @@ import {
   useGridApiRef
 } from "@mui/x-data-grid";
 
-import { LoadingContext } from "@digitalaidseattle/core";
-import { PageInfo } from "@digitalaidseattle/supabase";
+import { LoadingContext, PageInfo } from "@digitalaidseattle/core";
 
 import type { BillRow } from "../../api/bill";
 import { BillService } from "../../api/billService";

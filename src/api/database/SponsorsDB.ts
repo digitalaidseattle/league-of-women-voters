@@ -1,6 +1,6 @@
 import { Identifier } from "@digitalaidseattle/core";
-import { getConfiguration } from "../configuration";
 import { DataAccessOptions, SupabaseDAO } from "./SupabaseDAO";
+import { SupabaseConfiguration } from "@digitalaidseattle/supabase";
 
 export type DBSponsor = {
     id: Identifier,
@@ -20,7 +20,8 @@ export class SponsorsDB extends SupabaseDAO<Member> {
     }
 
     constructor() {
-        super(getConfiguration().client, 'Sponsors',
+        super(SupabaseConfiguration.getInstance().getSupabaseClient(),
+            'Sponsors',
             {
                 json2Entity:
                     (json) => ({
