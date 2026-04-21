@@ -11,6 +11,7 @@ import SponsorPage from './extra-pages/LegislatorPage';
 import { LegislatorsPage } from './extra-pages/LegislatorsPage';
 import { BillsPage } from "./extra-pages/BillsPage";
 import { BillPage } from "./BillPage";
+import { AdminPage } from "./AdminPage";
 
 const routes = [
   {
@@ -30,6 +31,10 @@ const routes = [
         element: <CommitteePage />,
       },
       {
+        path: "committee/:id",
+        element: <CommitteePage />,
+      },
+      {
         path: "bills",
         element: <BillsPage />,
       },
@@ -44,6 +49,10 @@ const routes = [
       {
         path: "legislator/:id",
         element: <SponsorPage />,
+      },
+      {
+        path: "admin",
+        element: <AdminPage />,
       },
       {
         path: "privacy",

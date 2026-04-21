@@ -3,14 +3,14 @@ import { NavLink, useNavigate } from "react-router-dom";
 
 // material-ui
 import { HomeOutlined, ReloadOutlined } from "@ant-design/icons";
-import { Breadcrumbs, Card, CardContent, CardHeader, IconButton, Tooltip, Typography } from '@mui/material';
+import { Breadcrumbs, Card, CardHeader, IconButton, Tooltip, Typography } from '@mui/material';
 import { DataGrid, GridColDef, Toolbar, useGridApiRef } from "@mui/x-data-grid";
 
+import { LoadingContext } from '@digitalaidseattle/core';
 import { PageInfo } from "@digitalaidseattle/supabase";
 import { LegislatorService } from '../../api/legislatorService';
 import { CHAMBER_TYPE, ChamberButtonGroup } from "../../components/ChamberButtonGroup";
 import { LoadingOverlay } from '../../components/LoadingOverlay';
-import { LoadingContext } from '@digitalaidseattle/core';
 // project import
 
 // ==============================|| SAMPLE PAGE ||============================== //
@@ -80,6 +80,7 @@ export const LegislatorsPage = () => {
       .getAll()
       .then(legislators => {
         const rows = legislators.filter(filterPredicate);
+        console.log(rows);
         setPageInfo({
           rows: rows,
           totalRowCount: rows.length,

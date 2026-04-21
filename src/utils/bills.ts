@@ -12,7 +12,6 @@ type BillFilterOptions = {
 class BillsService {
   static mapLegislativeDocumentToBillRow(
     bill: LegislativeDocument,
-    index: number
   ): BillRow | undefined {
     const billIdentifier = BillsService.stringFallback([bill.Name]);
     const fallbackIdentifier = BillsService.stringFallback([

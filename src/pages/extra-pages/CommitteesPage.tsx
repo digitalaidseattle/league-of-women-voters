@@ -43,7 +43,7 @@ const CommitteesPage = () => {
       totalRowCount: 0,
     });
     LegislatureService.getInstance()
-      .getCommittees()
+      .getAll()
       .then(data => {
         setPageInfo({
           rows: data,
@@ -56,7 +56,9 @@ const CommitteesPage = () => {
 
   const openCommittee = (params: any) => {
     const committee = params.row;
-    navigate(`/committee?agency=${committee.Agency}&committeeName=${encodeURIComponent(committee.Name)}`);
+    console.log(committee);
+    navigate(`/committee/${committee.Id}`);
+//    navigate(`/committee?agency=${committee.Agency}&committeeName=${encodeURIComponent(committee.Name)}`);
   };
 
   const getColumns = (): GridColDef[] => {

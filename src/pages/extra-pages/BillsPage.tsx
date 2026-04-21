@@ -130,7 +130,7 @@ export const BillsPage = () => {
       .getAll()
       .then(data => {
         const rows = data
-          .map((bill, index) => BillsService.mapLegislativeDocumentToBillRow(bill, index)!)
+          .map((bill) => BillsService.mapLegislativeDocumentToBillRow(bill)!)
           .filter(b => b !== undefined)
           .filter(row => rowFilter(row));
         setPageInfo({

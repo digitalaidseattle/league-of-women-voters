@@ -7,11 +7,11 @@
 
 import React, { useEffect, useState } from 'react';
 
-import { Card, CardHeader, Grid, Typography } from '@mui/material';
-import { LegislatureService } from '../../../api/legislatureService';
-import { LEGISLATORS_CONSTANTS } from './constants';
+import { Card, CardHeader, Grid } from '@mui/material';
 import { Link } from "react-router-dom";
+import { LegislatureService } from '../../../api/legislatureService';
 import { sleep } from '../../../utils/sleep';
+import { LEGISLATORS_CONSTANTS } from './constants';
 
 export function CommitteesSection({ legislator }: { legislator: Member }) {
   const [committees, setCommittees] = useState<Committee[]>([]);
@@ -42,7 +42,6 @@ export function CommitteesSection({ legislator }: { legislator: Member }) {
     <Card sx={{ height: "100%" }}>
       <CardHeader title={LEGISLATORS_CONSTANTS.committees_label} />
       <Grid container sx={{ margin: 2 }}>
-        <Typography>WIP</Typography>
         {loaded && committees.map((committee, idx) => {
           return <React.Fragment key={idx}>
             <Grid size={9}><Link to={`/committee?agency=${committee.Agency}&committeeName=${committee.Name}`}>{committee.Name}</Link></Grid>

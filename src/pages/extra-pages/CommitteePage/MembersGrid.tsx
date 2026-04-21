@@ -1,100 +1,27 @@
 import { CopyOutlined } from "@ant-design/icons";
-import { LoadingContext, useNotifications } from "@digitalaidseattle/core";
+import { useNotifications } from "@digitalaidseattle/core";
 import { PageInfo } from "@digitalaidseattle/supabase";
 import { Box, Button } from "@mui/material";
 import { DataGrid, GridColDef, useGridApiRef } from "@mui/x-data-grid";
-import { useContext, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { LegislatureService } from "../../../api/legislatureService";
 
 const PAGE_SIZE = 25;
 
-const MembersGrid = (props: { agency: string, committeeName: string }) => {
+const MembersGrid = (props: { committee: Committee }) => {
   const apiRef = useGridApiRef();
   const notifications = useNotifications();
   const [paginationModel, setPaginationModel] = useState({
     page: 0,
     pageSize: PAGE_SIZE,
   });
-
-  const [columns, setColumns] = useState<GridColDef[]>([]);
   const [pageInfo, setPageInfo] = useState<PageInfo<Member>>({
     rows: [],
     totalRowCount: 0,
   });
-  const { setLoading } = useContext(LoadingContext);
-  // const [agency, setAgency] = useState<string>("");
-  // const [committeeName, setCommitteeName] = useState<string>("");
 
-
-  useEffect(() => {
-    setColumns(getColumns());
-  }, []);
-
-  useEffect(() => {
-    if (props.committeeName && props.agency) {
-      refresh()
-    }
-  },[props]);
-
-
-  // function exportData() {
-  //   const csvContent = pageInfo.rows.map(row => {
-  //     return Object.values(row).join(",");
-  //   }).join("\n");
-
-  //   const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-  //   const url = URL.createObjectURL(blob);
-  //   const link = document.createElement("a");
-  //   link.href = url;
-  //   link.setAttribute("download", `${props.committeeName}_members.csv`);
-  //   document.body.appendChild(link);
-  //   link.click();
-  //   document.body.removeChild(link);
-  // }
-
-  function refresh() {
-    setLoading(true);
-    setPageInfo({
-      rows: [],
-      totalRowCount: 0,
-    })
-    LegislatureService.getInstance()
-      .getCommitteeMembers(props.agency, props.committeeName)
-      .then(response => {
-        setPageInfo({
-          rows: response,
-          totalRowCount: response.length,
-        })
-      })
-      .catch(error => {
-        console.error('Error invoking function:', error);
-      })
-      .finally(() => setLoading(false));
-  }
-
-  async function copyEmails() {
-    const emails = pageInfo.rows
-      .map((row) => row.Email)
-      .filter((email) => typeof email === "string" && email.trim().length > 0)
-      .join(", ");
-
-    if (!emails) {
-      notifications.warn("No emails found.");
-      return;
-    }
-
-    try {
-      await navigator.clipboard.writeText(emails);
-      notifications.success("All committee emails copied.");
-    } catch (error) {
-      console.error("Failed to copy emails:", error);
-      notifications.error("Copy failed. Please try again.");
-    }
-  }
-
-  const getColumns = (): GridColDef[] => {
-    return [
+  const columns: GridColDef[] =
+    [
       // {
       //   field: "Id",
       //   headerName: "Id",
@@ -145,31 +72,83 @@ const MembersGrid = (props: { agency: string, committeeName: string }) => {
         type: "string"
       }
     ];
-  };
 
-return (
-  <Box>
-    <Box sx={{ display: "flex", justifyContent: "flex-end", mb: 1 }}>
-      <Button
-        variant="text"
-        color="primary"
-        startIcon={<CopyOutlined />}
-        onClick={copyEmails}
-      >
-        Copy all emails
-      </Button>
+  useEffect(() => {
+    refresh()
+  }, [props]);
+
+
+  // function exportData() {
+  //   const csvContent = pageInfo.rows.map(row => {
+  //     return Object.values(row).join(",");
+  //   }).join("\n");
+
+  //   const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+  //   const url = URL.createObjectURL(blob);
+  //   const link = document.createElement("a");
+  //   link.href = url;
+  //   link.setAttribute("download", `${props.committeeName}_members.csv`);
+  //   document.body.appendChild(link);
+  //   link.click();
+  //   document.body.removeChild(link);
+  // }
+
+  function refresh() {
+    setPageInfo({
+      rows: [],
+      totalRowCount: 0,
+    })
+    if (props.committee) {
+      setPageInfo({
+        rows: props.committee.Members,
+        totalRowCount: props.committee.Members.length,
+      })
+    }
+  }
+
+  async function copyEmails() {
+    const emails = pageInfo.rows
+      .map((row) => row.Email)
+      .filter((email) => typeof email === "string" && email.trim().length > 0)
+      .join(", ");
+
+    if (!emails) {
+      notifications.warn("No emails found.");
+      return;
+    }
+
+    try {
+      await navigator.clipboard.writeText(emails);
+      notifications.success("All committee emails copied.");
+    } catch (error) {
+      console.error("Failed to copy emails:", error);
+      notifications.error("Copy failed. Please try again.");
+    }
+  }
+
+  return (
+    <Box>
+      <Box sx={{ display: "flex", justifyContent: "flex-end", mb: 1 }}>
+        <Button
+          variant="text"
+          color="primary"
+          startIcon={<CopyOutlined />}
+          onClick={copyEmails}
+        >
+          Copy all emails
+        </Button>
+      </Box>
+      <DataGrid
+        getRowId={(row) => row.Id}
+        apiRef={apiRef}
+        rows={pageInfo.rows}
+        columns={columns}
+        paginationModel={paginationModel}
+        onPaginationModelChange={setPaginationModel}
+        pageSizeOptions={[10, 25, 50, 100]}
+      />
     </Box>
-    <DataGrid
-      getRowId={(row) => row.Id}
-      apiRef={apiRef}
-      rows={pageInfo.rows}
-      columns={columns}
-      paginationModel={paginationModel}
-      onPaginationModelChange={setPaginationModel}
-      pageSizeOptions={[10, 25, 50, 100]}
-    />
-  </Box>
-)
+  )
 }
 
 export default MembersGrid;
