@@ -99,8 +99,8 @@ const MembersGrid = (props: { committee: Committee }) => {
     })
     if (props.committee) {
       setPageInfo({
-        rows: props.committee.Members,
-        totalRowCount: props.committee.Members.length,
+        rows: props.committee.Members ?? [],
+        totalRowCount: (props.committee.Members ?? []).length,
       })
     }
   }

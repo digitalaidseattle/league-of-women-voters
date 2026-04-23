@@ -1,8 +1,9 @@
 
 import { Identifier } from "@digitalaidseattle/core";
 import { SupabaseConfiguration } from "@digitalaidseattle/supabase";
+import { DAO } from "./DAO";
 
-export class LegislatorDao {
+export class LegislatorDao implements DAO<Member> {
 
     private static instance: LegislatorDao;
 

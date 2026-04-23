@@ -1,14 +1,21 @@
 import { Identifier } from "@digitalaidseattle/core";
-import { DataAccessOptions, SupabaseDAO } from "./SupabaseDAO";
-import { SupabaseConfiguration } from "@digitalaidseattle/supabase";
+import { SupabaseConfiguration, SupabaseDAO } from "@digitalaidseattle/supabase";
+import { DAO } from "../DAO";
 
-export type DBSponsor = {
+type DBSponsor = {
     id: Identifier,
-    lastUpdated: Date,
-    sponsor: Sponsor
+    created_at: Date,
+    updated_at: Date,
+    sponsor: Member
 }
 
-export class SponsorsDB extends SupabaseDAO<Member> {
+class IternalSponsoDAO extends SupabaseDAO<DBSponsor> {
+    constructor() {
+        super(SupabaseConfiguration.getInstance().getSupabaseClient(), 'Sponsors')
+    }
+}
+
+export class SponsorsDB implements DAO<Member> {
 
     private static instance: SponsorsDB;
 
@@ -19,35 +26,32 @@ export class SponsorsDB extends SupabaseDAO<Member> {
         return SponsorsDB.instance;
     }
 
+    db_dao: SupabaseDAO<DBSponsor>;
+
     constructor() {
-        super(SupabaseConfiguration.getInstance().getSupabaseClient(),
-            'Sponsors',
-            {
-                json2Entity:
-                    (json) => ({
-                        ...json.sponsor,
-                        Address: json.sponsor.address,
-                        Assistant: json.sponsor.assistant,
-                    }),
-                entity2Json:
-                    (entity) => ({
-                        id: entity.Id,
-                        sponsor: {
-                            ...entity,
-                            address: entity.Address,
-                            assistant: entity.Assistant
-                        }
-                    })
-            })
+        this.db_dao = new IternalSponsoDAO();
     }
 
-    async upsert(entity: Member | Member[], opts?: DataAccessOptions<Member>): Promise<Member | Member[]> {
-        const upload = Array.isArray(entity) ? entity : [entity]
+    getAll(): Promise<Member[]> {
+        return this.db_dao.getAll()
+            .then(wrapped => wrapped.map(sponsorDB => sponsorDB.sponsor))
+    }
+
+    getById(id: Identifier): Promise<Member> {
+        return this.db_dao.getById(id)
+            .then(wrapped => wrapped.sponsor);
+    }
+
+    async upsert(entity: Member | Member[]): Promise<Member | Member[]> {
+        const now = new Date();
+        const uploads = (Array.isArray(entity) ? entity : [entity])
             .map(mm => ({
-                ...mm,
-                lastUpdated: Date.now()
-            }));
-        return super.upsert(upload, opts);
+                id: mm.Id,
+                updated_at: now,
+                sponsor: mm
+            } as DBSponsor));
+        return Promise.all(uploads.map(up => this.db_dao.upsert(up)))
+            .then(resps => resps.map(sponsorDB => sponsorDB.sponsor))
     }
 
 }

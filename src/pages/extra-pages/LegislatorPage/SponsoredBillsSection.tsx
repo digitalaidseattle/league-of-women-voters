@@ -5,12 +5,12 @@
  *
  */
 
-import { Card, CardHeader, Grid, Link, Typography } from '@mui/material';
-import { LEGISLATORS_CONSTANTS } from './constants';
-import { LegislativeDocument } from '../../../api/bill';
+import { Card, CardHeader, Grid, Link } from '@mui/material';
 import { useEffect, useState } from 'react';
+import { LegislativeDocument } from '../../../api/bill';
 import { BillService } from '../../../api/billService';
 import { sleep } from '../../../utils/sleep';
+import { LEGISLATORS_CONSTANTS } from './constants';
 
 export function SponsoredBillsSection({ legislator }: { legislator: Member }) {
   const [bills, setBills] = useState<LegislativeDocument[]>([]);
@@ -41,11 +41,11 @@ export function SponsoredBillsSection({ legislator }: { legislator: Member }) {
     <Card sx={{ height: "100%" }}>
       <CardHeader title={LEGISLATORS_CONSTANTS.sponsored_bills_label} />
       <Grid container sx={{ margin: 2 }}>
-        <Typography>WIP</Typography>
         {loaded && bills.map((bill, idx) => {
           return (
             <Grid key={idx} size={6}>
-              <Link href={`/bill?number=${bill.Name}&name=${bill.Name}`}>{bill.Name}</Link>
+              {/* <Link href={`/bill?number=${bill.Name}&name=${bill.Name}`}>{bill.Name}</Link> */}
+              <Link href={`/bill/${bill.Id}`}>{bill.Id}</Link>
             </Grid>
           )
         })}

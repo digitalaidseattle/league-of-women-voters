@@ -80,7 +80,6 @@ export const LegislatorsPage = () => {
       .getAll()
       .then(legislators => {
         const rows = legislators.filter(filterPredicate);
-        console.log(rows);
         setPageInfo({
           rows: rows,
           totalRowCount: rows.length,

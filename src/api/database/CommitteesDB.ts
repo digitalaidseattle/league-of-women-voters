@@ -1,14 +1,21 @@
 import { Identifier } from "@digitalaidseattle/core";
-import { SupabaseDAO } from "./SupabaseDAO";
-import { SupabaseConfiguration } from "@digitalaidseattle/supabase";
+import { SupabaseConfiguration, SupabaseDAO } from "@digitalaidseattle/supabase";
+import { DAO } from "../DAO";
 
 export type DBCommittee = {
     id: Identifier,
-    lastUpdated: Date,
+    created_at: Date,
+    updated_at: Date,
     committee: Committee
 }
 
-export class CommitteesDB extends SupabaseDAO<Committee> {
+class IternalCommitteeDAO extends SupabaseDAO<DBCommittee> {
+    constructor() {
+        super(SupabaseConfiguration.getInstance().getSupabaseClient(), 'Committees')
+    }
+}
+
+export class CommitteesDB implements DAO<Committee> {
 
     private static instance: CommitteesDB;
 
@@ -19,37 +26,44 @@ export class CommitteesDB extends SupabaseDAO<Committee> {
         return CommitteesDB.instance;
     }
 
+    db_dao: SupabaseDAO<DBCommittee>;
 
     constructor() {
-        const client = SupabaseConfiguration.getInstance().getSupabaseClient();
-        super(client, 'Committees',
-            {
-                json2Entity:
-                    (json) => ({
-                        ...json.committee
-                    }),
-                entity2Json:
-                    (entity) => ({
-                        id: entity.Id,
-                        committee: {
-                            ...entity
-                        },
-                        lastUpdated: Date.now()
-                    })
-            })
-
+        this.db_dao = new IternalCommitteeDAO();
     }
 
-    async getCommitteeMembers(
-        agency: string,
-        committeeName: string,
-    ): Promise<Member[]> {
-        return this.client.functions
-            .invoke("committee-services", {
-                body: { operation: 'GetActiveCommitteeMembers', agency: agency, committeeName: committeeName },
-            })
-            .then((resp: any) => resp.data as Member[]);
+    getAll(): Promise<Committee[]> {
+        return this.db_dao.getAll()
+            .then(wrapped => wrapped.map(sponsorDB => sponsorDB.committee))
     }
+
+    getById(id: Identifier): Promise<Committee> {
+        return this.db_dao.getById(id)
+            .then(wrapped => wrapped.committee);
+    }
+
+    async upsert(entity: Committee | Committee[]): Promise<Committee | Committee[]> {
+        const now = new Date();
+        const uploads = (Array.isArray(entity) ? entity : [entity])
+            .map(cc => ({
+                id: cc.Id,
+                updated_at: now,
+                committee: cc
+            } as DBCommittee));
+        return Promise.all(uploads.map(up => this.db_dao.upsert(up)))
+            .then(resps => resps.map(db => db.committee))
+    }
+
+    // async getCommitteeMembers(
+    //     agency: string,
+    //     committeeName: string,
+    // ): Promise<Member[]> {
+    //     return this.client.functions
+    //         .invoke("committee-services", {
+    //             body: { operation: 'GetActiveCommitteeMembers', agency: agency, committeeName: committeeName },
+    //         })
+    //         .then((resp: any) => resp.data as Member[]);
+    // }
 
 
 }

@@ -6,13 +6,12 @@ import { useNotifications } from "@digitalaidseattle/core";
 import { Breadcrumbs, Button, Card, CardContent, CardHeader, IconButton, Stack, Typography } from '@mui/material';
 import { useState } from "react";
 import { BillDao } from "../api/billDao";
-import { BillService } from "../api/billService";
 import { CommitteeDao } from "../api/committeeDao";
-import { BillsDB } from "../api/database/BillsDB";
 import { CommitteesDB } from "../api/database/CommitteesDB";
 import { SponsorsDB } from "../api/database/SponsorsDB";
-import { LegislatorService } from "../api/legislatorService";
+import { LegislatorDao } from "../api/legislatorDao";
 import { LoadingOverlay } from "../components/LoadingOverlay";
+import { BillsDB } from "../api/database/BillsDB";
 
 // project import
 
@@ -24,15 +23,9 @@ export const AdminPage = () => {
 
     function loadLegislators(): void {
         setLoading(true);
-        LegislatorService.getInstance()
+        LegislatorDao.getInstance()
             .getAll()
-            .then(legislators => {
-                // there are duplicate IDs !!??
-                for (const legislator of legislators) {
-                    SponsorsDB.getInstance()
-                        .upsert(legislator)
-                }
-            })
+            .then(legislators => SponsorsDB.getInstance().upsert(legislators))
             .catch(error => {
                 console.log(error);
                 notify.error('Failed to load.')
@@ -44,40 +37,25 @@ export const AdminPage = () => {
     }
 
     function loadCommittees(): void {
-        throw new Error('not implemented yet');
-        // setLoading(true);
-        // LegislatureService.getInstance()
-        //     .getCommittees()
-        //     .then(committees => {
-        //         const dbCommittees = committees.map(committee => ({
-        //             id: committee.Id,
-        //             committee: committee
-        //         }));
-        //         CommitteesDB.getInstance()
-        //             .upsert(dbCommittees)
-        //     })
-        //     .catch(error => {
-        //         console.log(error);
-        //         notify.error('Failed to load.')
-        //     })
-        //     .finally(() => {
-        //         notify.success('Loaded legislators.')
-        //         setLoading(false)
-        //     });
+        setLoading(true);
+        CommitteeDao.getInstance()
+            .getAll()
+            .then(committees => CommitteesDB.getInstance().upsert(committees))
+            .catch(error => {
+                console.log(error);
+                notify.error('Failed to load.')
+            })
+            .finally(() => {
+                notify.success('Loaded legislators.')
+                setLoading(false)
+            });
     }
 
     function loadBills(): void {
         setLoading(true);
-        BillService.getInstance()
-            .getAll()
-            .then(bills => {
-                const dbBills = bills.map(bill => ({
-                    id: bill.Name!,
-                    bill: bill
-                }));
-                BillsDB.getInstance()
-                    .upsert(dbBills)
-            })
+        BillDao.getInstance()
+            .getBills()
+            .then(bills => BillsDB.getInstance().upsert(bills))
             .catch(error => {
                 console.log(error);
                 notify.error('Failed to load.')
@@ -95,9 +73,12 @@ export const AdminPage = () => {
             .then(bills => {
                 bills.forEach(bill =>
                     BillDao.getInstance()
-                        .getBillSponsors(bill.bill.BillId)
+                        .getBillSponsors(bill.Id)
                         .then(async sponsors => {
-                            const updated = { ...bill, bill: { ...bill.bill, Sponsors: sponsors } }
+                            const updated = {
+                                ...bill,
+                                Sponsors: sponsors
+                            }
                             await BillsDB.getInstance()
                                 .upsert(updated);
                         }));
@@ -122,9 +103,10 @@ export const AdminPage = () => {
                     await CommitteeDao.getInstance()
                         .getCommitteeMembers(committee.Agency, committee.Name)
                         .then(async members => {
-                            const updated = { ...committee, committee: { ...committee, Members: members } }
-                            console.log(updated)
-
+                            const updated = {
+                                ...committee,
+                                Members: members
+                            }
                             await CommitteesDB.getInstance()
                                 .upsert(updated);
                         })

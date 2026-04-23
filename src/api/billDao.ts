@@ -43,7 +43,13 @@ export class BillDao {
         if (resp.error) {
           throw resp.error
         }
-        return resp.data
+        console.log(resp.data)
+        return resp.data.map((bb: any) => (
+          {
+            ...bb,
+            Id: bb.Name
+          }
+        ))
       });
   }
 
