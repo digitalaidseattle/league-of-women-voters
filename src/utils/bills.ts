@@ -47,7 +47,6 @@ class BillsService {
     const { label: latestDocumentLabel, url: latestDocumentUrl } =
       BillsService.deriveDocumentLink(bill);
 
-    console.log(bill)
     return {
       id: bill.Name!, //[billNumber, bill.Biennium ?? index].join("-"),
       billNumber: BillsService.displayValue(billNumber),
