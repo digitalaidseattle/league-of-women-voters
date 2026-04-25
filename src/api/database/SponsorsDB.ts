@@ -57,6 +57,7 @@ export class SponsorsDB implements DAO<Member> {
         const now = new Date();
         const uploads = (Array.isArray(entity) ? entity : [entity])
             .map(mm => ({
+                id: mm.Id,
                 sponsor: mm,
                 updated_at: now
             } as DBSponsor));
