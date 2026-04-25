@@ -19,6 +19,8 @@ import { LoadingOverlay } from "../components/LoadingOverlay";
 // project import
 
 // ==============================|| SAMPLE PAGE ||============================== //
+// const gemini_model = 'gemini-2.5-flash-lite';
+const gemini_model = 'gemini-3.1-flash-lite-preview';
 
 export const AdminPage = () => {
     const [loading, setLoading] = useState(false);
@@ -180,7 +182,7 @@ export const AdminPage = () => {
                 try {
                     // console.log(url, project)
                     FirebaseAiService.getInstance()
-                        .parameterizedQuery(project, infoShema, 'gemini-2.5-flash-lite')
+                        .parameterizedQuery(project, infoShema, gemini_model)
                         .then(async result => {
                             const info = JSON.parse(await result.response.text());
                             const updated: Member = {
@@ -249,29 +251,27 @@ export const AdminPage = () => {
                         { name: 'Ranking Member' }
                     ],
                     tokenCount: 0,
-                    modelType: 'gemini-2.5-flash-lite',
+                    modelType: gemini_model,
                 }
 
-                const leadershipShema = {
+                const leadershipSchema = {
                     type: "array",
-                    items: [
-                        {
-                            type: "object",
-                            properties: {
-                                role: {
-                                    type: "string"
-                                },
-                                name: {
-                                    type: "string"
-                                }
+                    items: {
+                        type: "object",
+                        properties: {
+                            role: {
+                                type: "string"
                             },
-                            required: ["role", "name"]
-                        }
-                    ]
+                            name: {
+                                type: "string"
+                            }
+                        },
+                        required: ["role", "name"]
+                    }
                 }
 
                 FirebaseAiService.getInstance()
-                    .parameterizedQuery(project, leadershipShema, 'gemini-2.5-flash-lite')
+                    .parameterizedQuery(project, leadershipSchema, gemini_model)
                     .then(async result => {
                         const info = JSON.parse(await result.response.text());
                         const updated: Committee = {
