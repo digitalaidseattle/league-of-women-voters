@@ -38,14 +38,26 @@ export function CommitteesSection({ legislator }: { legislator: Member }) {
       })
   }
 
+  function getRole(committee: Committee) {
+    console.log(committee)
+    if (committee.Leadership) {
+      const leadership = (committee.Leadership)
+        .find(lead => lead.name === `${legislator.LastName}, ${legislator.FirstName}`)
+      return leadership ? (leadership.title ?? leadership.role) : 'Member'
+    } else {
+      return 'N/A'
+    }
+  }
+
   return (
     <Card sx={{ height: "100%" }}>
       <CardHeader title={LEGISLATORS_CONSTANTS.committees_label} />
       <Grid container sx={{ margin: 2 }}>
         {loaded && committees.map((committee, idx) => {
           return <React.Fragment key={idx}>
-            <Grid size={9}><Link to={`/committee?agency=${committee.Agency}&committeeName=${committee.Name}`}>{committee.Name}</Link></Grid>
-            <Grid size={3}>?? role ??</Grid>
+            <Grid size={9}><Link to={`/committee/${committee.Id}`}>{committee.Name}</Link></Grid>
+            {/* <Grid size={9}><Link to={`/committee?agency=${committee.Agency}&committeeName=${committee.Name}`}>{committee.Name}</Link></Grid> */}
+            <Grid size={3}>{getRole(committee)}</Grid>
           </React.Fragment>
         })}
       </Grid>

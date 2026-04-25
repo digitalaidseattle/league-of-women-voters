@@ -38,6 +38,18 @@ export const LegislatorsPage = () => {
         type: "string"
       },
       {
+        field: "FirstName",
+        headerName: "First Name",
+        width: 200,
+        type: "string"
+      },
+      {
+        field: "LastName",
+        headerName: "Last Name",
+        width: 200,
+        type: "string"
+      },
+      {
         field: "Agency",
         headerName: "Chamber",
         width: 100,
@@ -46,13 +58,13 @@ export const LegislatorsPage = () => {
       {
         field: "Party",
         headerName: "Party",
-        width: 50,
+        width: 75,
         type: "string"
       },
       {
         field: "District",
         headerName: "District",
-        width: 50,
+        width: 75,
         type: "number"
       },
       {

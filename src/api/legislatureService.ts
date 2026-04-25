@@ -29,7 +29,6 @@ class LegislatureService {
     return this.dao.getById(id);
   }
 
-  // FIXME members need to be added to committees
   async findCommitteesByMember(member: Member): Promise<Committee[]> {
     const committees = await this.getAll();
     return committees.filter(committee =>

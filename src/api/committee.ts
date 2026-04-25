@@ -7,6 +7,7 @@ type Committee = {
   Name: string;
   Phone: string;
   Members: Member[];
+  Leadership: { role?: string, title?: string, name?: string, member?: string }[]
 };
 
 type Member = {

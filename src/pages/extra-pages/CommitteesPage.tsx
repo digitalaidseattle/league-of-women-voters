@@ -56,7 +56,6 @@ const CommitteesPage = () => {
 
   const openCommittee = (params: any) => {
     const committee = params.row;
-    console.log(committee);
     navigate(`/committee/${committee.Id}`);
 //    navigate(`/committee?agency=${committee.Agency}&committeeName=${encodeURIComponent(committee.Name)}`);
   };

@@ -6,12 +6,24 @@ export type DBCommittee = {
     id: Identifier,
     created_at: Date,
     updated_at: Date,
+    membership_update: Date,
+    leadership_update: Date,
     committee: Committee
 }
 
 class IternalCommitteeDAO extends SupabaseDAO<DBCommittee> {
     constructor() {
         super(SupabaseConfiguration.getInstance().getSupabaseClient(), 'Committees')
+    }
+
+    async findLastUpdateBefore(date: Date, field?: string): Promise<DBCommittee[]> {
+        const check = field ?? 'updated_at';
+        const dateString = date.toISOString();
+        return this.client
+            .from(this.tableName)
+            .select('*')
+            .or(`${check}.lt.${dateString},${check}.is.null`)
+            .then(resp => resp.data as DBCommittee[])
     }
 }
 
@@ -26,7 +38,7 @@ export class CommitteesDB implements DAO<Committee> {
         return CommitteesDB.instance;
     }
 
-    db_dao: SupabaseDAO<DBCommittee>;
+    db_dao: IternalCommitteeDAO;
 
     constructor() {
         this.db_dao = new IternalCommitteeDAO();
@@ -54,16 +66,31 @@ export class CommitteesDB implements DAO<Committee> {
             .then(resps => resps.map(db => db.committee))
     }
 
-    // async getCommitteeMembers(
-    //     agency: string,
-    //     committeeName: string,
-    // ): Promise<Member[]> {
-    //     return this.client.functions
-    //         .invoke("committee-services", {
-    //             body: { operation: 'GetActiveCommitteeMembers', agency: agency, committeeName: committeeName },
-    //         })
-    //         .then((resp: any) => resp.data as Member[]);
-    // }
+    async findLastUpdateBefore(date: Date, field?: string): Promise<Committee[]> {
+        return this.db_dao.findLastUpdateBefore(date, field)
+            .then(resps => resps.map(sponsorDB => sponsorDB.committee))
+    }
 
+    async updateLeadership(entity: Committee | Committee[]): Promise<Committee | Committee[]> {
+        const now = new Date();
+        const uploads = (Array.isArray(entity) ? entity : [entity])
+            .map(cc => ({
+                committee: cc,
+                leadership_update: now
+            } as DBCommittee));
+        return Promise.all(uploads.map(up => this.db_dao.upsert(up)))
+            .then(resps => resps.map(sponsorDB => sponsorDB.committee))
+    }
+
+    async updateMembership(entity: Committee | Committee[]): Promise<Committee | Committee[]> {
+        const now = new Date();
+        const uploads = (Array.isArray(entity) ? entity : [entity])
+            .map(cc => ({
+                committee: cc,
+                membership_update: now
+            } as DBCommittee));
+        return Promise.all(uploads.map(up => this.db_dao.upsert(up)))
+            .then(resps => resps.map(sponsorDB => sponsorDB.committee))
+    }
 
 }

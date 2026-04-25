@@ -16,7 +16,7 @@
  */
 
 import { AI, getAI, getGenerativeModel, GoogleAIBackend, Part } from "firebase/ai";
-import { getConfiguration } from "./Configuration";
+import { FirebaseConfiguration } from "./FirebaseConfiguration";
 
 export type ProjectOutput = {
     name: string;
@@ -61,8 +61,8 @@ export class FirebaseAiService {
     storageFolder = "";
 
     constructor() {
-        const config = getConfiguration();
-        this.ai = getAI(config.client, { backend: new GoogleAIBackend() });
+        const firebaseClient = FirebaseConfiguration.getInstance().getClient();
+        this.ai = getAI(firebaseClient, { backend: new GoogleAIBackend() });
     }
 
     createParts(project: Project): Part[] {
@@ -82,34 +82,6 @@ export class FirebaseAiService {
         throw new Error("not implemented")
     }
 
-
-    // Provide a JSON schema object using a standard format.
-    // Later, pass this schema object into `responseSchema` in the generation config.
-
-    createSchema(project: Project): any {
-        const fields: string[] = project.outputs.map((o) => o.name);
-
-        const itemProperties =
-            Object.fromEntries(
-                fields.map(field => [field, { type: "string" }])
-            );
-
-        return {
-            type: "object",
-            properties: {
-                characters: {
-                    type: "array",
-                    items: {
-                        type: "object",
-                        properties: itemProperties,
-                        required: fields
-                    },
-                },
-            },
-            required: ["characters"]
-        };
-    }
-
     /**
      * Sends a prompt to the AI and tells it which fields to return.
      * 
@@ -118,13 +90,16 @@ export class FirebaseAiService {
      */
     async parameterizedQuery(
         project: Project,
+        schema: { [key: string]: unknown },
         modelType?: string
     ): Promise<any> {
+
         const parts = this.createParts(project);
         const model = getGenerativeModel(this.ai, {
             model: modelType ?? project.modelType ?? 'gemini-2.5-flash',
             generationConfig: {
                 responseMimeType: "application/json",
+                responseJsonSchema: schema
             }
         });
         return model.generateContent([project.prompt, ...parts])

@@ -7,11 +7,14 @@ import { Breadcrumbs, Button, Card, CardContent, CardHeader, IconButton, Stack, 
 import { useState } from "react";
 import { BillDao } from "../api/billDao";
 import { CommitteeDao } from "../api/committeeDao";
+import { BillsDB } from "../api/database/BillsDB";
 import { CommitteesDB } from "../api/database/CommitteesDB";
 import { SponsorsDB } from "../api/database/SponsorsDB";
+import { UpdateScheduleDB } from "../api/database/UpdateScheduleDB";
+import { HtmlDao } from "../api/HtmlDao";
 import { LegislatorDao } from "../api/legislatorDao";
+import { FirebaseAiService, Project, ProjectContext } from "../api/screen-scraped/FirebaseAiService";
 import { LoadingOverlay } from "../components/LoadingOverlay";
-import { BillsDB } from "../api/database/BillsDB";
 
 // project import
 
@@ -94,159 +97,201 @@ export const AdminPage = () => {
             });
     }
 
-    function loadCommitteMembers(): void {
+    async function loadCommitteMembers(): Promise<void> {
         setLoading(true);
-        CommitteesDB.getInstance()
-            .getAll()
-            .then(async dbCommittees => {
-                dbCommittees.forEach(async committee => {
-                    await CommitteeDao.getInstance()
-                        .getCommitteeMembers(committee.Agency, committee.Name)
-                        .then(async members => {
-                            const updated = {
-                                ...committee,
-                                Members: members
-                            }
-                            await CommitteesDB.getInstance()
-                                .upsert(updated);
-                        })
-                });
-                console.log('done')
-            })
-            .catch(error => {
-                console.log(error);
-                notify.error('Failed to load.')
-            })
-            .finally(() => {
-                notify.success('Loaded committe members.')
-                setLoading(false)
+        try {
+            const checkDate = new Date();
+
+            const committees = await CommitteesDB.getInstance()
+                .findLastUpdateBefore(checkDate, 'membership_update');
+            const now = new Date().toISOString();
+            committees.forEach(async committee => {
+                await CommitteeDao.getInstance()
+                    .getCommitteeMembers(committee.Agency, committee.Name)
+                    .then(async members => {
+                        const updated = {
+                            ...committee,
+                            membership_update: now,
+                            Members: members
+                        }
+                        await CommitteesDB.getInstance()
+                            .updateMembership(updated);
+                    })
             });
+        }
+        catch (error) {
+            console.log(error);
+            notify.error('Failed to load.')
+        }
+        finally {
+            notify.success('Loaded committe members.')
+            setLoading(false)
+        };
     }
 
     async function scrapeLegislatorInfo(): Promise<void> {
-        throw new Error('not implemented yet');
 
-        // const prompt = "Parse the provided page and find the Address and Legislative assisant. Return the results in structure JSON";
-        // setLoading(true);
-        // SponsorsDB.getInstance()
-        //     .getAll()
-        //     .then(async sponsors => {
+        const prompt = "Parse the provided page and find the Address and Legislative assisant. Return the results in structure JSON";
+        setLoading(true);
+        try {
+            const checkDate = await UpdateScheduleDB.getInstance()
+                .getByName('legislator_info')
+                .then(sched => sched.last_update);
 
-        //         for (const sponsor of sponsors) {
-        //             const url = `https://leg.wa.gov/legislators/member/${sponsor.FirstName}-${sponsor.LastName}`
+            const sponsors = await SponsorsDB.getInstance()
+                .findLastUpdateBefore(checkDate, 'info_update');
+            //for (let i = 0; i < sponsors.length; i++) {
+            for (let i = 0; i <= 0; i++) {
+                const sponsor = sponsors[i];
+                const url = `https://leg.wa.gov/legislators/member/${sponsor.FirstName}-${sponsor.LastName}`
 
-        //             const pageText = await HtmlDao.getInstance()
-        //                 .getHtml(url)
+                const pageText = await HtmlDao.getInstance()
+                    .getHtml(url)
 
-        //             const context: ProjectContext = {
-        //                 type: 'text',
-        //                 name: 'website',
-        //                 value: pageText,
-        //                 tokenCount: 0,
-        //             }
-        //             const project: Project = {
-        //                 name: 'chair-query',
-        //                 rating: 5,
-        //                 tags: [],
-        //                 template: '',
-        //                 prompt: prompt,
-        //                 contexts: [context],
-        //                 outputs: [{ name: 'Address' }, { name: 'LegislativeAssistant' }],
-        //                 tokenCount: 0,
-        //                 modelType: 'gemini-2.5-flash-lite',
-        //             }
+                const context: ProjectContext = {
+                    type: 'text',
+                    name: 'website',
+                    value: pageText,
+                    tokenCount: 0,
+                }
+                const project: Project = {
+                    name: 'chair-query',
+                    rating: 5,
+                    tags: [],
+                    template: '',
+                    prompt: prompt,
+                    contexts: [context],
+                    outputs: [{ name: 'Address' }, { name: 'LegislativeAssistant' }],
+                    tokenCount: 0,
+                    modelType: 'gemini-2.5-flash-lite',
+                }
+                const infoShema = {
+                    type: "object",
+                    properties: {
+                        Address: {
+                            type: "string"
+                        },
+                        Assistant: {
+                            type: "string"
+                        }
+                    },
+                }
 
-        //             try {
-        //                 FirebaseAiService.getInstance()
-        //                     .parameterizedQuery(project, 'gemini-2.5-flash-lite')
-        //                     .then(async result => {
-        //                         const info = JSON.parse(await result.response.text());
-        //                         console.log(info)
-        //                         const address = info["address"] ?? info['Address'];
-        //                         const assistant = info["legislative_assistant"] ?? JSON.stringify(info['Legislative_assistant']);
+                try {
+                    // console.log(url, project)
+                    FirebaseAiService.getInstance()
+                        .parameterizedQuery(project, infoShema, 'gemini-2.5-flash-lite')
+                        .then(async result => {
+                            const info = JSON.parse(await result.response.text());
+                            const updated: Member = {
+                                ...sponsor,
+                                ...info
+                            };
+                            await SponsorsDB.getInstance()
+                                .updateInfo(updated);
+                        })
+                } catch (err) {
+                    throw err;
+                }
 
-        //                         const updated: DBSponsor = {
-        //                             ...dbSponsor,
-        //                             sponsor: {
-        //                                 ...sponsor,
-        //                                 Address: address,
-        //                                 assistant: assistant
-        //                             }
-        //                         };
-        //                         console.log(updated);
-        //                         await SponsorsDB.getInstance()
-        //                             .upsert(updated);
-        //                     })
-        //             } catch (err) {
-        //                 throw err;
-        //             }
-
-        //         }
-        //     })
-        //     .catch(error => {
-        //         console.log(error);
-        //         notify.error('Failed to load.')
-        //     })
-        //     .finally(() => {
-        //         setLoading(false)
-        //         notify.success('Loaded committe members.')
-        //     });
+            }
+        }
+        catch (error) {
+            console.log(error);
+            notify.error('Failed to load.')
+        }
+        finally {
+            setLoading(false)
+            notify.success('Loaded legislator info.')
+        }
     }
 
-    async function scrapeCommitteInfo(): Promise<void> {
-        throw new Error('not implemented yet');
+    async function scrapeCommitteLeadership(): Promise<void> {
 
-        // const prompt = "Parse the provided page and list the committee leadership in structured JSON";
+        const prompt = "Parse the provided page and list the committee leaders in structured JSON";
 
 
-        // // setLoading(true);
-        // CommitteesDB.getInstance()
-        //     .getAll()
-        //     .then(async dbCommittees => {
+        setLoading(true);
+        try {
+            const checkDate = await UpdateScheduleDB.getInstance()
+                .getByName('committee_leadership')
+                .then(sched => sched.last_update);
 
-        //         for (const committee of dbCommittees) {
-        //             const url = committee.Agency === 'House'
-        //                 ? `https://leg.wa.gov/about-the-legislature/committees/house-of-representatives/${committee.committee.Acronym}`
-        //                 : committee.Agency === 'Senate'
-        //                     ? `https://leg.wa.gov/about-the-legislature/committees/senate/${committee.committee.Acronym}`
-        //                     : `https://leg.wa.gov/about-the-legislature/committees/joint/${committee.committee.Acronym}`
+            const committees = await CommitteesDB.getInstance()
+                .findLastUpdateBefore(checkDate, 'leadership_update');
+            for (let i = 0; i <= 0; i++) {
+                const committee = committees[i];
+                const url = committee.Agency === 'House'
+                    ? `https://leg.wa.gov/about-the-legislature/committees/house-of-representatives/${committee.Acronym}`
+                    : committee.Agency === 'Senate'
+                        ? `https://leg.wa.gov/about-the-legislature/committees/senate/${committee.Acronym}`
+                        : `https://leg.wa.gov/about-the-legislature/committees/joint/${committee.Acronym}`
 
-        //             const pageText = await HtmlDao.getInstance()
-        //                 .getHtml(url)
+                const pageText = await HtmlDao.getInstance()
+                    .getHtml(url)
 
-        //             const context: ProjectContext = {
-        //                 type: 'text',
-        //                 name: 'website',
-        //                 value: pageText,
-        //                 tokenCount: 0,
-        //             }
-        //             const project: Project = {
-        //                 name: 'chair-query',
-        //                 rating: 5,
-        //                 tags: [],
-        //                 template: '',
-        //                 prompt: prompt,
-        //                 contexts: [context],
-        //                 outputs: [{ name: 'Chair' }, { name: 'Vice Chair' }, { name: 'Ranking Member' }],
-        //                 tokenCount: 0,
-        //                 modelType: 'gemini-2.5-flash-lite',
-        //             }
+                const context: ProjectContext = {
+                    type: 'text',
+                    name: 'website',
+                    value: pageText,
+                    tokenCount: 0,
+                }
+                const project: Project = {
+                    name: 'chair-query',
+                    rating: 5,
+                    tags: [],
+                    template: '',
+                    prompt: prompt,
+                    contexts: [context],
+                    outputs: [
+                        { name: 'Chair' },
+                        { name: 'Vice Chair' },
+                        { name: 'Ranking Member' }
+                    ],
+                    tokenCount: 0,
+                    modelType: 'gemini-2.5-flash-lite',
+                }
 
-        //             FirebaseAiService.getInstance()
-        //                 .parameterizedQuery(project, 'gemini-2.5-flash-lite')
-        //                 .then(async result => {
-        //                     console.log('***AI response**', committee.Acronym, result.response.text());
-        //                 })
-        //         }
-        //     })
-        //     .catch(error => {
-        //         console.log(error);
-        //         notify.error('Failed to load.')
-        //     })
-        //     .finally(() => {
-        //         setLoading(false)
-        //         notify.success('Loaded committe members.')
-        //     });
+                const leadershipShema = {
+                    type: "array",
+                    items: [
+                        {
+                            type: "object",
+                            properties: {
+                                role: {
+                                    type: "string"
+                                },
+                                name: {
+                                    type: "string"
+                                }
+                            },
+                            required: ["role", "name"]
+                        }
+                    ]
+                }
+
+                FirebaseAiService.getInstance()
+                    .parameterizedQuery(project, leadershipShema, 'gemini-2.5-flash-lite')
+                    .then(async result => {
+                        const info = JSON.parse(await result.response.text());
+                        const updated: Committee = {
+                            ...committee,
+                            Leadership: info
+                        };
+                        console.log(url, info)
+                        await CommitteesDB.getInstance()
+                            .updateLeadership(updated);
+                    })
+            }
+        }
+        catch (error) {
+            console.log(error);
+            notify.error('Failed to load.')
+        }
+        finally {
+            setLoading(false)
+            notify.success('Loaded committe members.')
+        };
     }
 
     return (<>
@@ -265,7 +310,7 @@ export const AdminPage = () => {
                     <Button onClick={loadBillSponsors}>Load Bill Sponsors</Button>
                     <Button onClick={loadCommitteMembers}>Load Committee Members</Button>
                     <Button onClick={scrapeLegislatorInfo}>Scrape Legislator Info</Button>
-                    <Button onClick={scrapeCommitteInfo}>Scrape Committee Info</Button>
+                    <Button onClick={scrapeCommitteLeadership}>Scrape Committee Leadership</Button>
                 </Stack>
             </CardContent>
         </Card>
