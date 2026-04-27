@@ -6,9 +6,9 @@ import {
   MinimalLayout
 } from "@digitalaidseattle/mui";
 import CommitteePage from './extra-pages/CommitteePage';
-import CommitteesPage from './extra-pages/CommitteesPage';
+import CommitteesPage from './CommitteesPage';
 import SponsorPage from './extra-pages/LegislatorPage';
-import { LegislatorsPage } from './extra-pages/LegislatorsPage';
+import { LegislatorsPage } from './LegislatorsPage';
 import { BillsPage } from "./extra-pages/BillsPage";
 import { BillPage } from "./BillPage";
 import { AdminPage } from "./AdminPage";

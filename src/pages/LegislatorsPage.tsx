@@ -8,9 +8,9 @@ import { DataGrid, GridColDef, Toolbar, useGridApiRef } from "@mui/x-data-grid";
 
 import { LoadingContext } from '@digitalaidseattle/core';
 import { PageInfo } from "@digitalaidseattle/core";
-import { LegislatorService } from '../../api/legislatorService';
-import { CHAMBER_TYPE, ChamberButtonGroup } from "../../components/ChamberButtonGroup";
-import { LoadingOverlay } from '../../components/LoadingOverlay';
+import { LegislatorService } from '../api/legislatorService';
+import { CHAMBER_TYPE, ChamberButtonGroup } from "../components/ChamberButtonGroup";
+import { LoadingOverlay } from '../components/LoadingOverlay';
 // project import
 
 // ==============================|| SAMPLE PAGE ||============================== //
@@ -129,6 +129,7 @@ export const LegislatorsPage = () => {
       </Toolbar>
     );
   }
+  
   return (<>
     <LoadingOverlay loading={loading} />
     <Breadcrumbs aria-label="breadcrumb">

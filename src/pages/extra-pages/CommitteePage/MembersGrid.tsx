@@ -76,7 +76,6 @@ const MembersGrid = (props: { committee: Committee }) => {
           return found ? (found.LegislativeAssistant ?? []).map(la => la.name).join(", ") : ""
         }),
         renderCell: (params => {
-          console.log(params)
           const found = legislators.find(mm => mm.Id === params.row.Id);
           return found ? (found.LegislativeAssistant ?? []).map(la => la.name).join(", ") : ""
         })
