@@ -8,6 +8,7 @@ type DocumentHistoryLine = {
 };
 
 type LegislativeDocument = {
+  Id: string;
   Name?: string;
   Biennium?: string;
   Description?: string;
@@ -26,7 +27,7 @@ type LegislativeDocument = {
   CommitteeNames?: {
     CommitteeName?: string | string[];
   };
-  Sponsors?: string | string[];
+  Sponsors?: Sponsor[];
   OriginatingAgency?: string;
   Agency?: string;
   Chamber?: string;
@@ -35,10 +36,11 @@ type LegislativeDocument = {
   LastModified?: string;
   DocumentHistory?: {
     DocumentHistoryLine?:
-      | DocumentHistoryLine
-      | DocumentHistoryLine[]
-      | null;
+    | DocumentHistoryLine
+    | DocumentHistoryLine[]
+    | null;
   };
+  PrimeSponsorID?: number;
   [key: string]: unknown;
 };
 

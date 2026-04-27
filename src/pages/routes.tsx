@@ -1,5 +1,3 @@
-import CommitteesPage from './extra-pages/CommitteesPage';
-
 import {
   Error,
   Login,
@@ -8,11 +6,12 @@ import {
   MinimalLayout
 } from "@digitalaidseattle/mui";
 import CommitteePage from './extra-pages/CommitteePage';
-import BillsPage from './extra-pages/BillsPage';
-import BillDetailPage from './extra-pages/BillDetailPage';
-import SponsorPage from './extra-pages/SponsorPage';
-import SponsorsPage from './extra-pages/SponsorsPage';
-import LegislatorsPage from './extra-pages/LegislatorsPage';
+import CommitteesPage from './extra-pages/CommitteesPage';
+import SponsorPage from './extra-pages/LegislatorPage';
+import { LegislatorsPage } from './extra-pages/LegislatorsPage';
+import { BillsPage } from "./extra-pages/BillsPage";
+import { BillPage } from "./BillPage";
+import { AdminPage } from "./AdminPage";
 
 const routes = [
   {
@@ -32,28 +31,32 @@ const routes = [
         element: <CommitteePage />,
       },
       {
+        path: "committee/:id",
+        element: <CommitteePage />,
+      },
+      {
         path: "bills",
         element: <BillsPage />,
       },
       {
-        path: "bill",
-        element: <BillDetailPage />,
-      },
-      {
-        path: "sponsors",
-        element: <SponsorsPage />,
-      },
-      {
-        path: "sponsor",
-        element: <SponsorPage />,
+        path: "bill/:id",
+        element: <BillPage />,
       },
       {
         path: "legislators",
         element: <LegislatorsPage />,
       },
       {
+        path: "legislator/:id",
+        element: <SponsorPage />,
+      },
+      {
+        path: "admin",
+        element: <AdminPage />,
+      },
+      {
         path: "privacy",
-        element: <MarkdownPage filepath='privacy.md'/>,
+        element: <MarkdownPage filepath='privacy.md' />,
       }
     ]
   },

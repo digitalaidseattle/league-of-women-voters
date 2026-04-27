@@ -1,36 +1,79 @@
-import { PageInfo } from "@digitalaidseattle/supabase";
-import { Link } from "@mui/material";
+import { CopyOutlined } from "@ant-design/icons";
+import { PageInfo, useNotifications } from "@digitalaidseattle/core";
+import { Box, Button } from "@mui/material";
 import { DataGrid, GridColDef, useGridApiRef } from "@mui/x-data-grid";
 import { useEffect, useState } from "react";
-import { LegislatureService } from "../../../api/legislatureService";
+import { Link } from "react-router-dom";
 
 const PAGE_SIZE = 25;
 
-const MembersGrid = (props: { agency: string, committeeName: string }) => {
+const MembersGrid = (props: { committee: Committee }) => {
   const apiRef = useGridApiRef();
+  const notifications = useNotifications();
   const [paginationModel, setPaginationModel] = useState({
     page: 0,
     pageSize: PAGE_SIZE,
   });
-
-  const [columns, setColumns] = useState<GridColDef[]>([]);
   const [pageInfo, setPageInfo] = useState<PageInfo<Member>>({
     rows: [],
     totalRowCount: 0,
   });
 
-  // const [agency, setAgency] = useState<string>("");
-  // const [committeeName, setCommitteeName] = useState<string>("");
+  const columns: GridColDef[] =
+    [
+      // {
+      //   field: "Id",
+      //   headerName: "Id",
+      //   width: 100,
+      //   type: "number"
+      // },
+      {
+        field: "Name",
+        headerName: "Name",
+        width: 200,
+        type: "string",
+        renderCell: (params) => {
+          const legislator = params.row;
+          return (
+            <Link to={`/legislator/${legislator.Id}`}>{legislator.Name}</Link>
+          );
+        }
+      },
 
+      {
+        field: "Agency",
+        headerName: "Agency",
+        width: 100,
+        type: "string"
+      },
+      {
+        field: "Party",
+        headerName: "Party",
+        width: 100,
+        type: "string"
+      },
+      {
+        field: "District",
+        headerName: "District",
+        width: 100,
+        type: "number"
+      },
+      {
+        field: "Email",
+        headerName: "Email",
+        width: 200,
+        type: "string"
+      },
+      {
+        field: "LongName",
+        headerName: "Long Name",
+        width: 300,
+        type: "string"
+      }
+    ];
 
   useEffect(() => {
-    setColumns(getColumns());
-  }, []);
-
-  useEffect(() => {
-    if (props.committeeName && props.agency) {
-      refresh()
-    }
+    refresh()
   }, [props]);
 
 
@@ -54,85 +97,57 @@ const MembersGrid = (props: { agency: string, committeeName: string }) => {
       rows: [],
       totalRowCount: 0,
     })
-    LegislatureService.getInstance()
-      .getCommitteeMembers(props.agency, props.committeeName)
-      .then(response => {
-        setPageInfo({
-          rows: response,
-          totalRowCount: response.length,
-        })
+    if (props.committee) {
+      setPageInfo({
+        rows: props.committee.Members ?? [],
+        totalRowCount: (props.committee.Members ?? []).length,
       })
-      .catch(error => {
-        console.error('Error invoking function:', error);
-      });
+    }
   }
 
-  const getColumns = (): GridColDef[] => {
-    return [
-      // {
-      //   field: "Id",
-      //   headerName: "Id",
-      //   width: 100,
-      //   type: "number"
-      // },
-      {
-        field: "Name",
-        headerName: "Name",
-        width: 200,
-        type: "string",
-        renderCell: (params) => {
-          const sponsor = params.row;
-          console.log('Rendering sponsor:', sponsor);
-          return (
-              <Link href={`/sponsor?id=${sponsor.Id}`}>{sponsor.Name}</Link>
-          );
-        }
-      },
+  async function copyEmails() {
+    const emails = pageInfo.rows
+      .map((row: any) => row.Email)
+      .filter((email: string) => typeof email === "string" && email.trim().length > 0)
+      .join(", ");
 
-{
-  field: "Agency",
-    headerName: "Agency",
-      width: 100,
-        type: "string"
-},
-{
-  field: "Party",
-    headerName: "Party",
-      width: 100,
-        type: "string"
-},
-{
-  field: "District",
-    headerName: "District",
-      width: 100,
-        type: "number"
-},
-{
-  field: "Email",
-    headerName: "Email",
-      width: 200,
-        type: "string"
-},
-{
-  field: "LongName",
-    headerName: "Long Name",
-      width: 300,
-        type: "string"
-}
-    ];
-  };
+    if (!emails) {
+      notifications.warn("No emails found.");
+      return;
+    }
 
-return (
-  <DataGrid
-    getRowId={(row) => row.Id}
-    apiRef={apiRef}
-    rows={pageInfo.rows}
-    columns={columns}
-    paginationModel={paginationModel}
-    onPaginationModelChange={setPaginationModel}
-    pageSizeOptions={[10, 25, 50, 100]}
-  />
-)
+    try {
+      await navigator.clipboard.writeText(emails);
+      notifications.success("All committee emails copied.");
+    } catch (error) {
+      console.error("Failed to copy emails:", error);
+      notifications.error("Copy failed. Please try again.");
+    }
+  }
+
+  return (
+    <Box>
+      <Box sx={{ display: "flex", justifyContent: "flex-end", mb: 1 }}>
+        <Button
+          variant="text"
+          color="primary"
+          startIcon={<CopyOutlined />}
+          onClick={copyEmails}
+        >
+          Copy all emails
+        </Button>
+      </Box>
+      <DataGrid
+        getRowId={(row) => row.Id}
+        apiRef={apiRef}
+        rows={pageInfo.rows}
+        columns={columns}
+        paginationModel={paginationModel}
+        onPaginationModelChange={setPaginationModel}
+        pageSizeOptions={[10, 25, 50, 100]}
+      />
+    </Box>
+  )
 }
 
 export default MembersGrid;
