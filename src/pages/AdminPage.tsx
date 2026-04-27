@@ -71,14 +71,17 @@ export const AdminPage = () => {
             });
     }
 
-    function loadBillSponsors(): void {
+    async function loadBillSponsors(): Promise<void> {
         setLoading(true);
-        BillsDB.getInstance()
-            .getAll()
-            .then(bills => {
-                bills.forEach(bill =>
+        try {
+            const bills = await BillsDB.getInstance().getAll();
+            for (let i = 0; i < bills.length; i++) {
+                const bill = bills[i];
+                const substrings = `${bill.Id}`.split(".")
+                const name = substrings[0].split("-")[0]
+                try {
                     BillDao.getInstance()
-                        .getBillSponsors(bill.Id)
+                        .getBillSponsors(name)
                         .then(async sponsors => {
                             const updated = {
                                 ...bill,
@@ -86,17 +89,20 @@ export const AdminPage = () => {
                             }
                             await BillsDB.getInstance()
                                 .upsert(updated);
-                        }));
-                console.log('done')
-            })
-            .catch(error => {
-                console.log(error);
-                notify.error('Failed to load.')
-            })
-            .finally(() => {
-                notify.success('Loaded bill sponsors.')
-                setLoading(false)
-            });
+                        });
+                }
+                catch (error) {
+                    console.log(error);
+                    notify.error(`Failed to load sponsors. ${name}`);
+                    throw(error);
+                }
+            }
+            notify.success('Loaded bill sponsors.')
+            console.log('Done');
+        }
+        finally {
+            setLoading(false)
+        };
     }
 
     async function loadCommitteMembers(): Promise<void> {
