@@ -6,7 +6,7 @@
  */
 import { SupabaseClient } from '@supabase/supabase-js';
 import type { LegislativeDocument } from "./bill";
-import { getConfiguration } from './configuration';
+import { SupabaseConfiguration } from '@digitalaidseattle/supabase';
 
 const DEFAULT_DOCUMENT_CLASS = "Bills";
 
@@ -30,8 +30,7 @@ export class BillDao {
     } else {
       throw new Error("VITE_LWVW_CURRENT_BIENNIUM is required, but was not provided.");
     }
-
-    this.client = getConfiguration().client;
+    this.client = SupabaseConfiguration.getInstance().getSupabaseClient();
   }
 
   public async getBills(documentClass?: string): Promise<LegislativeDocument[]> {
@@ -44,7 +43,13 @@ export class BillDao {
         if (resp.error) {
           throw resp.error
         }
-        return resp.data
+        console.log(resp.data)
+        return resp.data.map((bb: any) => (
+          {
+            ...bb,
+            Id: bb.Name
+          }
+        ))
       });
   }
 

@@ -3,14 +3,14 @@ import { NavLink, useNavigate } from "react-router-dom";
 
 // material-ui
 import { HomeOutlined, ReloadOutlined } from "@ant-design/icons";
-import { Breadcrumbs, Card, CardContent, CardHeader, IconButton, Tooltip, Typography } from '@mui/material';
+import { Breadcrumbs, Card, CardHeader, IconButton, Tooltip, Typography } from '@mui/material';
 import { DataGrid, GridColDef, Toolbar, useGridApiRef } from "@mui/x-data-grid";
 
-import { PageInfo } from "@digitalaidseattle/supabase";
+import { LoadingContext } from '@digitalaidseattle/core';
+import { PageInfo } from "@digitalaidseattle/core";
 import { LegislatorService } from '../../api/legislatorService';
 import { CHAMBER_TYPE, ChamberButtonGroup } from "../../components/ChamberButtonGroup";
 import { LoadingOverlay } from '../../components/LoadingOverlay';
-import { LoadingContext } from '@digitalaidseattle/core';
 // project import
 
 // ==============================|| SAMPLE PAGE ||============================== //
@@ -38,6 +38,18 @@ export const LegislatorsPage = () => {
         type: "string"
       },
       {
+        field: "FirstName",
+        headerName: "First Name",
+        width: 200,
+        type: "string"
+      },
+      {
+        field: "LastName",
+        headerName: "Last Name",
+        width: 200,
+        type: "string"
+      },
+      {
         field: "Agency",
         headerName: "Chamber",
         width: 100,
@@ -46,13 +58,13 @@ export const LegislatorsPage = () => {
       {
         field: "Party",
         headerName: "Party",
-        width: 50,
+        width: 75,
         type: "string"
       },
       {
         field: "District",
         headerName: "District",
-        width: 50,
+        width: 75,
         type: "number"
       },
       {

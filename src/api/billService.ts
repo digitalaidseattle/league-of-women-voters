@@ -7,6 +7,8 @@
 
 import type { LegislativeDocument } from "./bill";
 import { BillDao } from './billDao';
+import { DAO } from "./DAO";
+import { BillsDB } from "./database/BillsDB";
 
 const DEFAULT_DOCUMENT_CLASS = "Bills";
 
@@ -20,11 +22,17 @@ export class BillService {
     return BillService.instance;
   }
 
+  dao: DAO<LegislativeDocument>;
   private constructor() {
+    this.dao = BillsDB.getInstance();
   }
 
   async getAll(documentClass?: string): Promise<LegislativeDocument[]> {
-    return BillDao.getInstance().getBills(documentClass ?? DEFAULT_DOCUMENT_CLASS);
+    if (documentClass) {
+      return BillDao.getInstance().getBills(documentClass ?? DEFAULT_DOCUMENT_CLASS);
+    } else {
+      return this.dao.getAll();
+    }
   }
 
   async getById(id: string): Promise<LegislativeDocument> {
@@ -36,15 +44,12 @@ export class BillService {
     throw new Error(`Could not find bill for id = ${id}`);
   }
 
-  // FIXME bills need Sponsors populated
   async findBillsBySponsor(sponsor: Member): Promise<LegislativeDocument[]> {
-    const bills = await this.getAll();
+    const bills = await this.dao.getAll();
     return bills.filter(b => {
       const sponsorIds = (b.Sponsors ?? []).map(s => s.Id);
       return sponsorIds.includes(sponsor.Id);
     })
   }
-
-
 
 }

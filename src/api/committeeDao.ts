@@ -4,8 +4,8 @@
  *  @copyright 2025 Digital Aid Seattle
  *
  */
+import { SupabaseConfiguration } from '@digitalaidseattle/supabase';
 import { SupabaseClient } from '@supabase/supabase-js';
-import { getConfiguration } from './configuration';
 
 export class CommitteeDao {
   private static instance: CommitteeDao;
@@ -27,7 +27,7 @@ export class CommitteeDao {
     } else {
       throw new Error("VITE_LWVW_CURRENT_BIENNIUM is required, but was not provided.");
     }
-    this.client = getConfiguration().client;
+    this.client = SupabaseConfiguration.getInstance().getSupabaseClient()
   }
 
   public async getAll(): Promise<Committee[]> {

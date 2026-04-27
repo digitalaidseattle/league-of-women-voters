@@ -25,8 +25,7 @@ import {
   useGridApiRef
 } from "@mui/x-data-grid";
 
-import { LoadingContext } from "@digitalaidseattle/core";
-import { PageInfo } from "@digitalaidseattle/supabase";
+import { LoadingContext, PageInfo } from "@digitalaidseattle/core";
 
 import type { BillRow } from "../../api/bill";
 import { BillService } from "../../api/billService";
@@ -130,7 +129,7 @@ export const BillsPage = () => {
       .getAll()
       .then(data => {
         const rows = data
-          .map((bill, index) => BillsService.mapLegislativeDocumentToBillRow(bill, index)!)
+          .map((bill) => BillsService.mapLegislativeDocumentToBillRow(bill)!)
           .filter(b => b !== undefined)
           .filter(row => rowFilter(row));
         setPageInfo({

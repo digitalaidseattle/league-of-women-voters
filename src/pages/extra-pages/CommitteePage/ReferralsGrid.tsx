@@ -1,4 +1,4 @@
-import { PageInfo } from "@digitalaidseattle/supabase";
+import { PageInfo } from "@digitalaidseattle/core";
 import { DataGrid, GridColDef, useGridApiRef } from "@mui/x-data-grid";
 import { useEffect, useState } from "react";
 import { LegislatureService } from "../../../api/legislatureService";

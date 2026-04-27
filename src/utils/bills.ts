@@ -12,7 +12,6 @@ type BillFilterOptions = {
 class BillsService {
   static mapLegislativeDocumentToBillRow(
     bill: LegislativeDocument,
-    index: number
   ): BillRow | undefined {
     const billIdentifier = BillsService.stringFallback([bill.Name]);
     const fallbackIdentifier = BillsService.stringFallback([
@@ -48,7 +47,6 @@ class BillsService {
     const { label: latestDocumentLabel, url: latestDocumentUrl } =
       BillsService.deriveDocumentLink(bill);
 
-    console.log(bill)
     return {
       id: bill.Name!, //[billNumber, bill.Biennium ?? index].join("-"),
       billNumber: BillsService.displayValue(billNumber),
