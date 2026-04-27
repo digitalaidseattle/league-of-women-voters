@@ -54,6 +54,11 @@ export class CommitteesDB implements DAO<Committee> {
             .then(wrapped => wrapped.committee);
     }
 
+    async findLastUpdateBefore(date: Date, field?: string): Promise<Committee[]> {
+        return this.db_dao.findLastUpdateBefore(date, field)
+            .then(resps => resps.map(sponsorDB => sponsorDB.committee))
+    }
+
     async upsert(entity: Committee | Committee[]): Promise<Committee | Committee[]> {
         const now = new Date();
         const uploads = (Array.isArray(entity) ? entity : [entity])
@@ -66,31 +71,31 @@ export class CommitteesDB implements DAO<Committee> {
             .then(resps => resps.map(db => db.committee))
     }
 
-    async findLastUpdateBefore(date: Date, field?: string): Promise<Committee[]> {
-        return this.db_dao.findLastUpdateBefore(date, field)
-            .then(resps => resps.map(sponsorDB => sponsorDB.committee))
-    }
-
-    async updateLeadership(entity: Committee | Committee[]): Promise<Committee | Committee[]> {
+    async updateLeadership(entity: Committee): Promise<Committee> {
         const now = new Date();
-        const uploads = (Array.isArray(entity) ? entity : [entity])
-            .map(cc => ({
-                committee: cc,
+        const current = await this.db_dao.getById(entity.Id);
+        const up = (
+            {
+                ...current,
+                committee: entity,
                 leadership_update: now
-            } as DBCommittee));
-        return Promise.all(uploads.map(up => this.db_dao.upsert(up)))
-            .then(resps => resps.map(sponsorDB => sponsorDB.committee))
+            })
+        return this.db_dao.upsert(up)
+            .then(sponsorDB => sponsorDB.committee)
     }
 
-    async updateMembership(entity: Committee | Committee[]): Promise<Committee | Committee[]> {
+
+    async updateMembership(entity: Committee): Promise<Committee> {
         const now = new Date();
-        const uploads = (Array.isArray(entity) ? entity : [entity])
-            .map(cc => ({
-                committee: cc,
+        const current = await this.db_dao.getById(entity.Id);
+        const up = (
+            {
+                ...current,
+                committee: entity,
                 membership_update: now
-            } as DBCommittee));
-        return Promise.all(uploads.map(up => this.db_dao.upsert(up)))
-            .then(resps => resps.map(sponsorDB => sponsorDB.committee))
+            })
+        return this.db_dao.upsert(up)
+            .then(sponsorDB => sponsorDB.committee)
     }
 
 }

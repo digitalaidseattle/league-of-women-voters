@@ -133,7 +133,7 @@ export const AdminPage = () => {
 
     async function scrapeLegislatorInfo(): Promise<void> {
 
-        const prompt = "Parse the provided page and find the Address and Legislative assisant. Return the results in structure JSON";
+        const prompt = "Parse the provided page and find the Address and Legislative assistant. Return the results in structure JSON";
         setLoading(true);
         try {
             const checkDate = await UpdateScheduleDB.getInstance()
@@ -157,7 +157,7 @@ export const AdminPage = () => {
                     tokenCount: 0,
                 }
                 const project: Project = {
-                    name: 'chair-query',
+                    name: 'legislator-info',
                     rating: 5,
                     tags: [],
                     template: '',
@@ -173,14 +173,24 @@ export const AdminPage = () => {
                         Address: {
                             type: "string"
                         },
-                        Assistant: {
-                            type: "string"
+                        LegislativeAssistant: {
+                            type: "array",
+                            items: {
+                                type: "object",
+                                properties: {
+                                    name: {
+                                        type: "string"
+                                    },
+                                    phone: {
+                                        type: "string"
+                                    }
+                                }
+                            }
                         }
-                    },
+                    }
                 }
 
                 try {
-                    // console.log(url, project)
                     FirebaseAiService.getInstance()
                         .parameterizedQuery(project, infoShema, gemini_model)
                         .then(async result => {
@@ -189,6 +199,7 @@ export const AdminPage = () => {
                                 ...sponsor,
                                 ...info
                             };
+                            console.log(updated)
                             await SponsorsDB.getInstance()
                                 .updateInfo(updated);
                         })
