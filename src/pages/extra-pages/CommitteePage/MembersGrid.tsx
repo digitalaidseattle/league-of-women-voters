@@ -4,6 +4,7 @@ import { Box, Button } from "@mui/material";
 import { DataGrid, GridColDef, useGridApiRef } from "@mui/x-data-grid";
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import { LegislatorService } from "../../../api/legislatorService";
 
 const PAGE_SIZE = 25;
 
@@ -18,6 +19,7 @@ const MembersGrid = (props: { committee: Committee }) => {
     rows: [],
     totalRowCount: 0,
   });
+  const [legislators, setLegislators] = useState<Member[]>([]);
 
   const columns: GridColDef[] =
     [
@@ -65,10 +67,19 @@ const MembersGrid = (props: { committee: Committee }) => {
         type: "string"
       },
       {
-        field: "LongName",
-        headerName: "Long Name",
+        field: "Id",
+        headerName: "Assistant",
         width: 300,
-        type: "string"
+        type: "string",
+        valueGetter: (params => {
+          const found = legislators.find(mm => mm.Id === params);
+          return found ? (found.LegislativeAssistant ?? []).map(la => la.name).join(", ") : ""
+        }),
+        renderCell: (params => {
+          console.log(params)
+          const found = legislators.find(mm => mm.Id === params.row.Id);
+          return found ? (found.LegislativeAssistant ?? []).map(la => la.name).join(", ") : ""
+        })
       }
     ];
 
@@ -98,11 +109,17 @@ const MembersGrid = (props: { committee: Committee }) => {
       totalRowCount: 0,
     })
     if (props.committee) {
+      fetchLegislators()
+        .then(mm => setLegislators(mm));
       setPageInfo({
         rows: props.committee.Members ?? [],
         totalRowCount: (props.committee.Members ?? []).length,
       })
     }
+  }
+  async function fetchLegislators(): Promise<Member[]> {
+    const legislatorService = LegislatorService.getInstance();
+    return Promise.all(props.committee.Members.map(mm => legislatorService.getById(mm.Id)))
   }
 
   async function copyEmails() {
