@@ -44,7 +44,7 @@ export function CommitteesSection({ legislator }: { legislator: Member }) {
       console.log(committee.Leadership )
       const leadership = committee.Leadership
         .find(lead => lead.name === `${legislator.LastName}, ${legislator.FirstName}`)
-      return leadership ? (leadership.title ?? leadership.role) : 'Member'
+      return leadership ? leadership.role : ''
     } else {
       return 'N/A'
     }
