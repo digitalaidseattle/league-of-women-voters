@@ -21,7 +21,7 @@ export function InfoSection({ legislator }: { legislator: Member }) {
         <Grid size={4}>{LEGISLATORS_CONSTANTS.address_label}:</Grid>
         <Grid size={8}>{legislator.Address}</Grid>
         <Grid size={4}>{LEGISLATORS_CONSTANTS.legislative_asst_label}:</Grid>
-        <Grid size={8}>{legislator.Assistant}</Grid>
+        <Grid size={8}>{(legislator.LegislativeAssistant ?? []).map(la => la.name).join(', ')}</Grid>
       </Grid>
     </Paper>
   )

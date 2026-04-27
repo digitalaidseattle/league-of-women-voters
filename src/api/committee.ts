@@ -23,7 +23,7 @@ type Member = {
   FirstName: string;
   LastName: string;
   Address?: string;
-  Assistant?: string;
+  LegislativeAssistant?: { name: string, phone: string }[];
 };
 
 type LegislationInfo = {
