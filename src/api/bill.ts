@@ -25,6 +25,7 @@ type LegislationInfo = {
 type LegislativeDocument = {
   Id: string;
   Name?: string;
+  BillId: string;
   Biennium?: string;
   Description?: string;
   ShortDescription?: string;
