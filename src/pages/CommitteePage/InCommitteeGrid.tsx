@@ -2,19 +2,9 @@ import { PageInfo } from "@digitalaidseattle/core";
 import { DataGrid, GridColDef, useGridApiRef } from "@mui/x-data-grid";
 import { useEffect, useState } from "react";
 import { LegislatureService } from "../../api/legislatureService";
+import { LegislationInfo } from "../../api/bill";
 
 const PAGE_SIZE = 25;
-
-type Referral = {
-  id: string
-  BillId: string
-  OriginalAgency: string
-  ReferredDate: string
-  CommitteeId: string
-  CommitteeName: string
-  Agency: string
-}
-
 
 const InCommitteeGrid = (props: { agency: string, committeeName: string }) => {
   const apiRef = useGridApiRef();
@@ -66,19 +56,6 @@ const InCommitteeGrid = (props: { agency: string, committeeName: string }) => {
       .catch(error => {
         console.error('Error invoking function:', error);
       });
-  }
-
-  function toReferral(referral: any): Referral {
-    console.log("Converting referral:", referral);
-    return {
-      id: `${referral.Committee.Id}-${referral.LegislationInfo.BillId}`,
-      BillId: referral.LegislationInfo.BillId,
-      OriginalAgency: referral.LegislationInfo.OriginalAgency,
-      ReferredDate: referral.ReferredDate,
-      CommitteeId: referral.Committee.Id,
-      CommitteeName: referral.Committee.Name,
-      Agency: referral.Committee.Agency
-    }
   }
 
   return (
