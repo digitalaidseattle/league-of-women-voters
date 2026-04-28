@@ -94,7 +94,7 @@ export const AdminPage = () => {
                 catch (error) {
                     console.log(error);
                     notify.error(`Failed to load sponsors. ${name}`);
-                    throw(error);
+                    throw (error);
                 }
             }
             notify.success('Loaded bill sponsors.')
@@ -239,6 +239,7 @@ export const AdminPage = () => {
             const committees = await CommitteesDB.getInstance()
                 .findLastUpdateBefore(checkDate, 'leadership_update');
             for (let i = 0; i <= 0; i++) {
+            // for (let i = 0; i <= committees.length; i++) {
                 const committee = committees[i];
                 const url = committee.Agency === 'House'
                     ? `https://leg.wa.gov/about-the-legislature/committees/house-of-representatives/${committee.Acronym}`

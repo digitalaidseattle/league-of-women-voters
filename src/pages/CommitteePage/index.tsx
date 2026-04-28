@@ -78,19 +78,20 @@ const CommitteePage = () => {
         <CardContent>
           <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
             <Tabs value={value} onChange={handleChange} aria-label="basic tabs example">
-              <Tab label="Bills" {...a11yProps(0)} />
+              <Tab label="Bills (In Committee)" {...a11yProps(0)} />
               <Tab label="Members" {...a11yProps(1)} />
-              <Tab label="Bills (In Committee)" {...a11yProps(2)} />
+              <Tab label="Bills" {...a11yProps(2)} />
             </Tabs>
           </Box>
           <CustomTabPanel value={value} index={0}>
-            <ReferralsGrid agency={committee.Agency} committeeName={committee.Name} />
+            <InCommitteeGrid agency={committee.Agency} committeeName={committee.Name} />
           </CustomTabPanel>
           <CustomTabPanel value={value} index={1}>
             <MembersGrid committee={committee!} />
           </CustomTabPanel>
+
           <CustomTabPanel value={value} index={2}>
-            <InCommitteeGrid agency={committee.Agency} committeeName={committee.Name} />
+            <ReferralsGrid agency={committee.Agency} committeeName={committee.Name} />
           </CustomTabPanel>
         </CardContent>
       </Card>

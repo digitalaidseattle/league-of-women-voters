@@ -23,16 +23,10 @@ const MembersGrid = (props: { committee: Committee }) => {
 
   const columns: GridColDef[] =
     [
-      // {
-      //   field: "Id",
-      //   headerName: "Id",
-      //   width: 100,
-      //   type: "number"
-      // },
       {
         field: "Name",
         headerName: "Name",
-        width: 200,
+        width: 175,
         type: "string",
         renderCell: (params) => {
           const legislator = params.row;
@@ -45,7 +39,7 @@ const MembersGrid = (props: { committee: Committee }) => {
       {
         field: "Agency",
         headerName: "Agency",
-        width: 100,
+        width: 75,
         type: "string"
       },
       {
@@ -57,7 +51,7 @@ const MembersGrid = (props: { committee: Committee }) => {
       {
         field: "District",
         headerName: "District",
-        width: 100,
+        width: 75,
         type: "number"
       },
       {
@@ -69,7 +63,7 @@ const MembersGrid = (props: { committee: Committee }) => {
       {
         field: "Id",
         headerName: "Assistant",
-        width: 300,
+        width: 200,
         type: "string",
         valueGetter: (params => {
           const found = legislators.find(mm => mm.Id === params);
@@ -78,6 +72,29 @@ const MembersGrid = (props: { committee: Committee }) => {
         renderCell: (params => {
           const found = legislators.find(mm => mm.Id === params.row.Id);
           return found ? (found.LegislativeAssistant ?? []).map(la => la.name).join(", ") : ""
+        })
+      },
+      {
+        field: "Acronym",  //Just a placeholder field to get the legislator, since the DataGrid needs a uniquefield to operate on
+        headerName: "Role",
+        width: 200,
+        type: "custom",
+        valueGetter: (acronym => {
+          const found = legislators.find(mm => mm.Acronym === acronym);
+          if (found) {
+            const memberName = `${found.LastName}, ${found.FirstName}`;
+            const leadership: { name: string, role: string } | undefined =
+              (props.committee.Leadership ?? []).find(mm => mm.name === memberName);
+            return leadership ? (leadership.role) : "";
+          } else {
+            return "";
+          }
+        }),
+        renderCell: (params => {
+          const memberName = `${params.row.LastName}, ${params.row.FirstName}`;
+          const leadership: { name: string, role: string } | undefined =
+            (props.committee.Leadership ?? []).find(mm => mm.name === memberName);
+          return leadership ? (leadership.role) : "";
         })
       }
     ];
