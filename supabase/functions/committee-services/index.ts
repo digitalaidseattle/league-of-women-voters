@@ -36,9 +36,10 @@ class GetActiveCommitteesWorker implements ServiceWorker<CommitteeInputParams> {
   }
 
   getLegUrl(_params: CommitteeInputParams): string {
-    const committeeURL =
-      "https://wslwebservices.leg.wa.gov/CommitteeService.asmx";
-    return `${committeeURL}/GetActiveCommittees`;
+    const baseUrl = "https://wslwebservices.leg.wa.gov/CommitteeService.asmx";
+    const service = "GetActiveCommittees";
+
+    return `${baseUrl}/${service}`;
   }
 
   getEntities(json: any): any {
@@ -58,10 +59,12 @@ class GetActiveCommitteeMembersWorker implements ServiceWorker<CommitteeInputPar
   }
 
   getLegUrl(params: CommitteeInputParams): string {
-    const committeeURL =
-      "https://wslwebservices.leg.wa.gov/CommitteeService.asmx";
-    return `${committeeURL}/GetActiveCommitteeMembers?agency=${encodeURIComponent(params.agency!)
-      }&committeeName=${encodeURIComponent(params.committeeName!)}`;
+    const baseUrl = "https://wslwebservices.leg.wa.gov/CommitteeService.asmx";
+    const service = "GetActiveCommitteeMembers";
+    const biennium = encodeURIComponent(params.biennium!);
+    const agency = encodeURIComponent(params.agency!);
+    const committeeName = encodeURIComponent(params.committeeName!);
+    return `${baseUrl}/${service}?biennium=${biennium}&agency=${agency}&committeeName=${committeeName}`
   }
 
   getEntities(json: any): any {
@@ -81,12 +84,12 @@ class GetCommitteeReferralsByCommitteeWorker implements ServiceWorker<CommitteeI
   }
 
   getLegUrl(params: CommitteeInputParams): string {
-    const committeeActionURL = "https://wslwebservices.leg.wa.gov/CommitteeActionService.asmx";
+    const baseUrl = "https://wslwebservices.leg.wa.gov/CommitteeActionService.asmx";
     const service = "GetCommitteeReferralsByCommittee";
     const biennium = encodeURIComponent(params.biennium!);
     const agency = encodeURIComponent(params.agency!);
     const committeeName = encodeURIComponent(params.committeeName!);
-    return `${committeeActionURL}/${service}?biennium=${biennium}&agency=${agency}&committeeName=${committeeName}`
+    return `${baseUrl}/${service}?biennium=${biennium}&agency=${agency}&committeeName=${committeeName}`
   }
 
   getEntities(json: any): any {
@@ -106,12 +109,12 @@ class GetInCommitteeWorker implements ServiceWorker<CommitteeInputParams> {
   }
 
   getLegUrl(params: CommitteeInputParams): string {
-    const committeeActionURL = "https://wslwebservices.leg.wa.gov/CommitteeActionService.asmx";
+    const baseUrl = "https://wslwebservices.leg.wa.gov/CommitteeActionService.asmx";
     const service = "GetInCommittee";
     const biennium = encodeURIComponent(params.biennium!);
     const agency = encodeURIComponent(params.agency!);
     const committeeName = encodeURIComponent(params.committeeName!);
-    return `${committeeActionURL}/${service}?biennium=${biennium}&agency=${agency}&committeeName=${committeeName}`
+    return `${baseUrl}/${service}?biennium=${biennium}&agency=${agency}&committeeName=${committeeName}`
   }
 
   getEntities(json: any): any {

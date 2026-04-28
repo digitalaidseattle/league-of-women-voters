@@ -1,4 +1,4 @@
-import { PageInfo } from "@digitalaidseattle/core";
+import { PageInfo, useNotifications } from "@digitalaidseattle/core";
 import { DataGrid, GridColDef, useGridApiRef } from "@mui/x-data-grid";
 import { useEffect, useState } from "react";
 import { LegislatureService } from "../../api/legislatureService";
@@ -28,10 +28,7 @@ const ReferralsGrid = (props: { agency: string, committeeName: string }) => {
     rows: [],
     totalRowCount: 0,
   });
-
-  // const [agency, setAgency] = useState<string>("");
-  // const [committeeName, setCommitteeName] = useState<string>("");
-
+  const notifications = useNotifications();
 
   useEffect(() => {
     setColumns(getColumns());
@@ -68,11 +65,15 @@ const ReferralsGrid = (props: { agency: string, committeeName: string }) => {
       .GetCommitteeReferralsByCommittee(props.agency, props.committeeName)
       .then(response => {
         console.log("Response from GetCommitteeReferralsByCommittee:", response);
-        const referrals = response.map((referral: any) => toReferral(referral))
-        setPageInfo({
-          rows: referrals,
-          totalRowCount: referrals.length,
-        })
+        if (response) {
+          const referrals = response.map((referral: any) => toReferral(referral))
+          setPageInfo({
+            rows: referrals,
+            totalRowCount: referrals.length,
+          })
+        } else {
+          notifications.error('Cound not get the committee referrals.')
+        }
       })
       .catch(error => {
         console.error('Error invoking function:', error);
