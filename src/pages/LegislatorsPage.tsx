@@ -140,7 +140,6 @@ export const LegislatorsPage = () => {
       <CardHeader title="Legislators" />
       <DataGrid
         apiRef={apiRef}
-        autoHeight
         rows={pageInfo.rows}
         columns={columns}
         getRowId={(row) => row.Id}

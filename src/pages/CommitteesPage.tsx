@@ -56,7 +56,7 @@ const CommitteesPage = () => {
       type: "string"
     }
   ];
-  
+
   useEffect(() => {
     refresh();
   }, [chamber]);
@@ -123,22 +123,20 @@ const CommitteesPage = () => {
       <NavLink to="/" ><IconButton size="medium"><HomeOutlined /></IconButton></NavLink>
       <Typography color="text.primary">Committees</Typography>
     </Breadcrumbs>
-    <Card sx={{ height: '100%' }}>
+    <Card>
       <CardHeader title="Committees" />
-      <CardContent>
-        <DataGrid
-          getRowId={(row) => row.Id}
-          apiRef={apiRef}
-          rows={pageInfo.rows}
-          columns={columns}
-          paginationModel={paginationModel}
-          onPaginationModelChange={setPaginationModel}
-          pageSizeOptions={[10, 25, 50, 100]}
-          onRowDoubleClick={openCommittee}
-          showToolbar={true}
-          slots={{ toolbar: CustomToolbar }}
-        />
-      </CardContent>
+      <DataGrid
+        apiRef={apiRef}
+        rows={pageInfo.rows}
+        columns={columns}
+        getRowId={(row) => row.Id}
+        paginationModel={paginationModel}
+        onPaginationModelChange={setPaginationModel}
+        pageSizeOptions={[10, 25, 50, 100]}
+        onRowDoubleClick={openCommittee}
+        showToolbar={true}
+        slots={{ toolbar: CustomToolbar }}
+      />
     </Card>
   </>
   )

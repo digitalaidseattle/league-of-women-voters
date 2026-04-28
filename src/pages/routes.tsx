@@ -5,7 +5,7 @@ import {
   MarkdownPage,
   MinimalLayout
 } from "@digitalaidseattle/mui";
-import CommitteePage from './extra-pages/CommitteePage';
+import CommitteePage from './CommitteePage';
 import CommitteesPage from './CommitteesPage';
 import SponsorPage from './extra-pages/LegislatorPage';
 import { LegislatorsPage } from './LegislatorsPage';

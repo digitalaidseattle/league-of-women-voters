@@ -50,6 +50,12 @@ class LegislatureService {
     return CommitteeDao.getInstance().getCommitteeReferralsByCommittee(agency, committeeName);
   }
 
+  async getInCommittee(
+    agency: string,
+    committeeName: string,
+  ): Promise<LegislationInfo[]> {
+    return CommitteeDao.getInstance().getInCommittee(agency, committeeName);
+  }
 }
 
 

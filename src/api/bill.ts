@@ -7,6 +7,21 @@ type DocumentHistoryLine = {
   HistoryText?: string;
 };
 
+type LegislationInfo = {
+  Biennium: string;
+  BillId: string;
+  BillNumber: string;
+  SubstituteVersion: number;
+  EngrossedVersion: number;
+  ShortLegislationType: {
+    ShortLegislationType: string;
+    LongLegislationType: string;
+  }
+  OriginalAgency: string;
+  Active: boolean;
+  DisplayNumber: string;
+}
+
 type LegislativeDocument = {
   Id: string;
   Name?: string;
@@ -58,4 +73,9 @@ type BillRow = {
   raw: LegislativeDocument;
 };
 
-export type { DocumentHistoryLine, LegislativeDocument, BillRow };
+export type {
+  DocumentHistoryLine,
+  LegislationInfo,
+  LegislativeDocument,
+  BillRow
+};

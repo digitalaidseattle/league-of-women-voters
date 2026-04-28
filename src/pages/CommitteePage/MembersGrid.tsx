@@ -4,7 +4,7 @@ import { Box, Button } from "@mui/material";
 import { DataGrid, GridColDef, useGridApiRef } from "@mui/x-data-grid";
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { LegislatorService } from "../../../api/legislatorService";
+import { LegislatorService } from "../../api/legislatorService";
 
 const PAGE_SIZE = 25;
 

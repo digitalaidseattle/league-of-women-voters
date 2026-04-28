@@ -29,25 +29,25 @@ type CommitteeInputParams = {
   committeeName?: string;
 };
 
-class GetActiveCommitteesWorker implements ServiceWorker<CommitteeInputParams>{
+class GetActiveCommitteesWorker implements ServiceWorker<CommitteeInputParams> {
 
   validate(_params: CommitteeInputParams) {
     // nothing to check
   }
 
-  getLegUrl(_params: CommitteeInputParams) : string {
+  getLegUrl(_params: CommitteeInputParams): string {
     const committeeURL =
       "https://wslwebservices.leg.wa.gov/CommitteeService.asmx";
     return `${committeeURL}/GetActiveCommittees`;
   }
 
-  getEntities(json: any) : any {
-      return json["ArrayOfCommittee"]["Committee"];
+  getEntities(json: any): any {
+    return json["ArrayOfCommittee"]["Committee"];
   }
 
 }
 
-class GetActiveCommitteeMembersWorker implements ServiceWorker<CommitteeInputParams>{
+class GetActiveCommitteeMembersWorker implements ServiceWorker<CommitteeInputParams> {
 
   validate(params: CommitteeInputParams) {
     if (
@@ -57,21 +57,20 @@ class GetActiveCommitteeMembersWorker implements ServiceWorker<CommitteeInputPar
     }
   }
 
-  getLegUrl(params: CommitteeInputParams) : string {
+  getLegUrl(params: CommitteeInputParams): string {
     const committeeURL =
       "https://wslwebservices.leg.wa.gov/CommitteeService.asmx";
-    return `${committeeURL}/GetActiveCommitteeMembers?agency=${
-        encodeURIComponent(params.agency!)
+    return `${committeeURL}/GetActiveCommitteeMembers?agency=${encodeURIComponent(params.agency!)
       }&committeeName=${encodeURIComponent(params.committeeName!)}`;
   }
 
-  getEntities(json: any) : any {
-      return json["ArrayOfMember"]["Member"];
+  getEntities(json: any): any {
+    return json["ArrayOfMember"]["Member"];
   }
 
 }
 
-class GetCommitteeReferralsByCommitteeWorker implements ServiceWorker<CommitteeInputParams>{
+class GetCommitteeReferralsByCommitteeWorker implements ServiceWorker<CommitteeInputParams> {
 
   validate(params: CommitteeInputParams) {
     if (
@@ -81,32 +80,58 @@ class GetCommitteeReferralsByCommitteeWorker implements ServiceWorker<CommitteeI
     }
   }
 
-  getLegUrl(params: CommitteeInputParams) : string {
-    const committeeActionURL =
-      "https://wslwebservices.leg.wa.gov/CommitteeActionService.asmx";
-    return `${committeeActionURL}/GetCommitteeReferralsByCommittee?biennium=${
-          encodeURIComponent(params.biennium!)
-        }&agency=${encodeURIComponent(params.agency!)}&committeeName=${
-          encodeURIComponent(params.committeeName!)
-        }`;
+  getLegUrl(params: CommitteeInputParams): string {
+    const committeeActionURL = "https://wslwebservices.leg.wa.gov/CommitteeActionService.asmx";
+    const service = "GetCommitteeReferralsByCommittee";
+    const biennium = encodeURIComponent(params.biennium!);
+    const agency = encodeURIComponent(params.agency!);
+    const committeeName = encodeURIComponent(params.committeeName!);
+    return `${committeeActionURL}/${service}?biennium=${biennium}&agency=${agency}&committeeName=${committeeName}`
   }
 
-  getEntities(json: any) : any {
-      return json["ArrayOfCommitteeReferral"]["CommitteeReferral"];
+  getEntities(json: any): any {
+    return json["ArrayOfCommitteeReferral"]["CommitteeReferral"];
+  }
+
+}
+
+class GetInCommitteeWorker implements ServiceWorker<CommitteeInputParams> {
+
+  validate(params: CommitteeInputParams) {
+    if (
+      (!params.agency || !params.committeeName)
+    ) {
+      throw new Error(`agency and committeeName are required for operation ${params.operation}`, { cause: "BadRequest" });
+    }
+  }
+
+  getLegUrl(params: CommitteeInputParams): string {
+    const committeeActionURL = "https://wslwebservices.leg.wa.gov/CommitteeActionService.asmx";
+    const service = "GetInCommittee";
+    const biennium = encodeURIComponent(params.biennium!);
+    const agency = encodeURIComponent(params.agency!);
+    const committeeName = encodeURIComponent(params.committeeName!);
+    return `${committeeActionURL}/${service}?biennium=${biennium}&agency=${agency}&committeeName=${committeeName}`
+  }
+
+  getEntities(json: any): any {
+    return json["ArrayOfLegislationInfo"]["LegislationInfo"];
   }
 
 }
 
 function getWorker(params: CommitteeInputParams) {
-  switch(params.operation) {
+  switch (params.operation) {
     case "GetActiveCommittees":
       return new GetActiveCommitteesWorker();
     case "GetActiveCommitteeMembers":
       return new GetActiveCommitteeMembersWorker();
     case "GetCommitteeReferralsByCommittee":
       return new GetCommitteeReferralsByCommitteeWorker();
+    case "GetInCommittee":
+      return new GetInCommitteeWorker();
     default:
-      throw Error(`Unknown operation: ${params.operation}` )
+      throw Error(`Unknown operation: ${params.operation}`)
   }
 }
 
@@ -133,11 +158,11 @@ Deno.serve(async (req) => {
     const worker = getWorker(params);
 
     worker.validate(params);
-    
+
     const url = worker.getLegUrl(params);
     const response = await fetch(url);
     const xmlText = await response.text();
-    
+
     const parser = new XMLParser();
     const json = parser.parse(xmlText);
     const entities = worker.getEntities(json);

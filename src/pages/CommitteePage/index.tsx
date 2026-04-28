@@ -9,9 +9,10 @@ import { Box, Breadcrumbs, Card, CardContent, CardHeader, IconButton, Tab, Tabs,
 import { useEffect, useState } from 'react';
 import { NavLink, useParams } from "react-router-dom";
 
-import { LegislatureService } from "../../../api/legislatureService";
+import { LegislatureService } from "../../api/legislatureService";
 import MembersGrid from './MembersGrid';
 import ReferralsGrid from './ReferralsGrid';
+import InCommitteeGrid from "./InCommitteeGrid";
 // project import
 
 interface TabPanelProps {
@@ -79,6 +80,7 @@ const CommitteePage = () => {
             <Tabs value={value} onChange={handleChange} aria-label="basic tabs example">
               <Tab label="Bills" {...a11yProps(0)} />
               <Tab label="Members" {...a11yProps(1)} />
+              <Tab label="Bills (In Committee)" {...a11yProps(2)} />
             </Tabs>
           </Box>
           <CustomTabPanel value={value} index={0}>
@@ -86,6 +88,9 @@ const CommitteePage = () => {
           </CustomTabPanel>
           <CustomTabPanel value={value} index={1}>
             <MembersGrid committee={committee!} />
+          </CustomTabPanel>
+          <CustomTabPanel value={value} index={2}>
+            <InCommitteeGrid agency={committee.Agency} committeeName={committee.Name} />
           </CustomTabPanel>
         </CardContent>
       </Card>

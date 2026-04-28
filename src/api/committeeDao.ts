@@ -6,6 +6,7 @@
  */
 import { SupabaseConfiguration } from '@digitalaidseattle/supabase';
 import { SupabaseClient } from '@supabase/supabase-js';
+import { LegislationInfo } from './bill';
 
 export class CommitteeDao {
   private static instance: CommitteeDao;
@@ -64,6 +65,17 @@ export class CommitteeDao {
         body: { operation: 'GetCommitteeReferralsByCommittee', biennium: this.biennium, agency: agency, committeeName: committeeName },
       })
       .then((resp: any) => resp.data as Member[]);
+  }
+
+  public async getInCommittee(
+    agency: string,
+    committeeName: string,
+  ): Promise<LegislationInfo[]> {
+    return this.client.functions
+      .invoke("committee-services", {
+        body: { operation: 'GetInCommittee', biennium: this.biennium, agency: agency, committeeName: committeeName },
+      })
+      .then((resp: any) => resp.data as LegislationInfo[]);
   }
 
 }
