@@ -1,5 +1,12 @@
+/**
+ *  BillsPage.tsx
+ *
+ *  @copyright 2026 Digital Aid Seattle
+ *
+ */
 import { useContext, useEffect, useState } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
+
 import {
   ExpandAltOutlined,
   HomeOutlined,
@@ -14,24 +21,22 @@ import {
   InputAdornment,
   Link,
   TextField,
-  Toolbar,
   Tooltip,
   Typography
 } from "@mui/material";
 import {
   DataGrid,
   GridColDef,
-  type GridPaginationModel,
+  Toolbar,
   useGridApiRef
 } from "@mui/x-data-grid";
 
 import { LoadingContext, PageInfo } from "@digitalaidseattle/core";
-
-import type { BillRow } from "../../api/bill";
-import { BillService } from "../../api/billService";
-import { CHAMBER_TYPE, ChamberButtonGroup } from "../../components/ChamberButtonGroup";
-import { LoadingOverlay } from "../../components/LoadingOverlay";
-import { BillsService } from "../../utils/bills";
+import type { BillRow } from "../api/bill";
+import { BillService } from "../api/billService";
+import { CHAMBER_TYPE, ChamberButtonGroup } from "../components/ChamberButtonGroup";
+import { LoadingOverlay } from "../components/LoadingOverlay";
+import { BillsService } from "../utils/bills";
 
 const BILL_SEARCH_URL = "https://app.leg.wa.gov/billsearch/";
 const PAGE_SIZE = 25;
@@ -113,7 +118,7 @@ export const BillsPage = () => {
   const apiRef = useGridApiRef();
   const navigate = useNavigate();
   const [search, setSearch] = useState("");
-  const [paginationModel, setPaginationModel] = useState<GridPaginationModel>({ page: 0, pageSize: PAGE_SIZE });
+  const [paginationModel, setPaginationModel] = useState({ page: 0, pageSize: PAGE_SIZE });
   const [pageInfo, setPageInfo] = useState<PageInfo<BillRow>>({ rows: [], totalRowCount: 0, });
   const { loading, setLoading } = useContext(LoadingContext);
   const [chamber, setChamber] = useState<CHAMBER_TYPE>('all');

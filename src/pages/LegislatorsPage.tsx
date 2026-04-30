@@ -1,3 +1,9 @@
+/**
+ *  LegislatorsPage.tsx
+ *
+ *  @copyright 2026 Digital Aid Seattle
+ *
+ */
 import { useContext, useEffect, useState } from 'react';
 import { NavLink, useNavigate } from "react-router-dom";
 

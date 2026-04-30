@@ -1,11 +1,18 @@
+/**
+ *  CommitteesPage.tsx
+ *
+ *  @copyright 2026 Digital Aid Seattle
+ *
+ */
 // material-ui
-import { HomeOutlined, ReloadOutlined } from "@ant-design/icons";
-import { useEffect, useState } from 'react';
-
-import { PageInfo } from "@digitalaidseattle/core";
-import { Breadcrumbs, Card, CardHeader, IconButton, Toolbar, Tooltip, Typography } from '@mui/material';
-import { DataGrid, GridColDef, useGridApiRef } from "@mui/x-data-grid";
+import { useContext, useEffect, useState } from 'react';
 import { NavLink, useNavigate } from "react-router-dom";
+
+import { HomeOutlined, ReloadOutlined } from "@ant-design/icons";
+import { Breadcrumbs, Card, CardHeader, IconButton, Tooltip, Typography } from '@mui/material';
+import { DataGrid, GridColDef, Toolbar, useGridApiRef } from "@mui/x-data-grid";
+
+import { LoadingContext, PageInfo } from "@digitalaidseattle/core";
 import { LegislatureService } from '../api/legislatureService';
 import { CHAMBER_TYPE, ChamberButtonGroup } from "../components/ChamberButtonGroup";
 import { LoadingOverlay } from "../components/LoadingOverlay";
@@ -27,7 +34,7 @@ const CommitteesPage = () => {
   });
 
   const navigate = useNavigate()
-  const [initialized, setInitialized] = useState(false);
+  const { loading, setLoading } = useContext(LoadingContext);
   const [chamber, setChamber] = useState<CHAMBER_TYPE>('all');
 
   const columns: GridColDef<Committee>[] = [
@@ -62,11 +69,8 @@ const CommitteesPage = () => {
   }, [chamber]);
 
   function refresh() {
-    setInitialized(false);
-    setPageInfo({
-      rows: [],
-      totalRowCount: 0,
-    });
+    setLoading(false);
+    setPageInfo({ rows: [], totalRowCount: 0, });
     LegislatureService.getInstance()
       .getAll()
       .then(committees => {
@@ -75,17 +79,9 @@ const CommitteesPage = () => {
           rows: rows,
           totalRowCount: rows.length,
         });
-      }).finally(() => {
-        setInitialized(true);
       })
+      .finally(() => setLoading(false))
   }
-
-  const openCommittee = (params: any) => {
-    const committee = params.row;
-    navigate(`/committee/${committee.Id}`);
-    //    navigate(`/committee?agency=${committee.Agency}&committeeName=${encodeURIComponent(committee.Name)}`);
-  };
-
 
   function filterPredicate(committee: Committee): boolean {
     switch (chamber) {
@@ -118,7 +114,7 @@ const CommitteesPage = () => {
   }
 
   return (<>
-    <LoadingOverlay loading={!initialized} />
+    <LoadingOverlay loading={loading} />
     <Breadcrumbs aria-label="breadcrumb">
       <NavLink to="/" ><IconButton size="medium"><HomeOutlined /></IconButton></NavLink>
       <Typography color="text.primary">Committees</Typography>
@@ -133,7 +129,7 @@ const CommitteesPage = () => {
         paginationModel={paginationModel}
         onPaginationModelChange={setPaginationModel}
         pageSizeOptions={[10, 25, 50, 100]}
-        onRowDoubleClick={openCommittee}
+        onRowDoubleClick={params => navigate(`/committee/${params.row.Id}`)}
         showToolbar={true}
         slots={{ toolbar: CustomToolbar }}
       />

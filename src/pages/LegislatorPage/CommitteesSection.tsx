@@ -9,8 +9,8 @@ import React, { useEffect, useState } from 'react';
 
 import { Card, CardHeader, Grid } from '@mui/material';
 import { Link } from "react-router-dom";
-import { LegislatureService } from '../../../api/legislatureService';
-import { sleep } from '../../../utils/sleep';
+import { LegislatureService } from '../../api/legislatureService';
+import { sleep } from '../../utils/sleep';
 import { LEGISLATORS_CONSTANTS } from './constants';
 
 export function CommitteesSection({ legislator }: { legislator: Member }) {
