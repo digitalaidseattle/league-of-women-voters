@@ -11,7 +11,7 @@ import {
 import { Breadcrumbs, Card, CardContent, CardHeader, Grid, IconButton, Typography } from '@mui/material';
 import { useEffect, useState } from "react";
 import { NavLink, useParams } from "react-router-dom";
-import { LegislatorService } from "../../../api/legislatorService";
+import { LegislatorService } from "../../api/legislatorService";
 import { CommitteesSection } from "./CommitteesSection";
 import { InfoSection } from "./InfoSection";
 import { SponsoredBillsSection } from "./SponsoredBillsSection";

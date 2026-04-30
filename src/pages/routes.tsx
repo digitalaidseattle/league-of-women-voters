@@ -1,3 +1,9 @@
+/**
+ *  Routes.tsx
+ *
+ *  @copyright 2026 Digital Aid Seattle
+ *
+ */
 import {
   Error,
   Login,
@@ -5,13 +11,13 @@ import {
   MarkdownPage,
   MinimalLayout
 } from "@digitalaidseattle/mui";
+import { AdminPage } from "./AdminPage";
+import { BillPage } from "./BillPage";
+import { BillsPage } from "./BillsPage";
 import CommitteePage from './CommitteePage';
 import CommitteesPage from './CommitteesPage';
-import SponsorPage from './extra-pages/LegislatorPage';
+import SponsorPage from './LegislatorPage';
 import { LegislatorsPage } from './LegislatorsPage';
-import { BillsPage } from "./extra-pages/BillsPage";
-import { BillPage } from "./BillPage";
-import { AdminPage } from "./AdminPage";
 
 const routes = [
   {
