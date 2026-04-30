@@ -7,25 +7,17 @@
 // material-ui
 import { ExpandAltOutlined, ReloadOutlined, SearchOutlined } from "@ant-design/icons";
 import { useEffect, useMemo, useState } from 'react';
-
-import { PageInfo } from "@digitalaidseattle/core";
 import { Box, Card, CardContent, IconButton, InputAdornment, Link as MuiLink, TextField, Toolbar, Tooltip, Typography } from '@mui/material';
 import { DataGrid, GridColDef, GridRenderCellParams, useGridApiRef } from "@mui/x-data-grid";
 import { Link as RouterLink, useNavigate } from "react-router-dom";
-import { useContext, useEffect, useState } from 'react';
-import { NavLink, useNavigate } from "react-router-dom";
 
-import { HomeOutlined, ReloadOutlined } from "@ant-design/icons";
-import { Breadcrumbs, Card, CardHeader, IconButton, Tooltip, Typography } from '@mui/material';
-import { DataGrid, GridColDef, Toolbar, useGridApiRef } from "@mui/x-data-grid";
 
-import { LoadingContext, PageInfo } from "@digitalaidseattle/core";
+import { PageInfo } from "@digitalaidseattle/core";
 import { LegislatureService } from '../api/legislatureService';
 import { CHAMBER_TYPE, ChamberButtonGroup } from "../components/ChamberButtonGroup";
 import { LoadingOverlay } from "../components/LoadingOverlay";
-// project import
 
-// ==============================|| SAMPLE PAGE ||============================== //
+
 const PAGE_SIZE = 25;
 const COMMITTEE_SEARCH_URL = "https://leg.wa.gov/about-the-legislature/committees/";
 
@@ -153,7 +145,6 @@ const CommitteesPage = () => {
     LegislatureService.getInstance()
       .getAll()
       .then(committees => {
-        const rows = committees.filter(filterPredicate);
         setPageInfo({
           rows: committees,
           totalRowCount: committees.length,
@@ -179,7 +170,6 @@ const CommitteesPage = () => {
       case 'joint':
         return committee.Agency === 'Joint'
       case 'all':
-      case 'joint':
       default:
         return true;
     }
