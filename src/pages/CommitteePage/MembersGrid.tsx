@@ -1,14 +1,14 @@
 import { CopyOutlined } from "@ant-design/icons";
 import { PageInfo, useNotifications } from "@digitalaidseattle/core";
 import { Box, Button } from "@mui/material";
-import { DataGrid, GridColDef, useGridApiRef } from "@mui/x-data-grid";
-import { useEffect, useState } from "react";
+import { DataGrid, GridColDef, GridRenderCellParams, useGridApiRef } from "@mui/x-data-grid";
+import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { LegislatorService } from "../../api/legislatorService";
 
 const PAGE_SIZE = 25;
 
-const MembersGrid = (props: { committee: Committee }) => {
+const MembersGrid = (props: { committee: Committee, search?: string }) => {
   const apiRef = useGridApiRef();
   const notifications = useNotifications();
   const [paginationModel, setPaginationModel] = useState({
@@ -21,81 +21,87 @@ const MembersGrid = (props: { committee: Committee }) => {
   });
   const [legislators, setLegislators] = useState<Member[]>([]);
 
+  const filteredRows = useMemo(() => {
+    const loweredQuery = props.search?.trim().toLowerCase();
+    if (!loweredQuery) {
+      return pageInfo.rows;
+    }
+
+    return pageInfo.rows.filter((member) =>
+      [
+        member.Name,
+        member.Party,
+        member.District,
+        member.Email,
+        member.Phone,
+        getLegislativeAssistantNames(member),
+        getLegislativeAssistantEmails(member)
+      ]
+        .join(" ")
+        .toLowerCase()
+        .includes(loweredQuery)
+    );
+  }, [pageInfo.rows, props.search, legislators]);
+
   const columns: GridColDef[] =
     [
       {
         field: "Name",
         headerName: "Name",
-        width: 175,
+        minWidth: 180,
+        flex: 1,
         type: "string",
-        renderCell: (params) => {
+        renderCell: (params: GridRenderCellParams<Member>) => {
           const legislator = params.row;
           return (
             <Link to={`/legislator/${legislator.Id}`}>{legislator.Name}</Link>
           );
         }
       },
-
-      {
-        field: "Agency",
-        headerName: "Agency",
-        width: 75,
-        type: "string"
-      },
       {
         field: "Party",
         headerName: "Party",
-        width: 100,
+        minWidth: 120,
+        flex: 0.6,
         type: "string"
       },
       {
         field: "District",
         headerName: "District",
-        width: 75,
+        width: 110,
+        align: "right",
+        headerAlign: "right",
         type: "number"
       },
       {
         field: "Email",
         headerName: "Email",
-        width: 200,
+        minWidth: 240,
+        flex: 1.2,
         type: "string"
       },
       {
-        field: "Id",
-        headerName: "Assistant",
-        width: 200,
-        type: "string",
-        valueGetter: (params => {
-          const found = legislators.find(mm => mm.Id === params);
-          return found ? (found.LegislativeAssistant ?? []).map(la => la.name).join(", ") : ""
-        }),
-        renderCell: (params => {
-          const found = legislators.find(mm => mm.Id === params.row.Id);
-          return found ? (found.LegislativeAssistant ?? []).map(la => la.name).join(", ") : ""
-        })
+        field: "Phone",
+        headerName: "Phone",
+        minWidth: 150,
+        flex: 0.8,
+        type: "string"
       },
       {
-        field: "Acronym",  //Just a placeholder field to get the legislator, since the DataGrid needs a uniquefield to operate on
-        headerName: "Role",
-        width: 200,
-        type: "custom",
-        valueGetter: (acronym => {
-          const found = legislators.find(mm => mm.Acronym === acronym);
-          if (found) {
-            const memberName = `${found.LastName}, ${found.FirstName}`;
-            const leadership: { name: string, role: string } | undefined =
-              (props.committee.Leadership ?? []).find(mm => mm.name === memberName);
-            return leadership ? (leadership.role) : "";
-          } else {
-            return "";
-          }
-        }),
-        renderCell: (params => {
-          const memberName = `${params.row.LastName}, ${params.row.FirstName}`;
-          const leadership: { name: string, role: string } | undefined =
-            (props.committee.Leadership ?? []).find(mm => mm.name === memberName);
-          return leadership ? (leadership.role) : "";
-        })
+        field: "legislativeAssistant",
+        headerName: "Legislative Assistant",
+        minWidth: 210,
+        flex: 1,
+        type: "string",
+        valueGetter: (_value, row) => getLegislativeAssistantNames(row),
+      },
+      {
+        field: "legislativeAssistantEmail",
+        headerName: "LA Email",
+        minWidth: 210,
+        flex: 1,
+        type: "string",
+        valueGetter: (_value, row) => getLegislativeAssistantEmails(row),
       }
     ];
 
@@ -135,7 +141,7 @@ const MembersGrid = (props: { committee: Committee }) => {
   }
   async function fetchLegislators(): Promise<Member[]> {
     const legislatorService = LegislatorService.getInstance();
-    return Promise.all(props.committee.Members.map(mm => legislatorService.getById(mm.Id)))
+    return Promise.all((props.committee.Members ?? []).map(mm => legislatorService.getById(mm.Id)))
   }
 
   async function copyEmails() {
@@ -158,6 +164,20 @@ const MembersGrid = (props: { committee: Committee }) => {
     }
   }
 
+  function getLegislativeAssistantNames(member: Member) {
+    const found = legislators.find(mm => mm.Id === member.Id) ?? member;
+    return (found.LegislativeAssistant ?? []).map(la => la.name).join(", ");
+  }
+
+  function getLegislativeAssistantEmails(member: Member) {
+    const found = legislators.find(mm => mm.Id === member.Id) ?? member;
+    const emails = (found.LegislativeAssistant ?? [])
+      .map((la) => (la as { email?: string; Email?: string }).email ?? (la as { email?: string; Email?: string }).Email)
+      .filter((email): email is string => typeof email === "string" && email.trim().length > 0);
+
+    return emails.join(", ");
+  }
+
   return (
     <Box>
       <Box sx={{ display: "flex", justifyContent: "flex-end", mb: 1 }}>
@@ -173,11 +193,18 @@ const MembersGrid = (props: { committee: Committee }) => {
       <DataGrid
         getRowId={(row) => row.Id}
         apiRef={apiRef}
-        rows={pageInfo.rows}
+        autoHeight
+        rows={filteredRows}
         columns={columns}
         paginationModel={paginationModel}
         onPaginationModelChange={setPaginationModel}
         pageSizeOptions={[10, 25, 50, 100]}
+        disableRowSelectionOnClick
+        sx={{
+          border: 0,
+          "& .MuiDataGrid-columnHeaderTitle": { fontWeight: 700 },
+          "& .MuiDataGrid-cell": { py: 2, alignItems: "center" }
+        }}
       />
     </Box>
   )

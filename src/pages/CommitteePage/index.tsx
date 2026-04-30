@@ -4,14 +4,13 @@
  *  @copyright 2024 Digital Aid Seattle
  *
  */
-import { HomeOutlined } from "@ant-design/icons";
-import { Box, Breadcrumbs, Card, CardContent, CardHeader, IconButton, Tab, Tabs, Typography } from '@mui/material';
+import { ExpandAltOutlined, LeftOutlined, ReloadOutlined, SearchOutlined } from "@ant-design/icons";
+import { Box, IconButton, InputAdornment, Tab, Tabs, TextField, Tooltip, Typography } from '@mui/material';
 import { useEffect, useState } from 'react';
-import { NavLink, useParams } from "react-router-dom";
+import { Link as RouterLink, useParams } from "react-router-dom";
 
 import { LegislatureService } from "../../api/legislatureService";
 import MembersGrid from './MembersGrid';
-import ReferralsGrid from './ReferralsGrid';
 import InCommitteeGrid from "./InCommitteeGrid";
 // project import
 
@@ -26,6 +25,8 @@ const CommitteePage = () => {
 
   const [value, setValue] = useState(0);
   const [committee, setCommittee] = useState<Committee>();
+  const [search, setSearch] = useState("");
+  const [refreshKey, setRefreshKey] = useState(0);
 
   useEffect(() => {
     if (id) {
@@ -34,10 +35,6 @@ const CommitteePage = () => {
         .then(cc => setCommittee(cc))
     }
   }, [id]);
-
-  useEffect(() => {
-    console.log(committee)
-  }, [committee]);
 
   function a11yProps(index: number) {
     return {
@@ -61,40 +58,108 @@ const CommitteePage = () => {
         aria-labelledby={`simple-tab-${index}`}
         {...other}
       >
-        {value === index && <Box sx={{ p: 3 }}>{children}</Box>}
+        {value === index && <Box>{children}</Box>}
       </div>
     );
   }
 
+  function getPageTitle(committee: Committee) {
+    const shortName = committee.Name.replace(/\s*Committee$/i, "");
+    return `${committee.Agency} Committee Legislation: ${shortName}`;
+  }
+
+  const externalUrl = committee
+    ? `https://leg.wa.gov/about-the-legislature/committees/${committee.Agency.toLowerCase()}/`
+    : "https://leg.wa.gov/about-the-legislature/committees/";
+
   return (committee &&
     <>
-      <Breadcrumbs aria-label="breadcrumb">
-        <NavLink to="/" ><IconButton size="medium"><HomeOutlined /></IconButton></NavLink>
-        <NavLink to="/committees" >Committees</NavLink>
-        <Typography color="text.primary">Committee Detail</Typography>
-      </Breadcrumbs>
-      <Card>
-        <CardHeader title={`${committee?.Agency}: ${committee?.Name}`} />
-        <CardContent>
-          <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
-            <Tabs value={value} onChange={handleChange} aria-label="basic tabs example">
-              <Tab label="Bills (In Committee)" {...a11yProps(0)} />
-              <Tab label="Members" {...a11yProps(1)} />
-              <Tab label="Bills" {...a11yProps(2)} />
-            </Tabs>
+      <Box sx={{ px: { xs: 1, md: 3 }, py: { xs: 2, md: 3 } }}>
+        <Box
+          component={RouterLink}
+          to="/committees"
+          sx={{
+            display: "inline-flex",
+            alignItems: "center",
+            gap: 0.75,
+            color: "text.secondary",
+            textDecoration: "none",
+            mb: 4,
+            fontSize: 18
+          }}
+        >
+          <LeftOutlined aria-hidden />
+          Back to all Committees
+        </Box>
+        <Box
+          sx={{
+            display: "flex",
+            alignItems: { xs: "stretch", md: "center" },
+            justifyContent: "space-between",
+            gap: 2,
+            flexDirection: { xs: "column", md: "row" },
+            mb: 2.5
+          }}
+        >
+          <Typography component="h1" variant="h3" sx={{ fontSize: { xs: 28, md: 34 }, fontWeight: 700 }}>
+            {getPageTitle(committee)}
+          </Typography>
+          <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+            <TextField
+              value={search}
+              onChange={(event) => setSearch(event.target.value)}
+              size="small"
+              placeholder="Search"
+              aria-label={value === 0 ? "Search committee bills" : "Search committee members"}
+              sx={{ width: { xs: "100%", sm: 260 } }}
+              slotProps={{
+                input: {
+                  startAdornment: (
+                    <InputAdornment position="start">
+                      <SearchOutlined />
+                    </InputAdornment>
+                  )
+                }
+              }}
+            />
+            <Tooltip title="Open committee directory">
+              <IconButton
+                color="primary"
+                onClick={() => window.open(externalUrl, "_blank", "noopener")}
+                aria-label="Open committee directory"
+              >
+                <ExpandAltOutlined />
+              </IconButton>
+            </Tooltip>
+            <Tooltip title="Refresh">
+              <IconButton
+                color="primary"
+                onClick={() => setRefreshKey((current) => current + 1)}
+                aria-label="Refresh committee data"
+              >
+                <ReloadOutlined />
+              </IconButton>
+            </Tooltip>
           </Box>
-          <CustomTabPanel value={value} index={0}>
-            <InCommitteeGrid agency={committee.Agency} committeeName={committee.Name} />
-          </CustomTabPanel>
-          <CustomTabPanel value={value} index={1}>
-            <MembersGrid committee={committee!} />
-          </CustomTabPanel>
-
-          <CustomTabPanel value={value} index={2}>
-            <ReferralsGrid agency={committee.Agency} committeeName={committee.Name} />
-          </CustomTabPanel>
-        </CardContent>
-      </Card>
+        </Box>
+        <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
+          <Tabs value={value} onChange={handleChange} aria-label="committee detail tabs">
+            <Tab label="Bills" {...a11yProps(0)} />
+            <Tab label="Members" {...a11yProps(1)} />
+          </Tabs>
+        </Box>
+        <CustomTabPanel value={value} index={0}>
+          <InCommitteeGrid
+            agency={committee.Agency}
+            committeeName={committee.Name}
+            search={search}
+            refreshKey={refreshKey}
+          />
+        </CustomTabPanel>
+        <CustomTabPanel value={value} index={1}>
+          <MembersGrid committee={committee} search={search} />
+        </CustomTabPanel>
+      </Box>
     </>
   )
 };

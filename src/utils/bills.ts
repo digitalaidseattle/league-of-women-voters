@@ -140,7 +140,17 @@ class BillsService {
     if (typeof sponsorField === "string") {
       return sponsorField;
     }
-    return Array.isArray(sponsorField) ? sponsorField.join(", ") : "";
+    return Array.isArray(sponsorField)
+      ? sponsorField
+        .map((sponsor) =>
+          sponsor.Name ||
+          [sponsor.FirstName, sponsor.LastName]
+            .filter((value) => typeof value === "string" && value.trim().length > 0)
+            .join(" ")
+        )
+        .filter((name) => name.trim().length > 0)
+        .join(", ")
+      : "";
   }
 
   private static stringFallback(candidates: Array<string | undefined | null>) {
