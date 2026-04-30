@@ -3,7 +3,7 @@ import { ExpandAltOutlined, ReloadOutlined, SearchOutlined } from "@ant-design/i
 import { useEffect, useMemo, useState } from 'react';
 
 import { PageInfo } from "@digitalaidseattle/core";
-import { Box, IconButton, InputAdornment, Link as MuiLink, TextField, Toolbar, Tooltip, Typography } from '@mui/material';
+import { Box, Card, CardContent, IconButton, InputAdornment, Link as MuiLink, TextField, Toolbar, Tooltip, Typography } from '@mui/material';
 import { DataGrid, GridColDef, GridRenderCellParams, useGridApiRef } from "@mui/x-data-grid";
 import { Link as RouterLink, useNavigate } from "react-router-dom";
 import { LegislatureService } from '../api/legislatureService';
@@ -283,7 +283,8 @@ const CommitteesPage = () => {
 
   return (<>
     <LoadingOverlay loading={!initialized} />
-    <Box sx={{ px: { xs: 1, md: 3 }, py: { xs: 2, md: 4 } }}>
+    <Card sx={{ mx: { xs: 1, md: 3 }, my: { xs: 2, md: 4 } }}>
+      <CardContent>
       <Typography component="h1" variant="h3" sx={{ fontSize: { xs: 28, md: 36 }, fontWeight: 700, mb: 2.5 }}>
         Committees
       </Typography>
@@ -308,7 +309,8 @@ const CommitteesPage = () => {
           "& .MuiDataGrid-cell": { py: 2, alignItems: "center" }
         }}
       />
-    </Box>
+      </CardContent>
+    </Card>
   </>
   )
 };

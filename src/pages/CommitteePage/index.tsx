@@ -5,7 +5,7 @@
  *
  */
 import { ExpandAltOutlined, LeftOutlined, ReloadOutlined, SearchOutlined } from "@ant-design/icons";
-import { Box, IconButton, InputAdornment, Tab, Tabs, TextField, Tooltip, Typography } from '@mui/material';
+import { Box, Card, CardContent, IconButton, InputAdornment, Tab, Tabs, TextField, Tooltip, Typography } from '@mui/material';
 import { useEffect, useState } from 'react';
 import { Link as RouterLink, useParams } from "react-router-dom";
 
@@ -74,7 +74,8 @@ const CommitteePage = () => {
 
   return (committee &&
     <>
-      <Box sx={{ px: { xs: 1, md: 3 }, py: { xs: 2, md: 3 } }}>
+      <Card sx={{ mx: { xs: 1, md: 3 }, my: { xs: 2, md: 3 } }}>
+        <CardContent>
         <Box
           component={RouterLink}
           to="/committees"
@@ -159,7 +160,8 @@ const CommitteePage = () => {
         <CustomTabPanel value={value} index={1}>
           <MembersGrid committee={committee} search={search} />
         </CustomTabPanel>
-      </Box>
+        </CardContent>
+      </Card>
     </>
   )
 };
