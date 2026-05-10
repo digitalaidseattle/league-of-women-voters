@@ -1,4 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import { corsResponse } from "../../shared/corsResponse.ts";
+import { errorResponse } from "../../shared/errorResponse.ts";
+import { standardResponse } from "../../shared/standardResponse.ts";
 import { ServiceWorker } from "../types.ts";
 
 
@@ -34,16 +37,7 @@ Deno.serve(async (req) => {
   const origin = req.headers.get("origin") || "*";
   // Handle preflight CORS (OPTIONS)
   if (req.method === "OPTIONS") {
-    return new Response(null, {
-      status: 204,
-      headers: {
-        "Access-Control-Allow-Origin": origin,
-        "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
-        "Access-Control-Allow-Headers":
-          "Content-Type, Authorization, apikey, x-client-info",
-        "Access-Control-Max-Age": "86400",
-      },
-    });
+    return corsResponse(origin);
   }
 
   try {
@@ -63,14 +57,8 @@ Deno.serve(async (req) => {
       all = all.concat(json.results);
     }
 
-    return new Response(JSON.stringify(all), {
-      headers: {
-        "Content-Type": "application/json",
-        "Access-Control-Allow-Origin": origin,
-      },
-    });
+    return standardResponse(origin, JSON.stringify(all));
   } catch (err) {
-    console.error("SOAP request failed:", err);
-    throw err;
+    return errorResponse(origin, err);
   }
 });

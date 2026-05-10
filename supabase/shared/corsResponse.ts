@@ -1,5 +1,5 @@
 /**
-*  handError.ts
+*  corsResponse.ts
 *
 *  @copyright 2025 Digital Aid Seattle
 *

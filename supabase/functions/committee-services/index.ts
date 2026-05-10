@@ -21,6 +21,9 @@ SOAPAction: "http://WSLWebServices.leg.wa.gov/GetActiveCommitteeMembers"
  */
 import { XMLParser } from "https://esm.sh/fast-xml-parser@4.3.5";
 import { ServiceWorker } from "../types.ts";
+import { corsResponse } from "../../shared/corsResponse.ts";
+import { errorResponse } from "../../shared/errorResponse.ts";
+import { standardResponse } from "../../shared/standardResponse.ts";
 
 type CommitteeInputParams = {
   operation: string;
@@ -143,16 +146,7 @@ Deno.serve(async (req) => {
 
   // Handle preflight CORS (OPTIONS)
   if (req.method === "OPTIONS") {
-    return new Response(null, {
-      status: 204,
-      headers: {
-        "Access-Control-Allow-Origin": origin,
-        "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
-        "Access-Control-Allow-Headers":
-          "Content-Type, Authorization, apikey, x-client-info",
-        "Access-Control-Max-Age": "86400",
-      },
-    });
+    return corsResponse(origin);
   }
 
   try {
@@ -169,20 +163,8 @@ Deno.serve(async (req) => {
     const parser = new XMLParser();
     const json = parser.parse(xmlText);
     const entities = worker.getEntities(json);
-    return new Response(JSON.stringify(entities), {
-      headers: {
-        "Content-Type": "application/json",
-        "Access-Control-Allow-Origin": origin,
-      },
-    });
+    return standardResponse(origin, JSON.stringify(entities));
   } catch (err) {
-    const statusCode = err.cause === "BadRequest" ? 400 : 500;
-    return new Response(JSON.stringify({ error: err.message || "Internal Server Error" }), {
-      status: statusCode,
-      headers: {
-        "Content-Type": "application/json",
-        "Access-Control-Allow-Origin": origin,
-      },
-    });
+    return errorResponse(origin, err);
   }
 });
