@@ -1,6 +1,5 @@
 import { Entity } from "npm:@digitalaidseattle/core";
-import { SupabaseDAO } from "npm:@digitalaidseattle/supabase";
-import { createClient } from "npm:@supabase/supabase-js@2";
+import { SupabaseClient } from 'npm:@supabase/supabase-js';
 
 export type UpdateSchedule = Entity & {
     created_at: Date,
@@ -8,29 +7,13 @@ export type UpdateSchedule = Entity & {
     last_update: Date
 }
 
-export class UpdateScheduleDAO extends SupabaseDAO<UpdateSchedule> {
+export class UpdateScheduleDAO {
 
-    private static instance: UpdateScheduleDAO;
+    client: SupabaseClient;
+    tableName = 'Update_schedules';
 
-    public static getInstance(): UpdateScheduleDAO {
-        if (!UpdateScheduleDAO.instance) {
-            UpdateScheduleDAO.instance = new UpdateScheduleDAO();
-        }
-        return UpdateScheduleDAO.instance;
-    }
-
-    constructor() {
-        const supabase = createClient(
-            Deno.env.get("SUPABASE_URL")!,
-            Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
-        )
-        super(supabase, 'Update_schedules',
-            {
-                mapper: (json: any) => ({
-                    ...json,
-                    last_update: new Date(json.last_update)
-                })
-            })
+    constructor(client: SupabaseClient) {
+        this.client = client;
     }
 
     // must be one row, or will throw an error
@@ -45,11 +28,14 @@ export class UpdateScheduleDAO extends SupabaseDAO<UpdateSchedule> {
                 console.error('Unexpected error during select', error);
                 throw new Error('Unexpected error during select');
             }
-            return this.mapJson(data);
-        } catch (err) {
-            console.error('Unexpected error during select:', err);
-            throw err;
+            return ({
+                ...data,
+                last_update: new Date(data.last_update)
+            }) as UpdateSchedule;
+            } catch (err) {
+                console.error('Unexpected error during select:', err);
+                throw err;
+            }
         }
-    }
 
 }

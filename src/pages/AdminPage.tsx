@@ -193,7 +193,7 @@ export const AdminPage = () => {
             SupabaseConfiguration.getInstance()
                 .getSupabaseClient().functions
                 .invoke("committee-db-service")
-                .then((resp: any) => resp.data);
+                .then((resp: any) => console.log(resp));
         }
         catch (error) {
             console.log(error);
