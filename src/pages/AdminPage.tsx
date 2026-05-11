@@ -175,7 +175,25 @@ export const AdminPage = () => {
         try {
             CommitteeDao.getInstance()
                 .getAll()
-                .then((resp: any) => console.log(resp.data));
+                .then((resp: any) => console.log(resp));
+        }
+        catch (error) {
+            console.log(error);
+            notify.error('Failed to load.')
+        }
+        finally {
+            notify.success('Loaded committe members.')
+            setLoading(false)
+        };
+    }
+
+    async function testDBEdgeFunction(): Promise<void> {
+        setLoading(true);
+        try {
+            SupabaseConfiguration.getInstance()
+                .getSupabaseClient().functions
+                .invoke("committee-db-service")
+                .then((resp: any) => resp.data);
         }
         catch (error) {
             console.log(error);
@@ -207,6 +225,7 @@ export const AdminPage = () => {
                     <Button onClick={committeeLeadershipJob}>Edge load Committee Leadership</Button>
                     <hr />
                     <Button onClick={testEdgeFunction}>Test Fetch Committees</Button>
+                    <Button onClick={testDBEdgeFunction}>Test Fetch Committees (DB)</Button>
                 </Stack>
             </CardContent>
         </Card>
