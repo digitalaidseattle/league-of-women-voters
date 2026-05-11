@@ -1,12 +1,10 @@
 
 import { CommitteeDAO } from "../../shared/CommitteeDAO.ts";
-import { FirebaseAiService, Project, ProjectContext } from "../../shared/FirebaseAiService.ts";
 import { UpdateScheduleDAO } from "../../shared/UpdateScheduleDAO.ts";
 import { configure } from "../../shared/configuration.ts";
 import { corsResponse } from "../../shared/corsResponse.ts";
 import { errorResponse } from "../../shared/errorResponse.ts";
 import { standardResponse } from "../../shared/standardResponse.ts";
-import { Committee } from "../../shared/types.ts";
 
 configure();
 

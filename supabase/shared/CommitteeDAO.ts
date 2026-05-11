@@ -1,11 +1,16 @@
-import { SupabaseConfiguration, SupabaseDAO } from "npm:@digitalaidseattle/supabase";
+import { SupabaseDAO } from "npm:@digitalaidseattle/supabase";
+import { createClient } from "npm:@supabase/supabase-js@2";
 import { Committee, DBCommittee } from "./types.ts";
-
 
 export class CommitteeDAO extends SupabaseDAO<DBCommittee> {
 
   constructor() {
-    super(SupabaseConfiguration.getInstance().getSupabaseClient(), 'Committees')
+    const supabase = createClient(
+      Deno.env.get("SUPABASE_URL")!,
+      Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
+    )
+
+    super(supabase, 'Committees')
   }
 
   async findLastUpdateBefore(date: Date, field?: string): Promise<DBCommittee[]> {

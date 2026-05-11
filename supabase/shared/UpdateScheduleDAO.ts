@@ -1,5 +1,6 @@
 import { Entity } from "npm:@digitalaidseattle/core";
-import { SupabaseConfiguration, SupabaseDAO } from "npm:@digitalaidseattle/supabase";
+import { SupabaseDAO } from "npm:@digitalaidseattle/supabase";
+import { createClient } from "npm:@supabase/supabase-js@2";
 
 export type UpdateSchedule = Entity & {
     created_at: Date,
@@ -19,8 +20,11 @@ export class UpdateScheduleDAO extends SupabaseDAO<UpdateSchedule> {
     }
 
     constructor() {
-        super(SupabaseConfiguration.getInstance().getSupabaseClient(),
-            'Update_schedules',
+        const supabase = createClient(
+            Deno.env.get("SUPABASE_URL")!,
+            Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
+        )
+        super(supabase, 'Update_schedules',
             {
                 mapper: (json: any) => ({
                     ...json,
@@ -32,6 +36,7 @@ export class UpdateScheduleDAO extends SupabaseDAO<UpdateSchedule> {
     // must be one row, or will throw an error
     async getByName(name: string): Promise<UpdateSchedule> {
         try {
+            console.log
             const { data, error } = await this.client.from(this.tableName)
                 .select("*")
                 .eq('name', name)
