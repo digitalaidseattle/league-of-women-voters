@@ -28,6 +28,9 @@ Deno.serve(async (req) => {
     }
   )
 
+  console.log("SUPABASE_URL: ", Deno.env.get('SUPABASE_URL'));  
+  console.log("SUPABASE_ANON_KEY: ", Deno.env.get('SUPABASE_ANON_KEY'));  
+
   const dao = new CommitteeDAO(supabase);
   const updateScheduleDAO = new UpdateScheduleDAO(supabase);
 
