@@ -170,6 +170,23 @@ export const AdminPage = () => {
         };
     }
 
+    async function testEdgeFunction(): Promise<void> {
+        setLoading(true);
+        try {
+            CommitteeDao.getInstance()
+                .getAll()
+                .then((resp: any) => console.log(resp.data));
+        }
+        catch (error) {
+            console.log(error);
+            notify.error('Failed to load.')
+        }
+        finally {
+            notify.success('Loaded committe members.')
+            setLoading(false)
+        };
+    }
+
     return (<>
         <LoadingOverlay loading={loading} />
         <Breadcrumbs aria-label="breadcrumb">
@@ -185,8 +202,11 @@ export const AdminPage = () => {
                     <Button onClick={loadBills}>Load Bills</Button>
                     <Button onClick={loadBillSponsors}>Load Bill Sponsors</Button>
                     <Button onClick={loadCommitteMembers}>Load Committee Members</Button>
+                    <hr />
                     <Button onClick={legislatorInfoJob}>Edge load Legislator </Button>
                     <Button onClick={committeeLeadershipJob}>Edge load Committee Leadership</Button>
+                    <hr />
+                    <Button onClick={testEdgeFunction}>Test Fetch Committees</Button>
                 </Stack>
             </CardContent>
         </Card>
