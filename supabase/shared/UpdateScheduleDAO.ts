@@ -1,6 +1,5 @@
-import { Entity } from "@digitalaidseattle/core";
-import { SupabaseConfiguration, SupabaseDAO } from "@digitalaidseattle/supabase";
-
+import { Entity } from "npm:@digitalaidseattle/core";
+import { SupabaseConfiguration, SupabaseDAO } from "npm:@digitalaidseattle/supabase";
 
 export type UpdateSchedule = Entity & {
     created_at: Date,
@@ -8,15 +7,15 @@ export type UpdateSchedule = Entity & {
     last_update: Date
 }
 
-export class UpdateScheduleDB extends SupabaseDAO<UpdateSchedule> {
+export class UpdateScheduleDAO extends SupabaseDAO<UpdateSchedule> {
 
-    private static instance: UpdateScheduleDB;
+    private static instance: UpdateScheduleDAO;
 
-    public static getInstance(): UpdateScheduleDB {
-        if (!UpdateScheduleDB.instance) {
-            UpdateScheduleDB.instance = new UpdateScheduleDB();
+    public static getInstance(): UpdateScheduleDAO {
+        if (!UpdateScheduleDAO.instance) {
+            UpdateScheduleDAO.instance = new UpdateScheduleDAO();
         }
-        return UpdateScheduleDB.instance;
+        return UpdateScheduleDAO.instance;
     }
 
     constructor() {
@@ -29,7 +28,6 @@ export class UpdateScheduleDB extends SupabaseDAO<UpdateSchedule> {
                 })
             })
     }
-
 
     // must be one row, or will throw an error
     async getByName(name: string): Promise<UpdateSchedule> {

@@ -1,5 +1,5 @@
 
-import { FirebaseApp, initializeApp } from 'firebase/app';
+import { FirebaseApp, initializeApp } from 'npm:firebase/app';
 
 export type ConfigurationOpts = {
     apiKey: string;
