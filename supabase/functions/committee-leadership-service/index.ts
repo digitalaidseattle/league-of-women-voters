@@ -1,4 +1,5 @@
 
+import { createClient } from 'jsr:@supabase/supabase-js@2';
 import { CommitteeDAO } from "../../shared/CommitteeDAO.ts";
 import { FirebaseAiService, Project, ProjectContext } from "../../shared/FirebaseAiService.ts";
 import { UpdateScheduleDAO } from "../../shared/UpdateScheduleDAO.ts";
@@ -10,9 +11,6 @@ import { Committee } from "../../shared/types.ts";
 
 configure();
 
-const dao = new CommitteeDAO();
-const updateScheduleDAO = UpdateScheduleDAO.getInstance();
-const gemini_model = 'gemini-3.1-flash-lite-preview';
 
 async function fetchPage(committee: Committee): Promise<string> {
   const url = committee.Agency === 'House'
@@ -25,6 +23,8 @@ async function fetchPage(committee: Committee): Promise<string> {
 }
 
 async function scrapeInfo(html: string): Promise<any> {
+  const gemini_model = 'gemini-3.1-flash-lite-preview';
+
   const prompt = "Parse the provided page and list the committee leaders in structured JSON";
 
   const context: ProjectContext = {
@@ -73,15 +73,20 @@ Deno.serve(async (req) => {
 
   try {
     console.log("Starting committee leadership service...");
+
+    const dao = new CommitteeDAO();
+    const updateScheduleDAO = new UpdateScheduleDAO();
+
     const sched = await updateScheduleDAO
-      .getByName('committee-leadership');
+      .getByName('committee_leadership');
 
     // Lookup the existing legistators in DB.
     const entities = await dao
       .findLastUpdateBefore(sched.last_update, 'leadership_update');
 
-    // FIXME for (let i = 0; i < sponsors.length; i++) {
-    for (let i = 0; i <= 0; i++) {
+    const allUpserted: Committee[] = [];
+
+    for (let i = 0; i < entities.length; i++) {
       const committee = entities[i].committee;
 
       // Load HTML for the legislator
@@ -97,15 +102,17 @@ Deno.serve(async (req) => {
         Leadership: info
       };
       const upserted = await dao.updateLeadership(updated);
+      allUpserted.push(upserted);
     }
+
     const nextCheck = new Date();
-    nextCheck.setDate(nextCheck.getDate() + sched.time_span);
+    nextCheck.setDate(nextCheck.getDate() + (sched.time_span ?? 1));
     await updateScheduleDAO
       .upsert({
         ...sched,
         last_update: nextCheck,
       })
-    return standardResponse(origin, "Done");
+    return standardResponse(origin, JSON.stringify(allUpserted));
   } catch (err) {
     return errorResponse(origin, err);
   }

@@ -10,8 +10,6 @@ import { Member } from "../../shared/types.ts";
 
 configure();
 
-const sponsorDAO = new SponsorDAO();
-const updateScheduleDAO = UpdateScheduleDAO.getInstance();
 const gemini_model = 'gemini-3.1-flash-lite-preview';
 
 async function fetchPage(member: Member): Promise<string> {
@@ -76,16 +74,19 @@ Deno.serve(async (req) => {
 
   try {
     console.log("Starting legislator info service...");
+
+    const sponsorDAO = new SponsorDAO();
+    const updateScheduleDAO = new UpdateScheduleDAO();
+
     const sched = await updateScheduleDAO
-      .getByName('legislator-info');
+      .getByName('legislator_info');
 
     // Lookup the existing legistators in DB.
     const entities = await sponsorDAO
       .findLastUpdateBefore(sched.last_update, 'info_update');
 
     const allUpserted: Member[] = [];
-    // FIXME for (let i = 0; i < sponsors.length; i++) {
-    for (let i = 0; i <= 0; i++) {
+    for (let i = 0; i < entities.length; i++) {
       const sponsor = entities[i].sponsor;
 
       // Load HTML for the legislator
@@ -104,7 +105,7 @@ Deno.serve(async (req) => {
       allUpserted.push(upserted);
     }
     const nextCheck = new Date();
-    nextCheck.setDate(nextCheck.getDate() + sched.time_span);
+    nextCheck.setDate(nextCheck.getDate() + (sched.time_span ?? 1));
     await updateScheduleDAO
       .upsert({
         ...sched,

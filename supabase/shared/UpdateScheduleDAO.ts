@@ -1,5 +1,5 @@
+import { SupabaseConfiguration, SupabaseDAO } from "npm:@digitalaidseattle/supabase";
 import { Entity } from "npm:@digitalaidseattle/core";
-import { SupabaseClient } from 'npm:@supabase/supabase-js';
 
 export type UpdateSchedule = Entity & {
     created_at: Date,
@@ -7,19 +7,15 @@ export type UpdateSchedule = Entity & {
     last_update: Date
 }
 
-export class UpdateScheduleDAO {
+export class UpdateScheduleDAO extends SupabaseDAO<UpdateSchedule> {
 
-    client: SupabaseClient;
-    tableName = 'Update_schedules';
-
-    constructor(client: SupabaseClient) {
-        this.client = client;
+    constructor() {
+        super(SupabaseConfiguration.getInstance().getSupabaseClient(), 'Update_schedules');
     }
 
     // must be one row, or will throw an error
     async getByName(name: string): Promise<UpdateSchedule> {
         try {
-            console.log
             const { data, error } = await this.client.from(this.tableName)
                 .select("*")
                 .eq('name', name)
@@ -32,10 +28,10 @@ export class UpdateScheduleDAO {
                 ...data,
                 last_update: new Date(data.last_update)
             }) as UpdateSchedule;
-            } catch (err) {
-                console.error('Unexpected error during select:', err);
-                throw err;
-            }
+        } catch (err) {
+            console.error('Unexpected error during select:', err);
+            throw err;
         }
+    }
 
 }

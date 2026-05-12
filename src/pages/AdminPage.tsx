@@ -170,41 +170,6 @@ export const AdminPage = () => {
         };
     }
 
-    async function testEdgeFunction(): Promise<void> {
-        setLoading(true);
-        try {
-            CommitteeDao.getInstance()
-                .getAll()
-                .then((resp: any) => console.log(resp));
-        }
-        catch (error) {
-            console.log(error);
-            notify.error('Failed to load.')
-        }
-        finally {
-            notify.success('Loaded committe members.')
-            setLoading(false)
-        };
-    }
-
-    async function testDBEdgeFunction(): Promise<void> {
-        setLoading(true);
-        try {
-            SupabaseConfiguration.getInstance()
-                .getSupabaseClient().functions
-                .invoke("committee-db-service")
-                .then((resp: any) => console.log(resp));
-        }
-        catch (error) {
-            console.log(error);
-            notify.error('Failed to load.')
-        }
-        finally {
-            notify.success('Loaded committe members.')
-            setLoading(false)
-        };
-    }
-
     return (<>
         <LoadingOverlay loading={loading} />
         <Breadcrumbs aria-label="breadcrumb">
@@ -223,9 +188,6 @@ export const AdminPage = () => {
                     <hr />
                     <Button onClick={legislatorInfoJob}>Edge load Legislator </Button>
                     <Button onClick={committeeLeadershipJob}>Edge load Committee Leadership</Button>
-                    <hr />
-                    <Button onClick={testEdgeFunction}>Test Fetch Committees</Button>
-                    <Button onClick={testDBEdgeFunction}>Test Fetch Committees (DB)</Button>
                 </Stack>
             </CardContent>
         </Card>
