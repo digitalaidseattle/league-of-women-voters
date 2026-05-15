@@ -53,32 +53,15 @@ export const AdminPage = () => {
             });
     }
 
-    function loadBills(): void {
-        setLoading(true);
-        BillDao.getInstance()
-            .getBills()
-            .then(bills => BillsDB.getInstance().upsert(bills))
-            .catch(error => {
-                console.log(error);
-                notify.error('Failed to load.')
-            })
-            .finally(() => {
-                notify.success('Loaded bills.')
-                setLoading(false)
-            });
-    }
-
     async function loadBillSponsors(): Promise<void> {
         setLoading(true);
         try {
             const bills = await BillsDB.getInstance().getAll();
             for (let i = 0; i < bills.length; i++) {
                 const bill = bills[i];
-                const substrings = `${bill.Id}`.split(".")
-                const name = substrings[0].split("-")[0]
                 try {
                     BillDao.getInstance()
-                        .getBillSponsors(name)
+                        .getBillSponsors(bill.BillNumber)
                         .then(async sponsors => {
                             const updated = {
                                 ...bill,
@@ -219,7 +202,6 @@ export const AdminPage = () => {
                 <Stack>
                     <Button onClick={loadLegislators}>Load Legislators</Button>
                     <Button onClick={loadCommittees}>Load Committees</Button>
-                    <Button onClick={loadBills}>Load Bills</Button>
                     <Button onClick={loadBillSponsors}>Load Bill Sponsors</Button>
                     <Button onClick={loadCommitteMembers}>Load Committee Members</Button>
                     <hr />

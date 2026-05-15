@@ -76,7 +76,9 @@ export class BillService {
     return this.dao.getById(id)
   }
 
+  
   async findBillsBySponsor(sponsor: Member): Promise<Bill[]> {
+    // FIXME should not use get all
     const bills = await this.dao.getAll();
     return bills.filter(b => {
       const sponsorIds = (b.Sponsors ?? []).map(s => s.Id);

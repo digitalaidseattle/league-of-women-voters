@@ -7,13 +7,13 @@
 
 import { Card, CardHeader, Grid, Link } from '@mui/material';
 import { useEffect, useState } from 'react';
-import { LegislativeDocument } from '../../api/bill';
+import { Bill } from '../../api/bill';
 import { BillService } from '../../api/billService';
 import { sleep } from '../../utils/sleep';
 import { LEGISLATORS_CONSTANTS } from './constants';
 
 export function SponsoredBillsSection({ legislator }: { legislator: Member }) {
-  const [bills, setBills] = useState<LegislativeDocument[]>([]);
+  const [bills, setBills] = useState<Bill[]>([]);
   const [loaded, setLoaded] = useState(false);
 
   useEffect(() => {
@@ -39,13 +39,13 @@ export function SponsoredBillsSection({ legislator }: { legislator: Member }) {
   }
 
   // The same bill will have different IDs (e.g. 1007, 1007.SP, etc.)
-  function collapseBills(bills: LegislativeDocument[]): LegislativeDocument[] {
-    const map = new Map<string, LegislativeDocument>();
+  function collapseBills(bills: Bill[]): Bill[] {
+    const map = new Map<string, Bill>();
     bills.forEach(bill => {
-      const billNumber = getBillNumber(bill.Id);
+      const billNumber = bill.BillNumber;
       map.set(billNumber, bill);
     });
-    return [...map.values()].sort((b1, b2) => ("" + b1.Id).localeCompare("" + b2.Id));
+    return [...map.values()].sort((b1, b2) => ("" + b1.BillId).localeCompare("" + b2.BillId));
   }
 
   function getBillNumber(billId: string): string {
@@ -63,7 +63,7 @@ export function SponsoredBillsSection({ legislator }: { legislator: Member }) {
           return (
             <Grid key={idx} size={6}>
               {/* <Link href={`/bill?number=${bill.Name}&name=${bill.Name}`}>{bill.Name}</Link> */}
-              <Link href={`/bill/${bill.Id}`}>{getBillNumber(bill.Id)}</Link>
+              <Link href={`/bill/${bill.BillId}`}>{getBillNumber(bill.BillId)}</Link>
             </Grid>
           )
         })}
