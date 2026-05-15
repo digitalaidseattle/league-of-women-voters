@@ -61,15 +61,15 @@ export const BillsPage = () => {
         ...paginationModel,
         sortField: 'id',
         sortDirection: 'asc',
-        filterModel: {
-          items: [
-            {
-              field: 'metadata->OriginalAgency',
-              operator: 'equals',
-              value: 'House'
-            }
-          ]
-        }
+        // filterModel: {
+        //   items: [
+        //     {
+        //       field: 'metadata->OriginalAgency',
+        //       operator: 'equals',
+        //       value: 'House'
+        //     }
+        //   ]
+        // }
       } as QueryModel)
       .then(data => setPageInfo(data))
       .finally(() => setLoading(false));
