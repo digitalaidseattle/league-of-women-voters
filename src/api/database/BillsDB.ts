@@ -1,14 +1,14 @@
-import { Identifier } from "@digitalaidseattle/core";
+import { DataAccessOptions, Identifier, PageInfo, QueryModel } from "@digitalaidseattle/core";
 
-import { LegislativeDocument } from "../bill";
-import { DAO } from "../DAO";
 import { SupabaseConfiguration, SupabaseDAO } from "@digitalaidseattle/supabase";
+import { Bill } from "../bill";
+import { DAO } from "../DAO";
 
 export type DBBill = {
     id: Identifier,
     created_at: Date,
     updated_at: Date,
-    bill: LegislativeDocument
+    bill: Bill
 }
 
 class IternalBillsDAO extends SupabaseDAO<DBBill> {
@@ -17,7 +17,7 @@ class IternalBillsDAO extends SupabaseDAO<DBBill> {
     }
 }
 
-export class BillsDB implements DAO<LegislativeDocument> {
+export class BillsDB implements DAO<Bill> {
 
     private static instance: BillsDB;
 
@@ -34,28 +34,36 @@ export class BillsDB implements DAO<LegislativeDocument> {
         this.db_dao = new IternalBillsDAO();
     }
 
-    getAll(): Promise<LegislativeDocument[]> {
-        return this.db_dao.getAll()
+    getAll(): Promise<Bill[]> {
+        return this.db_dao.getAll({ count: 5000 })
             .then(wrapped => wrapped.map(db => db.bill))
     }
 
-    getById(id: Identifier): Promise<LegislativeDocument> {
+    getById(id: Identifier): Promise<Bill> {
         return this.db_dao.getById(id)
             .then(wrapped => wrapped.bill);
     }
 
-    async upsert(entity: LegislativeDocument | LegislativeDocument[]): Promise<LegislativeDocument | LegislativeDocument[]> {
+    async upsert(entity: Bill): Promise<Bill> {
         const now = new Date();
-        const uploads = (Array.isArray(entity) ? entity : [entity])
-            .map(bb => ({
-                id: bb.Id,
-                updated_at: now,
-                bill: bb
-            } as DBBill));
-        return Promise.all(uploads.map(up => this.db_dao.upsert(up)))
-            .then(resps => resps.map(db => db.bill))
+        const wrapper = {
+            id: entity.BillId,
+            updated_at: now,
+            bill: entity
+        } as DBBill;
+        return this.db_dao.upsert(wrapper)
+            .then(resp => resp.bill)
     }
 
-
-
+    async find(queryModel: QueryModel, opts?: DataAccessOptions<Bill>): Promise<PageInfo<Bill>> {
+        return this.db_dao
+            .find(queryModel, opts as unknown as DataAccessOptions<DBBill>)
+            .then(pageInfo => {
+                console.log(pageInfo)
+                return ({
+                    ...pageInfo,
+                    rows: pageInfo.rows.map(dbBill => dbBill.bill)
+                })
+            });
+    }
 }

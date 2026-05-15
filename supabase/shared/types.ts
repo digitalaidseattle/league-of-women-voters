@@ -43,3 +43,58 @@ export type DBCommittee = {
     leadership_update: Date,
     committee: Committee
 }
+
+export type DBBill = {
+    id: Identifier,
+    created_at: Date,
+    updated_at: Date,
+    detail_update: Date,
+    bill: Bill
+}
+
+type LegislationInfo = {
+  Biennium: string;
+  BillId: string;
+  BillNumber: string;
+  SubstituteVersion: number;
+  EngrossedVersion: number;
+  ShortLegislationType: {
+    ShortLegislationType: string;
+    LongLegislationType: string;
+  }
+  OriginalAgency: string;
+  Active: boolean;
+  DisplayNumber: string;
+}
+
+type Legislation = {
+  StateFiscalNote: boolean;
+  LocalFiscalNote: boolean;
+  Appropriations: boolean;
+  RequestedByGovernor: boolean;
+  RequestedByBudgetCommittee: boolean;
+  RequestedByDepartment: boolean;
+  RequestedByOther: boolean;
+  ShortDescription: string;
+  Request: string;
+  IntroducedDate: string;
+  CurrentStatus: {
+    BillId: string;
+    HistoryLine: string;
+    ActionDate: string;
+    AmendedByOppositeBody: boolean;
+    PartialVeto: boolean;
+    Veto: boolean;
+    AmendmentsExist: boolean;
+    Status: string;
+  };
+  Sponsor: string;
+  PrimeSponsorID: number;
+  LongDescription: string;
+  LegalTitle: string;
+  Companions?: {
+    Companion?: unknown; // not sure what this is, seems to always be null
+  }
+};
+
+export type Bill = LegislationInfo & Legislation

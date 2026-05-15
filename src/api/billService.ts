@@ -5,12 +5,10 @@
  *
  */
 
-import type { LegislativeDocument } from "./bill";
-import { BillDao } from './billDao';
-import { DAO } from "./DAO";
+import { DataAccessOptions, PageInfo, QueryModel } from "@digitalaidseattle/core";
+import type { Bill, LegislationInfo } from "./bill";
 import { BillsDB } from "./database/BillsDB";
-
-const DEFAULT_DOCUMENT_CLASS = "Bills";
+import { LegislatureService } from "./legislatureService";
 
 export class BillService {
   private static instance: BillService;
@@ -22,34 +20,88 @@ export class BillService {
     return BillService.instance;
   }
 
-  dao: DAO<LegislativeDocument>;
+  dao: BillsDB;
+  inCommitteeMap: Map<Committee, LegislationInfo[]> | null = null;
+
   private constructor() {
     this.dao = BillsDB.getInstance();
+    this.fectchInCommittee();
   }
 
-  async getAll(documentClass?: string): Promise<LegislativeDocument[]> {
-    if (documentClass) {
-      return BillDao.getInstance().getBills(documentClass ?? DEFAULT_DOCUMENT_CLASS);
-    } else {
-      return this.dao.getAll();
+  async getInCommitteeMap(): Promise<Map<Committee, LegislationInfo[]>> {
+    if (this.inCommitteeMap == null) {
+      this.fectchInCommittee();
     }
+    return this.inCommitteeMap!;
   }
 
-  async getById(id: string): Promise<LegislativeDocument> {
-    const bills = await this.getAll()
-    const found = bills.find(bill => bill.Id === id);
-    if (found) {
-      return found;
+
+  fectchInCommittee() {
+    const legislatureService = LegislatureService.getInstance();
+
+    legislatureService
+      .getAll()
+      .then(async committees => {
+        Promise
+          .all(committees.map(committee => legislatureService.getInCommittee(committee.Agency, committee.Name)))
+          .then(resps => {
+            const map = new Map<Committee, LegislationInfo[]>();
+            for (let i = 0; i < committees.length; i++) {
+              const committee = committees[i];
+              map.set(committee, resps[i])
+            }
+            this.inCommitteeMap = map
+          })
+      })
+  };
+
+  async findInCommittee(bill: Bill): Promise<Committee | undefined> {
+    const map = await this.getInCommitteeMap();
+    for (const [committee, infos] of map.entries()) {
+      if (infos) {
+        if (infos.find(info => info.BillId === bill.BillId)) {
+          return committee;
+        }
+      }
     }
-    throw new Error(`Could not find bill for id = ${id}`);
+    return undefined
+  };
+
+
+  async getAll(): Promise<Bill[]> {
+    return this.dao.getAll();
   }
 
-  async findBillsBySponsor(sponsor: Member): Promise<LegislativeDocument[]> {
+  async getById(id: string): Promise<Bill> {
+    return this.dao.getById(id)
+  }
+
+  async findBillsBySponsor(sponsor: Member): Promise<Bill[]> {
     const bills = await this.dao.getAll();
     return bills.filter(b => {
       const sponsorIds = (b.Sponsors ?? []).map(s => s.Id);
       return sponsorIds.includes(sponsor.Id);
     })
   }
+
+  async find(queryModel: QueryModel, opts?: DataAccessOptions<Bill>): Promise<PageInfo<Bill>> {
+    const pageInfo = await this.dao.find(queryModel, opts);
+    console.log(pageInfo);
+    const updated = [];
+    const bills = pageInfo.rows;
+    for (let i = 0; i < bills.length; i++) {
+      const bill = bills[i];
+      const committee = await this.findInCommittee(bill);
+      updated.push({
+        ...bill,
+        InCommittee: committee
+      })
+    }
+    return ({
+      ...pageInfo,
+      rows: updated
+    })
+  }
+
 
 }

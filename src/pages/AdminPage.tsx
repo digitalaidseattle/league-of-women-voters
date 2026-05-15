@@ -170,6 +170,43 @@ export const AdminPage = () => {
         };
     }
 
+
+    async function billInfoCachingJob(): Promise<void> {
+        setLoading(true);
+        try {
+            SupabaseConfiguration.getInstance()
+                .getSupabaseClient().functions
+                .invoke("legislation-info-service")
+                .then((resp: any) => resp.data);
+        }
+        catch (error) {
+            console.log(error);
+            notify.error('Failed to load.')
+        }
+        finally {
+            notify.success('Loaded committe members.')
+            setLoading(false)
+        };
+    }
+
+    async function billDetailCachingJob(): Promise<void> {
+        setLoading(true);
+        try {
+            SupabaseConfiguration.getInstance()
+                .getSupabaseClient().functions
+                .invoke("legislation-detail-service")
+                .then((resp: any) => resp.data);
+        }
+        catch (error) {
+            console.log(error);
+            notify.error('Failed to load.')
+        }
+        finally {
+            notify.success('Loaded committe members.')
+            setLoading(false)
+        };
+    }
+
     return (<>
         <LoadingOverlay loading={loading} />
         <Breadcrumbs aria-label="breadcrumb">
@@ -188,10 +225,11 @@ export const AdminPage = () => {
                     <hr />
                     <Button onClick={legislatorInfoJob}>Edge load Legislator </Button>
                     <Button onClick={committeeLeadershipJob}>Edge load Committee Leadership</Button>
+                    <Button onClick={billInfoCachingJob}>Edge load Bill Infos</Button>
+                    <Button onClick={billDetailCachingJob}>Edge load Bill Details</Button>
                 </Stack>
             </CardContent>
         </Card>
-
     </>
     )
 };
