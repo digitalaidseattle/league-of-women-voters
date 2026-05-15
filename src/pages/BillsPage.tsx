@@ -31,7 +31,7 @@ import {
   useGridApiRef
 } from "@mui/x-data-grid";
 
-import { LoadingContext, PageInfo, QueryModel } from "@digitalaidseattle/core";
+import { FilterItem, LoadingContext, PageInfo, QueryModel } from "@digitalaidseattle/core";
 import type { Bill } from "../api/bill";
 import { BillService } from "../api/billService";
 import { CHAMBER_TYPE, ChamberButtonGroup } from "../components/ChamberButtonGroup";
@@ -56,20 +56,24 @@ export const BillsPage = () => {
   function fetchData() {
     setLoading(true);
     console.log(chamber)
+    const filterItems: FilterItem[] = [];
+    const agency = chamber === 'house' ? "House" : (chamber === 'senate' ? "Senate" : undefined) ;
+    if (agency) {
+      filterItems.push({
+        field: 'OriginalAgency',
+        operator: '=',
+        value: agency
+      })
+    }
+    console.log(filterItems)
     BillService.getInstance()
       .find({
         ...paginationModel,
         sortField: 'id',
         sortDirection: 'asc',
-        // filterModel: {
-        //   items: [
-        //     {
-        //       field: 'metadata->OriginalAgency',
-        //       operator: 'equals',
-        //       value: 'House'
-        //     }
-        //   ]
-        // }
+        filterModel: {
+          items: filterItems
+        }
       } as QueryModel)
       .then(data => setPageInfo(data))
       .finally(() => setLoading(false));
@@ -136,7 +140,7 @@ export const BillsPage = () => {
       type: "string",
       renderCell: (params) => {
         const { row } = params;
-        return row.CurrentStatus.HistoryLine;
+        return row.CurrentStatus ? row.CurrentStatus.HistoryLine : 'n/a';
       }
     },
     {
@@ -146,7 +150,7 @@ export const BillsPage = () => {
       type: "string",
       renderCell: (params) => {
         const { row } = params;
-        return row.CurrentStatus.Status;
+        return row.CurrentStatus ? row.CurrentStatus.Status : 'n/a';
       }
     }
   ];
@@ -212,6 +216,10 @@ export const BillsPage = () => {
         paginationModel={paginationModel}
         rowCount={pageInfo.totalRowCount}
         onPaginationModelChange={setPaginationModel}
+
+        // TODO add sort & filter models,  will need to add to DBBill
+        // sortingMode="server"
+        // sortModel={sortModel}
 
         pageSizeOptions={[10, 25, 50, 100]}
         onRowDoubleClick={params => navigate(`/bill/${params.row.BillId}`)}

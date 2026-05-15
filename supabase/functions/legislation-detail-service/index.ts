@@ -18,7 +18,6 @@ async function fetchDetail(bill: Bill): Promise<Bill> {
   const xml = await response.text();
   const json = parser.parse(xml);
   const legislation = json["ArrayOfLegislation"]["Legislation"];
-  console.log('legislation', Array.isArray(legislation), bill.BillId)
   return (Array.isArray(legislation) ? legislation : [legislation]).find((l: any) => l.BillId === bill.BillId) as Bill;
 }
 
@@ -39,28 +38,38 @@ Deno.serve(async (req) => {
       .getByName('bill_detail_update');
 
     const entities = await billsDao.findLastUpdateBefore(sched.last_update, 'detail_update')
-    console.log(`Found ${entities.length} bill before ${sched.last_update}`);
-    while (entities.length > 0) {
-      // for (let i = 0; i < 1; i++) {
-      for (let i = 0; i < entities.length; i++) {
-        const dbBill = entities[i];
-        const detail = await fetchDetail(dbBill.bill);
-
-        await billsDao.updateDetail({
-          ...dbBill.bill,
-          ...detail,
-        });
+    if (entities.length === 0) {
+      console.log(`Updating to next time`);
+      const nextCheck = new Date();
+      nextCheck.setDate(nextCheck.getDate() + (sched.time_span ?? 1));
+      await updateScheduleDAO
+        .upsert({
+          ...sched,
+          last_update: nextCheck,
+        })
+    } else {
+      console.log(`Found ${entities.length} bill before ${sched.last_update}`);
+      while (entities.length > 0) {
+        // for (let i = 0; i < 1; i++) {
+        for (let i = 0; i < entities.length; i++) {
+          const dbBill = entities[i];
+          const detail = await fetchDetail(dbBill.bill);
+          const updated = {
+            ...dbBill,
+            bill: {
+              ...dbBill.bill,
+              ...detail,
+            },
+            PrimeSponsorID: detail.PrimeSponsorID,
+            detail_update: new Date()
+          }
+          await billsDao.upsert(updated);
+        }
+        console.log(`Updated ${entities.length} bills with detail information.`);
       }
-      console.log(`Updated ${entities.length} bills with detail information.`);
-
     }
-    const nextCheck = new Date();
-    nextCheck.setDate(nextCheck.getDate() + (sched.time_span ?? 1));
-    await updateScheduleDAO
-      .upsert({
-        ...sched,
-        last_update: nextCheck,
-      })
+
+
     return standardResponse(origin, `Done`);
   } catch (err) {
     return errorResponse(origin, err);

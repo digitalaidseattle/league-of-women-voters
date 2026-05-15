@@ -43,8 +43,3 @@ type Referral = {
   committee: Committee;
   ReferredDate: string;
 };
-
-
-type Sponsor = Member & {
-  Type: string;
-};

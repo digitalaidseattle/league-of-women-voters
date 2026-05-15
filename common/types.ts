@@ -1,4 +1,4 @@
-import { Identifier } from "npm:@digitalaidseattle/core";
+import { Entity, Identifier } from "npm:@digitalaidseattle/core";
 
 export type Committee = {
   Acronym: string;
@@ -26,34 +26,6 @@ export type Member = {
   Address?: string;
   LegislativeAssistant?: { name: string, phone: string }[];
 };
-
-export type DBSponsor = {
-  id: Identifier,
-  created_at: Date,
-  updated_at: Date,
-  info_update: Date,
-  sponsor: Member
-}
-
-export type DBCommittee = {
-  id: Identifier,
-  created_at: Date,
-  updated_at: Date,
-  membership_update: Date,
-  leadership_update: Date,
-  committee: Committee
-}
-
-export type DBBill = {
-  id: Identifier;
-  created_at: Date;
-  updated_at: Date;
-  detail_update: Date;
-  bill: Bill;
-  OriginalAgency?: string;
-  PrimeSponsorID?: number;
-  SearchKey?: number;
-}
 
 type LegislationInfo = {
   Biennium: string;
@@ -100,4 +72,34 @@ type Legislation = {
   }
 };
 
-export type Bill = LegislationInfo & Legislation
+type Bill = Entity & LegislationInfo & Legislation & {
+  Sponsors?: Sponsor[];
+  InCommittee?: Committee;  
+};
+
+export type DBSponsor = {
+  id: Identifier,
+  created_at: Date,
+  updated_at: Date,
+  info_update: Date,
+  sponsor: Member
+}
+
+export type DBCommittee = {
+  id: Identifier,
+  created_at: Date,
+  updated_at: Date,
+  membership_update: Date,
+  leadership_update: Date,
+  committee: Committee
+}
+
+export type DBBill = {
+  id: Identifier;
+  created_at: Date;
+  updated_at: Date;
+  detail_update: Date;
+  bill: Bill;
+  OriginalAgency?: string;
+  PrimeSponsorID?: number;
+}

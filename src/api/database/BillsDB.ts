@@ -8,13 +8,24 @@ export type DBBill = {
     id: Identifier,
     created_at: Date,
     updated_at: Date,
-    bill: Bill
+    bill: Bill,
+    OriginalAgency?: string,
+    PrimeSponsorID?: number
 }
 
 class IternalBillsDAO extends SupabaseDAO<DBBill> {
     constructor() {
         super(SupabaseConfiguration.getInstance().getSupabaseClient(), 'Bills')
     }
+
+    async findByPrimarySponsor(sponsorId: Identifier): Promise<DBBill[]> {
+        return this.client
+            .from(this.tableName)
+            .select(this.getSelect({}))
+            .eq("PrimeSponsorID", sponsorId)
+            .then((resp: any) => resp.data.map((json: any) => this.mapJson(json)));
+    }
+
 }
 
 export class BillsDB implements DAO<Bill> {
@@ -28,7 +39,7 @@ export class BillsDB implements DAO<Bill> {
         return BillsDB.instance;
     }
 
-    db_dao: SupabaseDAO<DBBill>;
+    db_dao: IternalBillsDAO;
 
     constructor() {
         this.db_dao = new IternalBillsDAO();
@@ -59,11 +70,16 @@ export class BillsDB implements DAO<Bill> {
         return this.db_dao
             .find(queryModel, opts as unknown as DataAccessOptions<DBBill>)
             .then(pageInfo => {
-                console.log(pageInfo)
                 return ({
                     ...pageInfo,
                     rows: pageInfo.rows.map(dbBill => dbBill.bill)
                 })
             });
+    }
+
+    async findByPrimarySponsor(sponsorId: Identifier): Promise<Bill[]> {
+        return this.db_dao
+            .findByPrimarySponsor(sponsorId)
+            .then(dbBills => dbBills.map(dbBill => dbBill.bill))
     }
 }

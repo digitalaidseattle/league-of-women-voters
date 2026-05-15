@@ -22,18 +22,14 @@ async function fetchData(year: number): Promise<DBBill[]> {
   const bills: DBBill[] = [];
   for (let i = 0; i < summaries.length; i++) {
     const summary = summaries[i];
-    // const bilUrl = `${BASE_URL}/GetLegislation?biennium=${summary.Biennium}&billNumber=${summary.BillNumber}`;
-    // const detailResponse = await fetch(bilUrl);
-    // const detailXml = await detailResponse.text();
-    // const detailJson = parser.parse(detailXml);
-    // const detail = detailJson["ArrayOfLegislation"]["Legislation"];
     bills.push({
       id: summary.BillId,
       bill: {
         ...summary,
-        Id: summary.BillId,
+        Id: summary.BillId,        
       },
-      updated_at: now
+      updated_at: now,
+      OriginalAgency: summary.OriginalAgency
     } as DBBill);
   };
 

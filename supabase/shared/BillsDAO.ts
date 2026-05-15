@@ -27,17 +27,4 @@ export class BillsDAO extends SupabaseDAO<DBBill> {
       .then((resp: any) => resp.data as DBBill[])
   }
 
-  async updateDetail(entity: Bill): Promise<Bill> {
-    const now = new Date();
-    const current = await this.getById(entity.Id);
-    const up = (
-      {
-        ...current,
-        bill: entity,
-        detail_update: now
-      })
-    return this.upsert(up)
-      .then((billDB: DBBill) => billDB.bill)
-  }
-
 }

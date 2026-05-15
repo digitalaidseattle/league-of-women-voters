@@ -103,8 +103,8 @@ type Legislation = {
 };
 
 type Bill = Entity & LegislationInfo & Legislation & {
-  Sponsors?: Sponsor[];
-  InCommittee?: Committee;
+  Sponsors?: Member[];
+  InCommittee?: Committee;  
 };
 
 type LegislativeDocument = {
@@ -128,7 +128,7 @@ type LegislativeDocument = {
   CommitteeNames?: {
     CommitteeName?: string | string[];
   };
-  Sponsors?: Sponsor[];
+  Sponsors?: Member[];
   OriginatingAgency?: string;
   Agency?: string;
   Chamber?: string;

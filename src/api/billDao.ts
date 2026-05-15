@@ -92,7 +92,7 @@ export class BillDao {
     return data;
   }
 
-  public async getBillSponsors(billNumber: string): Promise<Sponsor[]> {
+  public async getBillSponsors(billNumber: string): Promise<Member[]> {
     const { error, data } = await this.client.functions
       .invoke("legislation-services", {
         body: { operation: "GetSponsors", biennium: this.biennium, billNumber: billNumber }

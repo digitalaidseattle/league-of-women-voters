@@ -76,19 +76,13 @@ export class BillService {
     return this.dao.getById(id)
   }
 
-  
+
   async findBillsBySponsor(sponsor: Member): Promise<Bill[]> {
-    // FIXME should not use get all
-    const bills = await this.dao.getAll();
-    return bills.filter(b => {
-      const sponsorIds = (b.Sponsors ?? []).map(s => s.Id);
-      return sponsorIds.includes(sponsor.Id);
-    })
+    return this.dao.findByPrimarySponsor(sponsor.Id);
   }
 
   async find(queryModel: QueryModel, opts?: DataAccessOptions<Bill>): Promise<PageInfo<Bill>> {
     const pageInfo = await this.dao.find(queryModel, opts);
-    console.log(pageInfo);
     const updated = [];
     const bills = pageInfo.rows;
     for (let i = 0; i < bills.length; i++) {

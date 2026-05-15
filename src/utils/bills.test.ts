@@ -38,7 +38,7 @@ describe("bills", () => {
 
     it("summarizeSponsors", () => {
         expect(summarizeSponsors({ Id: 'test' } as LegislativeDocument)).toBe('');
-        expect(summarizeSponsors({ Id: 'test', Sponsors: [{ Name: 'bill' } as Sponsor, { Name: 'ted' } as Sponsor] } as LegislativeDocument)).toBe('bill, ted');
+        expect(summarizeSponsors({ Id: 'test', Sponsors: [{ Name: 'bill' } as Member, { Name: 'ted' } as Member] } as LegislativeDocument)).toBe('bill, ted');
     });
 
 
