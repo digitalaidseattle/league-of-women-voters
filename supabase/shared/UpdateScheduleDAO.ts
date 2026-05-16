@@ -4,7 +4,8 @@ import { Entity } from "npm:@digitalaidseattle/core";
 export type UpdateSchedule = Entity & {
     created_at: Date,
     name: string,
-    last_update: Date
+    next_update: Date,
+    wait_time: number
 }
 
 export class UpdateScheduleDAO extends SupabaseDAO<UpdateSchedule> {
@@ -26,7 +27,7 @@ export class UpdateScheduleDAO extends SupabaseDAO<UpdateSchedule> {
             }
             return ({
                 ...data,
-                last_update: new Date(data.last_update)
+                next_update: new Date(data.next_update)
             }) as UpdateSchedule;
         } catch (err) {
             console.error('Unexpected error during select:', err);

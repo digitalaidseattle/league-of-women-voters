@@ -1,5 +1,5 @@
 import { SupabaseConfiguration, SupabaseDAO } from "npm:@digitalaidseattle/supabase";
-import { Bill, DBBill, DBCommittee } from "./types.ts";
+import { DBBill } from "./types.ts";
 
 export class BillsDAO extends SupabaseDAO<DBBill> {
 
@@ -11,7 +11,6 @@ export class BillsDAO extends SupabaseDAO<DBBill> {
     }
     return BillsDAO.instance;
   }
-
 
   constructor() {
     super(SupabaseConfiguration.getInstance().getSupabaseClient(), 'Bills');
@@ -27,4 +26,22 @@ export class BillsDAO extends SupabaseDAO<DBBill> {
       .then((resp: any) => resp.data as DBBill[])
   }
 
+  async findById(entityId: Identifier): Promise<DBBill | null> {
+    try {
+
+      const { data, error } = await this.client
+        .from(this.tableName)
+        .select('*')
+        .eq('id', entityId)
+        .maybeSingle();
+      if (error) {
+        console.error('Unexpected error during select', error);
+        throw new Error('Unexpected error during select');
+      }
+      return data;
+    } catch (err) {
+      console.error('Unexpected error during select:', err);
+      throw err;
+    }
+  }
 }

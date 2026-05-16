@@ -5,6 +5,7 @@ import { UpdateScheduleDAO } from "../../shared/UpdateScheduleDAO.ts";
 import { configure } from "../../shared/configuration.ts";
 import { corsResponse } from "../../shared/corsResponse.ts";
 import { errorResponse } from "../../shared/errorResponse.ts";
+import { resetSchedule } from "../../shared/resetSchedule.ts";
 import { standardResponse } from "../../shared/standardResponse.ts";
 import { Member } from "../../shared/types.ts";
 
@@ -78,14 +79,22 @@ Deno.serve(async (req) => {
     const sponsorDAO = new SponsorDAO();
     const updateScheduleDAO = new UpdateScheduleDAO();
 
-    const sched = await updateScheduleDAO
-      .getByName('legislator_info');
+    const sched = await updateScheduleDAO.getByName('legislator_info');
 
-    // Lookup the existing legistators in DB.
-    const entities = await sponsorDAO
-      .findLastUpdateBefore(sched.last_update, 'info_update');
+    if (sched.next_update.getTime() > new Date().getTime()) {
+      console.info(`Not time to be updated`, sched.next_update);
+      return standardResponse(origin, `Not time to be updated`);
+    }
 
-    const allUpserted: Member[] = [];
+    const entities = await sponsorDAO.findLastUpdateBefore(sched.next_update, 'info_update');
+
+    if (entities.length === 0) {
+      await resetSchedule(sched);
+      console.info(`Found nothing to update.  Next scheduled check`, sched.next_update);
+      return standardResponse(origin, `Found nothing to update. Next check ${sched.next_update}`);
+    }
+
+    const allUpdated: Member[] = [];
     for (let i = 0; i < entities.length; i++) {
       const sponsor = entities[i].sponsor;
 
@@ -102,16 +111,11 @@ Deno.serve(async (req) => {
         ...info
       };
       const upserted = await sponsorDAO.updateInfo(updated);
-      allUpserted.push(upserted);
+      allUpdated.push(upserted);
     }
-    const nextCheck = new Date();
-    nextCheck.setDate(nextCheck.getDate() + (sched.time_span ?? 1));
-    await updateScheduleDAO
-      .upsert({
-        ...sched,
-        last_update: nextCheck,
-      })
-    return standardResponse(origin, JSON.stringify(allUpserted));
+    console.log(`Saved ${allUpdated.length} records to the database.`);
+    return standardResponse(origin, `Updated ${allUpdated.length} records.`);
+
   } catch (err) {
     return errorResponse(origin, err);
   }

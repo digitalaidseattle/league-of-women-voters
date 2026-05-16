@@ -8,6 +8,7 @@ import { corsResponse } from "../../shared/corsResponse.ts";
 import { errorResponse } from "../../shared/errorResponse.ts";
 import { standardResponse } from "../../shared/standardResponse.ts";
 import { Committee } from "../../shared/types.ts";
+import { resetSchedule } from '../../shared/resetSchedule.ts';
 
 configure();
 
@@ -77,15 +78,22 @@ Deno.serve(async (req) => {
     const dao = new CommitteeDAO();
     const updateScheduleDAO = new UpdateScheduleDAO();
 
-    const sched = await updateScheduleDAO
-      .getByName('committee_leadership');
+    const sched = await updateScheduleDAO.getByName('committee_leadership');
 
-    // Lookup the existing legistators in DB.
-    const entities = await dao
-      .findLastUpdateBefore(sched.last_update, 'leadership_update');
+    if (sched.next_update.getTime() > new Date().getTime()) {
+      console.info(`Not time to be updated`, sched.next_update);
+      return standardResponse(origin, `Not time to be updated`);
+    }
 
-    const allUpserted: Committee[] = [];
+    const entities = await dao.findLastUpdateBefore(sched.next_update, 'leadership_update');
 
+    if (entities.length === 0) {
+      await resetSchedule(sched);
+      console.info(`Found nothing to update.  Next scheduled check`, sched.next_update);
+      return standardResponse(origin, `Found nothing to update. Next check ${sched.next_update}`);
+    }
+
+    const allUpdated: Committee[] = [];
     for (let i = 0; i < entities.length; i++) {
       const committee = entities[i].committee;
 
@@ -94,7 +102,7 @@ Deno.serve(async (req) => {
 
       // Send page to AI to extract address and assistant information
       const info = await scrapeInfo(pageText);
-      console.log(`Scraped page for ${committee.Name}`, info);
+      console.info(`Scraped page for ${committee.Name}`, info);
 
       // Update legislator in DB with new information
       const updated: Committee = {
@@ -102,17 +110,10 @@ Deno.serve(async (req) => {
         Leadership: info
       };
       const upserted = await dao.updateLeadership(updated);
-      allUpserted.push(upserted);
+      allUpdated.push(upserted);
     }
-
-    const nextCheck = new Date();
-    nextCheck.setDate(nextCheck.getDate() + (sched.time_span ?? 1));
-    await updateScheduleDAO
-      .upsert({
-        ...sched,
-        last_update: nextCheck,
-      })
-    return standardResponse(origin, JSON.stringify(allUpserted));
+    console.log(`Saved ${allUpdated.length} records to the database.`);
+    return standardResponse(origin, `Updated ${allUpdated.length} records.`);
   } catch (err) {
     return errorResponse(origin, err);
   }

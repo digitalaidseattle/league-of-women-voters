@@ -6,7 +6,8 @@ import { corsResponse } from "../../shared/corsResponse.ts";
 import { errorResponse } from "../../shared/errorResponse.ts";
 import { standardResponse } from "../../shared/standardResponse.ts";
 import { Bill } from "../../shared/types.ts";
-import { UpdateScheduleDAO } from "../../shared/UpdateScheduleDAO.ts";
+import { UpdateSchedule, UpdateScheduleDAO } from "../../shared/UpdateScheduleDAO.ts";
+import { resetSchedule } from "../../shared/resetSchedule.ts";
 
 configure();
 const BASE_URL = "https://wslwebservices.leg.wa.gov/LegislationService.asmx";
@@ -32,45 +33,46 @@ Deno.serve(async (req) => {
   try {
     console.log("Starting legistation detail service...");
     const updateScheduleDAO = new UpdateScheduleDAO();
-    const billsDao = BillsDAO.getInstance();
 
-    const sched = await updateScheduleDAO
+    const sched: UpdateSchedule = await updateScheduleDAO
       .getByName('bill_detail_update');
 
-    const entities = await billsDao.findLastUpdateBefore(sched.last_update, 'detail_update')
-    if (entities.length === 0) {
-      console.log(`Updating to next time`);
-      const nextCheck = new Date();
-      nextCheck.setDate(nextCheck.getDate() + (sched.time_span ?? 1));
-      await updateScheduleDAO
-        .upsert({
-          ...sched,
-          last_update: nextCheck,
-        })
-    } else {
-      console.log(`Found ${entities.length} bill before ${sched.last_update}`);
-      while (entities.length > 0) {
-        // for (let i = 0; i < 1; i++) {
-        for (let i = 0; i < entities.length; i++) {
-          const dbBill = entities[i];
-          const detail = await fetchDetail(dbBill.bill);
-          const updated = {
-            ...dbBill,
-            bill: {
-              ...dbBill.bill,
-              ...detail,
-            },
-            PrimeSponsorID: detail.PrimeSponsorID,
-            detail_update: new Date()
-          }
-          await billsDao.upsert(updated);
-        }
-        console.log(`Updated ${entities.length} bills with detail information.`);
-      }
+    if (sched.next_update.getTime() > new Date().getTime()) {
+      console.info(`Not time to be updated`, sched.next_update);
+      return standardResponse(origin, `Not time to be updated`);
     }
 
+    const billsDao = BillsDAO.getInstance();
+    const entities = await billsDao.findLastUpdateBefore(sched.next_update, 'detail_update')
+    if (sched.next_update.getTime() > new Date().getTime()) {
+      console.info(`Not time to be updated`, sched.next_update);
+      return standardResponse(origin, `Not time to be updated`);
+    }
 
+    if (entities.length === 0) {
+      await resetSchedule(sched);
+      console.info(`Found nothing to update.  Nect scheduled check`, sched.next_update);
+      return standardResponse(origin, `Found nothing to update. Next check ${sched.next_update}`);
+    }
+
+    // for (let i = 0; i < 1; i++) {
+    for (let i = 0; i < entities.length; i++) {
+      const dbBill = entities[i];
+      const detail = await fetchDetail(dbBill.bill);
+      const updated = {
+        ...dbBill,
+        bill: {
+          ...dbBill.bill,
+          ...detail,
+        },
+        PrimeSponsorID: detail.PrimeSponsorID,
+        detail_update: new Date()
+      }
+      await billsDao.upsert(updated);
+    }
+    console.log(`Updated ${entities.length} bills with detail information.`);
     return standardResponse(origin, `Done`);
+
   } catch (err) {
     return errorResponse(origin, err);
   }

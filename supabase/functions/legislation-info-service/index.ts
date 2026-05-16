@@ -5,12 +5,14 @@ import { configure } from "../../shared/configuration.ts";
 import { corsResponse } from "../../shared/corsResponse.ts";
 import { errorResponse } from "../../shared/errorResponse.ts";
 import { standardResponse } from "../../shared/standardResponse.ts";
-import { DBBill } from "../../shared/types.ts";
+import { DBBill, LegislationInfo } from "../../shared/types.ts";
+import { UpdateSchedule, UpdateScheduleDAO } from "../../shared/UpdateScheduleDAO.ts";
+import { resetSchedule } from "../../shared/resetSchedule.ts";
 
 configure();
 const BASE_URL = "https://wslwebservices.leg.wa.gov/LegislationService.asmx";
 
-async function fetchData(year: number): Promise<DBBill[]> {
+async function fetchData(year: number): Promise<LegislationInfo[]> {
   const parser = new XMLParser();
 
   const url = `${BASE_URL}/GetLegislationByYear?year=${year}`;
@@ -18,22 +20,7 @@ async function fetchData(year: number): Promise<DBBill[]> {
   const xmlText = await response.text();
   const json = parser.parse(xmlText);
   const now = new Date();
-  const summaries = json["ArrayOfLegislationInfo"]["LegislationInfo"];
-  const bills: DBBill[] = [];
-  for (let i = 0; i < summaries.length; i++) {
-    const summary = summaries[i];
-    bills.push({
-      id: summary.BillId,
-      bill: {
-        ...summary,
-        Id: summary.BillId,        
-      },
-      updated_at: now,
-      OriginalAgency: summary.OriginalAgency
-    } as DBBill);
-  };
-
-  return bills;
+  return json["ArrayOfLegislationInfo"]["LegislationInfo"];
 }
 
 async function save(data: DBBill[]): Promise<DBBill[]> {
@@ -61,11 +48,56 @@ Deno.serve(async (req) => {
   try {
     console.log("Starting bill caching service...");
 
+    const updateScheduleDAO = new UpdateScheduleDAO();
+    const billsDao = BillsDAO.getInstance();
+
+    const sched: UpdateSchedule = await updateScheduleDAO
+      .getByName('bill_info_update');
+
+    if (sched.next_update.getTime() > new Date().getTime()) {
+      console.info(`Not time to be updated`, sched.next_update);
+      return standardResponse(origin, `Not time to be updated`);
+    }
     const year = 2025;  // TODO get year from request
-    const bills = await fetchData(year);
-    const savedBills = await save(bills);
-    console.log(`Saved ${savedBills.length} bills to the database.`);
-    return standardResponse(origin, `Updated ${savedBills.length} bills.`);
+    const infos = await fetchData(year);
+
+    const now = new Date();
+    const allUpdated: DBBill[] = [];
+
+    for (let i = 0; i < infos.length; i++) {
+      const info = infos[i];
+      const current = await billsDao.findById(info.BillId);
+      !current && console.log(info.BillId)
+
+      const updated = current
+        ? {
+          ...current,
+          bill: {
+            ...current.bill,
+            ...info
+          },
+          updated_at: now,
+          info_update: now,
+          OriginalAgency: info.OriginalAgency
+        }
+        : {
+          id: info.BillId,
+          bill: {
+            ...info
+          },
+          created_at: now,
+          updated_at: now,
+          info_update: now,
+          OriginalAgency: info.OriginalAgency
+        }
+      allUpdated.push(await billsDao.upsert(updated));
+    };
+
+    await resetSchedule(sched);
+
+    console.log(`Saved ${allUpdated.length} bills to the database.`);
+    return standardResponse(origin, `Updated ${allUpdated.length} bills.`);
+
   } catch (err) {
     return errorResponse(origin, err);
   }

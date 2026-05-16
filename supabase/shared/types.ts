@@ -55,7 +55,7 @@ export type DBBill = {
   SearchKey?: number;
 }
 
-type LegislationInfo = {
+export type LegislationInfo = {
   Biennium: string;
   BillId: string;
   BillNumber: string;
@@ -70,7 +70,7 @@ type LegislationInfo = {
   DisplayNumber: string;
 }
 
-type Legislation = {
+export type Legislation = {
   StateFiscalNote: boolean;
   LocalFiscalNote: boolean;
   Appropriations: boolean;
