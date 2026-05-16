@@ -37,7 +37,7 @@ export function HearingsSection({ bill }: { bill: Bill }) {
       <CardHeader title={BILL_CONSTANTS.hearing_date_label} />
       <Grid container sx={{ margin: 2 }}>
         <Grid size={12}>
-          {hearings.map((hearing, idx) => <Typography>{`${dayjs(hearing.CommitteeMeeting.RevisedDate).format('MM/DD/YYYY')}`}</Typography>)}
+          {hearings.map((hearing, idx) => <Typography key={idx}>{`${dayjs(hearing.CommitteeMeeting.RevisedDate).format('MM/DD/YYYY')}`}</Typography>)}
         </Grid>
       </Grid>
     </Card >

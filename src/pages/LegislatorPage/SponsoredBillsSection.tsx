@@ -5,13 +5,13 @@
  *
  */
 
-import { Card, CardHeader, Grid, Link } from '@mui/material';
+import { Card, CardHeader, Grid } from '@mui/material';
 import { useEffect, useState } from 'react';
+import { NavLink } from 'react-router-dom';
 import { Bill } from '../../api/bill';
 import { BillService } from '../../api/billService';
 import { sleep } from '../../utils/sleep';
 import { LEGISLATORS_CONSTANTS } from './constants';
-import { NavLink } from 'react-router-dom';
 
 export function SponsoredBillsSection({ legislator }: { legislator: Member }) {
   const [bills, setBills] = useState<Bill[]>([]);
