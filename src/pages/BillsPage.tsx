@@ -9,6 +9,7 @@ import { NavLink, useNavigate } from "react-router-dom";
 
 import {
   ExpandAltOutlined,
+  ExportOutlined,
   HomeOutlined,
   ReloadOutlined,
   SearchOutlined
@@ -41,6 +42,7 @@ const BILL_SEARCH_URL = "https://app.leg.wa.gov/billsearch/";
 const PAGE_SIZE = 25;
 
 export const BillsPage = () => {
+  const billService = BillService.getInstance();
   const apiRef = useGridApiRef();
   const navigate = useNavigate();
   const [search, setSearch] = useState("");
@@ -55,9 +57,8 @@ export const BillsPage = () => {
 
   function fetchData() {
     setLoading(true);
-    console.log(chamber)
     const filterItems: FilterItem[] = [];
-    const agency = chamber === 'house' ? "House" : (chamber === 'senate' ? "Senate" : undefined) ;
+    const agency = chamber === 'house' ? "House" : (chamber === 'senate' ? "Senate" : undefined);
     if (agency) {
       filterItems.push({
         field: 'OriginalAgency',
@@ -65,7 +66,6 @@ export const BillsPage = () => {
         value: agency
       })
     }
-    console.log(filterItems)
     BillService.getInstance()
       .find({
         ...paginationModel,
@@ -87,16 +87,14 @@ export const BillsPage = () => {
       type: "string",
       renderCell: (params) => {
         const { row } = params;
-        const year = row.Biennium.split('-')[0];
-        const billNumber = row.BillNumber
         return (<>
           <Link
             title={`Open WA Leg ${row.BillId}`}
-            href={`https://app.leg.wa.gov/billsummary/?BillNumber=${billNumber}&Year=${year}`}
+            href={billService.getBillUrl(row)}
             target="_blank"
             rel="noopener noreferrer"
           >
-            {row.BillId}
+            {row.BillId} <ExportOutlined />
           </Link>
         </>);
       }
@@ -122,6 +120,7 @@ export const BillsPage = () => {
           rel="noopener noreferrer"
         >
           {committee.Name}
+
         </NavLink>
       }
     },

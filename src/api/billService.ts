@@ -76,7 +76,6 @@ export class BillService {
     return this.dao.getById(id)
   }
 
-
   async findBillsBySponsor(sponsor: Member): Promise<Bill[]> {
     return this.dao.findByPrimarySponsor(sponsor.Id);
   }
@@ -97,6 +96,12 @@ export class BillService {
       ...pageInfo,
       rows: updated
     })
+  }
+
+  getBillUrl(bill: Bill): string {
+    const year = bill.Biennium.split('-')[0];
+    const billNumber = bill.BillNumber
+    return `https://app.leg.wa.gov/billsummary/?BillNumber=${billNumber}&Year=${year}`
   }
 
 

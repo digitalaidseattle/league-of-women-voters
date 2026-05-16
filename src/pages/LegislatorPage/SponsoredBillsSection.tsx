@@ -11,6 +11,7 @@ import { Bill } from '../../api/bill';
 import { BillService } from '../../api/billService';
 import { sleep } from '../../utils/sleep';
 import { LEGISLATORS_CONSTANTS } from './constants';
+import { NavLink } from 'react-router-dom';
 
 export function SponsoredBillsSection({ legislator }: { legislator: Member }) {
   const [bills, setBills] = useState<Bill[]>([]);
@@ -62,8 +63,9 @@ export function SponsoredBillsSection({ legislator }: { legislator: Member }) {
         {loaded && bills.map((bill, idx) => {
           return (
             <Grid key={idx} size={6}>
-              {/* <Link href={`/bill?number=${bill.Name}&name=${bill.Name}`}>{bill.Name}</Link> */}
-              <Link href={`/bill/${bill.BillId}`}>{getBillNumber(bill.BillId)}</Link>
+              <NavLink
+                title={`Open ${bill.BillId}`}
+                to={`/bill/${bill.BillId}`}>{getBillNumber(bill.BillId)}</NavLink>
             </Grid>
           )
         })}

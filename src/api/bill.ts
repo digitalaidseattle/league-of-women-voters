@@ -104,7 +104,7 @@ type Legislation = {
 
 type Bill = Entity & LegislationInfo & Legislation & {
   Sponsors?: Member[];
-  InCommittee?: Committee;  
+  InCommittee?: Committee;
 };
 
 type LegislativeDocument = {
@@ -145,6 +145,31 @@ type LegislativeDocument = {
   [key: string]: unknown;
 };
 
+type BillHearing = {
+  BillId: string;
+  Biennium: string;
+  CommitteeMeeting: {
+    AgendaId: number;
+    Agency: string;
+    Committees: Committee[];
+    Room: string;
+    Building: string;
+    Address: string;
+    City: string;
+    State: string;
+    ZipCode: string;
+    Date: Date;
+    Cancelled: boolean;
+    RevisedDate: Date;
+    ContactInformation: string;
+    CommitteeType: string;
+    Notes: string;
+  }
+  HearingType: string;
+  HearingTypeDescription: string;
+}
+
+
 type BillRow = {
   id: string;
   billNumber: string;
@@ -165,6 +190,7 @@ export type {
   Legislation,
   LegislationInfo,
   LegislativeDocument,
+  BillHearing,
   Bill,
   BillRow
 };

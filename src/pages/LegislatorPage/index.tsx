@@ -54,7 +54,6 @@ const LegislatorPage = () => {
           <CardHeader title={LEGISLATORS_CONSTANTS.not_founnd} />
         </Card>
       }
-
     </>
   )
 };

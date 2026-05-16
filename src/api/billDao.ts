@@ -5,7 +5,7 @@
  *
  */
 import { SupabaseClient } from '@supabase/supabase-js';
-import type { LegislativeDocument } from "./bill";
+import type { BillHearing, LegislativeDocument } from "./bill";
 import { SupabaseConfiguration } from '@digitalaidseattle/supabase';
 
 const DEFAULT_DOCUMENT_CLASS = "Bills";
@@ -96,6 +96,17 @@ export class BillDao {
     const { error, data } = await this.client.functions
       .invoke("legislation-services", {
         body: { operation: "GetSponsors", biennium: this.biennium, billNumber: billNumber }
+      })
+    if (error) {
+      throw error;
+    }
+    return Array.isArray(data) ? data : [data];
+  }
+
+  public async getBillHearings(billNumber: string): Promise<BillHearing[]> {
+    const { error, data } = await this.client.functions
+      .invoke("legislation-services", {
+        body: { operation: "GetHearings", biennium: this.biennium, billNumber: billNumber }
       })
     if (error) {
       throw error;

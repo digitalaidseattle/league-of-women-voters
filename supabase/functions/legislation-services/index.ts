@@ -65,12 +65,31 @@ class GetSponsorsWorker implements ServiceWorker<LegislationParams> {
 
 }
 
+class GetHearingsWorker implements ServiceWorker<LegislationParams> {
+
+  validate(_params: LegislationParams) {
+    // nothing to check
+  }
+
+  getLegUrl(params: LegislationParams): string {
+    return `${BASE_URL}/GetHearings?biennium=${params.biennium}&billNumber=${params.billNumber}`;
+  }
+
+  getEntities(json: any): any {
+    return json["ArrayOfHearing"]["Hearing"];
+  }
+
+}
+
+
 function getWorker(params: LegislationParams) {
   switch (params.operation) {
     case "GetLegislation":
       return new GetLegislationWorker();
     case "GetSponsors":
       return new GetSponsorsWorker();
+    case "GetHearings":
+      return new GetHearingsWorker();
     default:
       throw Error(`Unknown operation: ${params.operation}`)
   }
@@ -86,13 +105,15 @@ Deno.serve(async (req) => {
   }
 
   try {
-    const params = await req.json();
 
+    const params = await req.json();
+    console.log('Starting legislation service', params.operation)
     const worker = getWorker(params);
 
     worker.validate(params);
 
     const url = worker.getLegUrl(params);
+
     const response = await fetch(url);
 
     const xmlText = await response.text();
