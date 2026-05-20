@@ -65,7 +65,13 @@ export const BillsPage = () => {
         value: agency
       })
     }
-    console.log(filterItems)
+    if (search && search.trim() !== '') {
+      filterItems.push({
+        field: 'SearchKey',
+        operator: 'contains',
+        value: search
+      })
+    }
     BillService.getInstance()
       .find({
         ...paginationModel,

@@ -8,6 +8,7 @@ import { standardResponse } from "../../shared/standardResponse.ts";
 import { Bill } from "../../shared/types.ts";
 import { UpdateSchedule, UpdateScheduleDAO } from "../../shared/UpdateScheduleDAO.ts";
 import { resetSchedule } from "../../shared/resetSchedule.ts";
+import { calculateSearchKey } from "../../shared/calculateSearchKey.ts";
 
 configure();
 const BASE_URL = "https://wslwebservices.leg.wa.gov/LegislationService.asmx";
@@ -55,24 +56,27 @@ Deno.serve(async (req) => {
       return standardResponse(origin, `Found nothing to update. Next check ${sched.next_update}`);
     }
 
-    // for (let i = 0; i < 1; i++) {
+    const now = new Date();
     for (let i = 0; i < entities.length; i++) {
       const dbBill = entities[i];
       const detail = await fetchDetail(dbBill.bill);
-      const updated = {
-        ...dbBill,
-        bill: {
-          ...dbBill.bill,
-          ...detail,
-        },
-        PrimeSponsorID: detail.PrimeSponsorID,
-        detail_update: new Date()
+      const updatedBill = {
+        ...dbBill.bill,
+        ...detail,
       }
-      await billsDao.upsert(updated);
+      const searchKey = calculateSearchKey(updatedBill);
+      const updatedDBBill = {
+        ...dbBill,
+        bill: updatedBill,
+        updated_at: now,
+        detail_update: now,
+        PrimeSponsorID: detail.PrimeSponsorID,
+        SearchKey: searchKey
+      }
+      await billsDao.upsert(updatedDBBill);
     }
     console.log(`Updated ${entities.length} bills with detail information.`);
     return standardResponse(origin, `Done`);
-
   } catch (err) {
     return errorResponse(origin, err);
   }

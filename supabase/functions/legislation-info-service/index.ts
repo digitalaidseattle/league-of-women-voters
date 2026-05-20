@@ -5,9 +5,10 @@ import { configure } from "../../shared/configuration.ts";
 import { corsResponse } from "../../shared/corsResponse.ts";
 import { errorResponse } from "../../shared/errorResponse.ts";
 import { standardResponse } from "../../shared/standardResponse.ts";
-import { DBBill, LegislationInfo } from "../../shared/types.ts";
+import { Bill, DBBill, LegislationInfo } from "../../shared/types.ts";
 import { UpdateSchedule, UpdateScheduleDAO } from "../../shared/UpdateScheduleDAO.ts";
 import { resetSchedule } from "../../shared/resetSchedule.ts";
+import { calculateSearchKey } from "../../shared/calculateSearchKey.ts";
 
 configure();
 const BASE_URL = "https://wslwebservices.leg.wa.gov/LegislationService.asmx";
@@ -63,41 +64,31 @@ Deno.serve(async (req) => {
 
     const now = new Date();
     const allUpdated: DBBill[] = [];
-
     for (let i = 0; i < infos.length; i++) {
       const info = infos[i];
       const current = await billsDao.findById(info.BillId);
-      !current && console.log(info.BillId)
-
-      const updated = current
+      const updatedBill = current
         ? {
-          ...current,
-          bill: {
-            ...current.bill,
-            ...info
-          },
-          updated_at: now,
-          info_update: now,
-          OriginalAgency: info.OriginalAgency
+          ...current.bill,
+          ...info
         }
         : {
-          id: info.BillId,
-          bill: {
-            ...info
-          },
-          created_at: now,
-          updated_at: now,
-          info_update: now,
-          OriginalAgency: info.OriginalAgency
+          ...info
         }
-      allUpdated.push(await billsDao.upsert(updated));
+      const searchKey = calculateSearchKey(updatedBill as Bill);
+      const updatedDBBill = {
+        ...current,
+        bill: updatedBill,
+        updated_at: now,
+        info_update: now,
+        OriginalAgency: info.OriginalAgency,
+        SearchKey: searchKey
+      }
+      allUpdated.push(await billsDao.upsert(updatedDBBill));
     };
-
     await resetSchedule(sched);
-
     console.log(`Saved ${allUpdated.length} bills to the database.`);
     return standardResponse(origin, `Updated ${allUpdated.length} bills.`);
-
   } catch (err) {
     return errorResponse(origin, err);
   }
