@@ -8,7 +8,7 @@ import { standardResponse } from "../../shared/standardResponse.ts";
 import { Bill, DBBill, LegislationInfo } from "../../shared/types.ts";
 import { UpdateSchedule, UpdateScheduleDAO } from "../../shared/UpdateScheduleDAO.ts";
 import { resetSchedule } from "../../shared/resetSchedule.ts";
-import { calculateSearchKey } from "../../shared/calculateSearchKey.ts";
+import { calcSearchKey } from "../../shared/calcSearchKey.ts";
 
 configure();
 const BASE_URL = "https://wslwebservices.leg.wa.gov/LegislationService.asmx";
@@ -75,7 +75,7 @@ Deno.serve(async (req) => {
         : {
           ...info
         }
-      const searchKey = calculateSearchKey(updatedBill as Bill);
+      const searchKey = calcSearchKey(updatedBill as Bill);
       const updatedDBBill = {
         ...current,
         bill: updatedBill,

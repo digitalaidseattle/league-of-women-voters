@@ -55,7 +55,6 @@ export const BillsPage = () => {
 
   function fetchData() {
     setLoading(true);
-    console.log(chamber)
     const filterItems: FilterItem[] = [];
     const agency = chamber === 'house' ? "House" : (chamber === 'senate' ? "Senate" : undefined) ;
     if (agency) {
