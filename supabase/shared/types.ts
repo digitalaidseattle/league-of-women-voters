@@ -54,6 +54,7 @@ export type DBBill = {
   OriginalAgency?: string;
   PrimeSponsorID?: number;
   SearchKey?: number;
+  CommitteeName: string;
 }
 
 export type LegislationInfo = {

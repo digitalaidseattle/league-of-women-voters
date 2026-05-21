@@ -2,6 +2,14 @@ import { SupabaseConfiguration, SupabaseDAO } from "npm:@digitalaidseattle/supab
 import { Committee, DBCommittee } from "./types.ts";
 
 export class CommitteeDAO extends SupabaseDAO<DBCommittee> {
+  private static instance: CommitteeDAO;
+
+  public static getInstance(): CommitteeDAO {
+    if (!CommitteeDAO.instance) {
+      CommitteeDAO.instance = new CommitteeDAO();
+    }
+    return CommitteeDAO.instance;
+  }
 
   constructor() {
     super(SupabaseConfiguration.getInstance().getSupabaseClient(), 'Committees');

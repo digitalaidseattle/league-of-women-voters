@@ -1,7 +1,7 @@
 /**
-*  corsResponse.ts
+*  calcSearchKey.ts
 *
-*  @copyright 2025 Digital Aid Seattle
+*  @copyright 2026 Digital Aid Seattle
 *
 */
 
@@ -11,7 +11,7 @@ export function calcSearchKey(bill: Bill): string {
     return [
         bill.BillNumber,
         bill.LegalTitle,
-        // bill.committee,  FIXME
+        bill.InCommittee ? bill.InCommittee.Name : undefined,
         bill.CurrentStatus ? bill.CurrentStatus.Status : undefined,
         bill.CurrentStatus ? bill.CurrentStatus.HistoryLine : undefined,
     ]
