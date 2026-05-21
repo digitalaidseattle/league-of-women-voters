@@ -5,23 +5,48 @@ import { configure } from "../../shared/configuration.ts";
 import { corsResponse } from "../../shared/corsResponse.ts";
 import { errorResponse } from "../../shared/errorResponse.ts";
 import { standardResponse } from "../../shared/standardResponse.ts";
-import { Bill } from "../../shared/types.ts";
+import { Bill, Committee, DBCommittee, LegislationInfo } from "../../shared/types.ts";
 import { UpdateSchedule, UpdateScheduleDAO } from "../../shared/UpdateScheduleDAO.ts";
 import { resetSchedule } from "../../shared/resetSchedule.ts";
 import { calcSearchKey } from "../../shared/calcSearchKey.ts";
+import { CommitteeDAO } from "../../shared/CommitteeDAO.ts";
 
 configure();
-const BASE_URL = "https://wslwebservices.leg.wa.gov/LegislationService.asmx";
 const parser = new XMLParser();
 
-async function fetchDetail(bill: Bill): Promise<Bill> {
-  const bilUrl = `${BASE_URL}/GetLegislation?biennium=${bill.Biennium}&billNumber=${bill.BillNumber}`;
-  const response = await fetch(bilUrl);
-  const xml = await response.text();
-  const json = parser.parse(xml);
-  const legislation = json["ArrayOfLegislation"]["Legislation"];
-  return (Array.isArray(legislation) ? legislation : [legislation]).find((l: any) => l.BillId === bill.BillId) as Bill;
+async function fetchInCommitteeMap(biennium: string): Promise<Map<Committee, LegislationInfo[]>> {
+  const map = new Map<Committee, LegislationInfo[]>();
+
+  const committees: DBCommittee[] = await CommitteeDAO.getInstance().getAll();
+  console.log(`Committees found`, committees.length);
+
+  for (let i = 0; i < committees.length; i++) {
+    const committee = committees[i].committee;
+    const baseUrl = "https://wslwebservices.leg.wa.gov/CommitteeActionService.asmx";
+    const service = "GetInCommittee";
+    const eBiennium = encodeURIComponent(biennium);
+    const agency = encodeURIComponent(committee.Agency);
+    const committeeName = encodeURIComponent(committee.Name!);
+    const url = `${baseUrl}/${service}?biennium=${eBiennium}&agency=${agency}&committeeName=${committeeName}`
+    const response = await fetch(url);
+    const xmlText = await response.text();
+    const json = parser.parse(xmlText);
+    const infos = json["ArrayOfLegislationInfo"]["LegislationInfo"];
+    map.set(committee, infos)
+  }
+  return map
 }
+
+function findInCommittee(map: Map<Committee, LegislationInfo[]>, bill: Bill): Committee | null {
+  for (const [committee, infos] of map.entries()) {
+    if (infos) {
+      if (infos.find(info => info.BillId === bill.BillId)) {
+        return committee;
+      }
+    }
+  }
+  return null
+};
 
 Deno.serve(async (req) => {
   const origin = req.headers.get("origin") || "*";
@@ -32,11 +57,11 @@ Deno.serve(async (req) => {
   }
 
   try {
-    console.log("Starting legistation detail service...");
+    console.log("Starting legistation committee service...");
     const updateScheduleDAO = new UpdateScheduleDAO();
 
     const sched: UpdateSchedule = await updateScheduleDAO
-      .getByName('bill_detail_update');
+      .getByName('bill_committee_update');
 
     if (sched.next_update.getTime() > new Date().getTime()) {
       console.info(`Not time to be updated`, sched.next_update);
@@ -44,7 +69,7 @@ Deno.serve(async (req) => {
     }
 
     const billsDao = BillsDAO.getInstance();
-    const entities = await billsDao.findLastUpdateBefore(sched.next_update, 'detail_update')
+    const entities = await billsDao.findLastUpdateBefore(sched.next_update, 'committee_update')
     if (sched.next_update.getTime() > new Date().getTime()) {
       console.info(`Not time to be updated`, sched.next_update);
       return standardResponse(origin, `Not time to be updated`);
@@ -56,26 +81,29 @@ Deno.serve(async (req) => {
       return standardResponse(origin, `Found nothing to update. Next check ${sched.next_update}`);
     }
 
+    const params = await req.json();
+    const map = await fetchInCommitteeMap(params.biennium);
     const now = new Date();
     for (let i = 0; i < entities.length; i++) {
       const dbBill = entities[i];
-      const detail = await fetchDetail(dbBill.bill);
+      const committee = findInCommittee(map, dbBill.bill);
+
       const updatedBill = {
         ...dbBill.bill,
-        ...detail,
+        InCommittee: committee,
       }
       const searchKey = calcSearchKey(updatedBill);
       const updatedDBBill = {
         ...dbBill,
         bill: updatedBill,
         updated_at: now,
-        detail_update: now,
-        PrimeSponsorID: detail.PrimeSponsorID,
-        SearchKey: searchKey
+        committee_update: now,
+        SearchKey: searchKey,
+        CommitteeName: committee ? committee.Name : null
       }
       await billsDao.upsert(updatedDBBill);
     }
-    console.log(`Updated ${entities.length} bills with detail information.`);
+    console.log(`Updated ${entities.length} bills with committee information.`);
     return standardResponse(origin, `Done`);
   } catch (err) {
     return errorResponse(origin, err);

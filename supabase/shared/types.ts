@@ -49,10 +49,12 @@ export type DBBill = {
   created_at: Date;
   updated_at: Date;
   detail_update: Date;
+  committee_update: Date;
   bill: Bill;
   OriginalAgency?: string;
   PrimeSponsorID?: number;
   SearchKey?: number;
+  CommitteeName: string;
 }
 
 export type LegislationInfo = {
@@ -100,4 +102,4 @@ export type Legislation = {
   }
 };
 
-export type Bill = LegislationInfo & Legislation
+export type Bill = LegislationInfo & Legislation & { InCommittee: Committee | null }

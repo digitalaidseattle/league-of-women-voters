@@ -8,25 +8,22 @@ import { useContext, useEffect, useState } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
 
 import {
-  ExpandAltOutlined,
   HomeOutlined,
-  ReloadOutlined,
-  SearchOutlined
+  ReloadOutlined
 } from "@ant-design/icons";
 import {
   Breadcrumbs,
   Card,
   CardHeader,
   IconButton,
-  InputAdornment,
   Link,
-  TextField,
   Tooltip,
   Typography
 } from "@mui/material";
 import {
   DataGrid,
   GridColDef,
+  GridFilterModel,
   Toolbar,
   useGridApiRef
 } from "@mui/x-data-grid";
@@ -36,8 +33,9 @@ import type { Bill } from "../api/bill";
 import { BillService } from "../api/billService";
 import { CHAMBER_TYPE, ChamberButtonGroup } from "../components/ChamberButtonGroup";
 import { LoadingOverlay } from "../components/LoadingOverlay";
+import { SearchField } from "../components/SearchField";
+import { GridSortModel } from "@mui/x-data-grid";
 
-const BILL_SEARCH_URL = "https://app.leg.wa.gov/billsearch/";
 const PAGE_SIZE = 25;
 
 export const BillsPage = () => {
@@ -45,19 +43,24 @@ export const BillsPage = () => {
   const navigate = useNavigate();
   const [search, setSearch] = useState("");
   const [paginationModel, setPaginationModel] = useState({ page: 0, pageSize: PAGE_SIZE });
+  const [sortModel, setSortModel] = useState<GridSortModel>([{ field: 'id', sort: 'asc' }]);
+  const [filterModel, setFilterModel] = useState<GridFilterModel>({ items: [] });
   const [pageInfo, setPageInfo] = useState<PageInfo<Bill>>({ rows: [], totalRowCount: 0, });
   const { loading, setLoading } = useContext(LoadingContext);
   const [chamber, setChamber] = useState<CHAMBER_TYPE>('all');
 
   useEffect(() => {
     fetchData();
-  }, [chamber, search, paginationModel]);
+  }, [chamber, search, paginationModel, sortModel, filterModel]);
+
+  useEffect(() => {
+    console.log(filterModel);
+  }, [filterModel]);
 
   function fetchData() {
     setLoading(true);
-    console.log(chamber)
     const filterItems: FilterItem[] = [];
-    const agency = chamber === 'house' ? "House" : (chamber === 'senate' ? "Senate" : undefined) ;
+    const agency = chamber === 'house' ? "House" : (chamber === 'senate' ? "Senate" : undefined);
     if (agency) {
       filterItems.push({
         field: 'OriginalAgency',
@@ -65,12 +68,29 @@ export const BillsPage = () => {
         value: agency
       })
     }
-    console.log(filterItems)
+    if (search && search.trim() !== '') {
+      filterItems.push({
+        field: 'SearchKey',
+        operator: 'contains',
+        value: search
+      })
+    }
+    if (filterModel && filterModel.items.length > 0) {
+      const filterItem = filterModel.items[0];
+      filterItems.push({
+        field: filterItem.field,
+        operator: filterItem.operator,
+        value: filterItem.value
+      })
+    }
+
+    const sortField = sortModel && sortModel.length > 0 ? sortModel![0].field : '';
+    const sortDirection = sortModel && sortModel.length > 0 ? sortModel![0].sort : '';
     BillService.getInstance()
       .find({
         ...paginationModel,
-        sortField: 'id',
-        sortDirection: 'asc',
+        sortField: sortField,
+        sortDirection: sortDirection,
         filterModel: {
           items: filterItems
         }
@@ -81,7 +101,7 @@ export const BillsPage = () => {
 
   const columns: GridColDef<Bill>[] = [
     {
-      field: "BillId",
+      field: "id",
       headerName: "Bill",
       width: 120,
       type: "string",
@@ -105,10 +125,12 @@ export const BillsPage = () => {
       field: "Active",
       headerName: "Active",
       width: 120,
-      type: "boolean"
+      type: "boolean",
+      filterable: false,
+      sortable: false,
     },
     {
-      field: "committee",
+      field: "CommitteeName",
       headerName: "In Committee",
       width: 240,
       type: "string",
@@ -130,7 +152,9 @@ export const BillsPage = () => {
       headerName: "Title",
       flex: 1,
       minWidth: 260,
-      type: "string"
+      type: "string",
+      filterable: false,
+      sortable: false,
     },
     {
       field: "history",
@@ -141,7 +165,10 @@ export const BillsPage = () => {
       renderCell: (params) => {
         const { row } = params;
         return row.CurrentStatus ? row.CurrentStatus.HistoryLine : 'n/a';
-      }
+      },
+      filterable: false,
+      sortable: false,
+
     },
     {
       field: "status",
@@ -151,7 +178,9 @@ export const BillsPage = () => {
       renderCell: (params) => {
         const { row } = params;
         return row.CurrentStatus ? row.CurrentStatus.Status : 'n/a';
-      }
+      },
+      filterable: false,
+      sortable: false,
     }
   ];
 
@@ -165,30 +194,7 @@ export const BillsPage = () => {
         <ChamberButtonGroup
           chamber={chamber}
           onChange={handleChamberChange} />
-        <TextField
-          value={search}
-          onChange={(event) => setSearch(event.target.value)}
-          size="small"
-          placeholder="Search"
-          sx={{ width: 220, mr: 1.5 }}
-          slotProps={{
-            input: {
-              startAdornment: (
-                <InputAdornment position="start">
-                  <SearchOutlined />
-                </InputAdornment>
-              )
-            }
-          }}
-        />
-        <Tooltip title="Open Bill Search">
-          <IconButton
-            color="primary"
-            onClick={() => window.open(BILL_SEARCH_URL, "_blank", "noopener")}
-          >
-            <ExpandAltOutlined />
-          </IconButton>
-        </Tooltip>
+        <SearchField value={search} onChange={(value) => setSearch(value)} />
         <Tooltip title="Refresh">
           <IconButton color="primary" size="small" onClick={fetchData}>
             <ReloadOutlined />
@@ -217,9 +223,13 @@ export const BillsPage = () => {
         rowCount={pageInfo.totalRowCount}
         onPaginationModelChange={setPaginationModel}
 
-        // TODO add sort & filter models,  will need to add to DBBill
-        // sortingMode="server"
-        // sortModel={sortModel}
+        sortingMode="server"
+        sortModel={sortModel}
+        onSortModelChange={setSortModel}
+
+        filterMode="server"
+        filterModel={filterModel}
+        onFilterModelChange={setFilterModel}
 
         pageSizeOptions={[10, 25, 50, 100]}
         onRowDoubleClick={params => navigate(`/bill/${params.row.BillId}`)}

@@ -5,12 +5,16 @@ import { Bill } from "../bill";
 import { DAO } from "../DAO";
 
 export type DBBill = {
-    id: Identifier,
-    created_at: Date,
-    updated_at: Date,
-    bill: Bill,
-    OriginalAgency?: string,
-    PrimeSponsorID?: number
+  id: Identifier;
+  created_at: Date;
+  updated_at: Date;
+  detail_update: Date;
+  committee_update: Date;
+  bill: Bill;
+  OriginalAgency?: string;
+  PrimeSponsorID?: number;
+  SearchKey?: number;
+  CommitteeName: string;
 }
 
 class IternalBillsDAO extends SupabaseDAO<DBBill> {

@@ -1,1 +1,2 @@
-delete from "Bills"
+UPDATE "Bills"
+SET committee_update = null
