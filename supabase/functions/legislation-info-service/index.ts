@@ -73,11 +73,12 @@ Deno.serve(async (req) => {
           ...info
         }
         : {
-          ...info
+          ...info,
         }
       const searchKey = calcSearchKey(updatedBill as Bill);
       const updatedDBBill = {
         ...current,
+        id: current ? current.id : updatedBill.BillId,
         bill: updatedBill,
         updated_at: now,
         info_update: now,
