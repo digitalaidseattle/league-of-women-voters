@@ -37,8 +37,6 @@ export function InfoSection({ bill }: { bill: Bill }) {
         </Grid>
         <Grid size={4}>{BILL_CONSTANTS.title_label}:</Grid>
         <Grid size={8}>{bill.LegalTitle}</Grid>
-        <Grid size={4}>{BILL_CONSTANTS.hearing_date_label}:</Grid>
-        <Grid size={8}>{'N/A'}</Grid>
         <Grid size={4}>{BILL_CONSTANTS.status}:</Grid>
         <Grid size={8}>{bill.CurrentStatus.Status}</Grid>
         <Grid size={4}>{BILL_CONSTANTS.history}:</Grid>
