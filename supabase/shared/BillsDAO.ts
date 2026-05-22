@@ -1,3 +1,4 @@
+import { Identifier } from "npm:@digitalaidseattle/core";
 import { SupabaseConfiguration, SupabaseDAO } from "npm:@digitalaidseattle/supabase";
 import { DBBill } from "./types.ts";
 

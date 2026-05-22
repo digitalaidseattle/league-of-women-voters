@@ -117,6 +117,7 @@ Deno.serve(async (req) => {
     return standardResponse(origin, `Updated ${allUpdated.length} records.`);
 
   } catch (err) {
+    console.error(err);
     return errorResponse(origin, err);
   }
 });

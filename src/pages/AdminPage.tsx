@@ -3,16 +3,10 @@ import { NavLink } from "react-router-dom";
 // material-ui
 import { HomeOutlined } from "@ant-design/icons";
 import { useNotifications } from "@digitalaidseattle/core";
+import { SupabaseConfiguration } from "@digitalaidseattle/supabase";
 import { Breadcrumbs, Button, Card, CardContent, CardHeader, IconButton, Stack, Typography } from '@mui/material';
 import { useState } from "react";
-import { BillDao } from "../api/billDao";
-import { CommitteeDao } from "../api/committeeDao";
-import { BillsDB } from "../api/database/BillsDB";
-import { CommitteesDB } from "../api/database/CommitteesDB";
-import { SponsorsDB } from "../api/database/SponsorsDB";
-import { LegislatorDao } from "../api/legislatorDao";
 import { LoadingOverlay } from "../components/LoadingOverlay";
-import { SupabaseConfiguration } from "@digitalaidseattle/supabase";
 
 // project import
 
@@ -23,99 +17,26 @@ export const AdminPage = () => {
     const [loading, setLoading] = useState(false);
     const notify = useNotifications();
 
-    function loadLegislators(): void {
-        setLoading(true);
-        LegislatorDao.getInstance()
-            .getAll()
-            .then(legislators => SponsorsDB.getInstance().upsert(legislators))
-            .catch(error => {
-                console.log(error);
-                notify.error('Failed to load.')
-            })
-            .finally(() => {
-                notify.success('Loaded committees.')
-                setLoading(false)
-            });
-    }
-
-    function loadCommittees(): void {
-        setLoading(true);
-        CommitteeDao.getInstance()
-            .getAll()
-            .then(committees => CommitteesDB.getInstance().upsert(committees))
-            .catch(error => {
-                console.log(error);
-                notify.error('Failed to load.')
-            })
-            .finally(() => {
-                notify.success('Loaded legislators.')
-                setLoading(false)
-            });
-    }
-
-    async function loadBillSponsors(): Promise<void> {
+    async function legislatorJob(): Promise<void> {
         setLoading(true);
         try {
-            const bills = await BillsDB.getInstance().getAll();
-            for (let i = 0; i < bills.length; i++) {
-                const bill = bills[i];
-                try {
-                    BillDao.getInstance()
-                        .getBillSponsors(bill.BillNumber)
-                        .then(async sponsors => {
-                            const updated = {
-                                ...bill,
-                                Sponsors: sponsors
-                            }
-                            await BillsDB.getInstance()
-                                .upsert(updated);
-                        });
-                }
-                catch (error) {
-                    console.log(error);
-                    notify.error(`Failed to load sponsors. ${name}`);
-                    throw (error);
-                }
-            }
-            notify.success('Loaded bill sponsors.')
-            console.log('Done');
-        }
-        finally {
-            setLoading(false)
-        };
-    }
-
-    async function loadCommitteMembers(): Promise<void> {
-        setLoading(true);
-        try {
-            const checkDate = new Date();
-
-            const committees = await CommitteesDB.getInstance()
-                .findLastUpdateBefore(checkDate, 'membership_update');
-            const now = new Date().toISOString();
-            committees.forEach(async committee => {
-                await CommitteeDao.getInstance()
-                    .getCommitteeMembers(committee.Agency, committee.Name)
-                    .then(async members => {
-                        const updated = {
-                            ...committee,
-                            membership_update: now,
-                            Members: members
-                        }
-                        await CommitteesDB.getInstance()
-                            .updateMembership(updated);
-                    })
-            });
+            SupabaseConfiguration.getInstance()
+                .getSupabaseClient().functions
+                .invoke("legislator-services", {
+                    body: { biennium: "2025-26" },
+                })
+                .then((resp: any) => resp.data);
         }
         catch (error) {
             console.log(error);
             notify.error('Failed to load.')
         }
         finally {
-            notify.success('Loaded committe members.')
+            notify.success('Loaded legislators.')
             setLoading(false)
         };
     }
+
 
     async function legislatorInfoJob(): Promise<void> {
         setLoading(true);
@@ -131,6 +52,45 @@ export const AdminPage = () => {
         }
         finally {
             notify.success('Loaded committe members.')
+            setLoading(false)
+        };
+    }
+
+    async function loadCommitteMembersJob(): Promise<void> {
+        setLoading(true);
+        try {
+            SupabaseConfiguration.getInstance()
+                .getSupabaseClient().functions
+                .invoke("committee-membership-service", {
+                    body: { biennium: "2025-26" },
+                })
+                .then((resp: any) => resp.data);
+        }
+        catch (error) {
+            console.log(error);
+            notify.error('Failed to load.')
+        }
+        finally {
+            notify.success('Loaded committe members.')
+            setLoading(false)
+        };
+    }
+
+
+    async function loadCommitteesJob(): Promise<void> {
+        setLoading(true);
+        try {
+            SupabaseConfiguration.getInstance()
+                .getSupabaseClient().functions
+                .invoke("committee-info-service")
+                .then((resp: any) => resp.data);
+        }
+        catch (error) {
+            console.log(error);
+            notify.error('Failed to load.')
+        }
+        finally {
+            notify.success('Loaded committees.')
             setLoading(false)
         };
     }
@@ -152,7 +112,6 @@ export const AdminPage = () => {
             setLoading(false)
         };
     }
-
 
     async function billInfoCachingJob(): Promise<void> {
         setLoading(true);
@@ -210,6 +169,26 @@ export const AdminPage = () => {
         };
     }
 
+    async function billSponsorsCachingJob(): Promise<void> {
+        setLoading(true);
+        try {
+            SupabaseConfiguration.getInstance()
+                .getSupabaseClient().functions
+                .invoke("legislation-sponsors-service", {
+                    body: { biennium: "2025-26" },
+                })
+                .then((resp: any) => resp.data);
+        }
+        catch (error) {
+            console.log(error);
+            notify.error('Failed to load.')
+        }
+        finally {
+            notify.success('Loaded bill sponsors.')
+            setLoading(false)
+        };
+    }
+
 
     return (<>
         <LoadingOverlay loading={loading} />
@@ -221,17 +200,17 @@ export const AdminPage = () => {
             <CardHeader title={'Admin'} />
             <CardContent>
                 <Stack>
-                    <Button onClick={loadLegislators}>Load Legislators</Button>
-                    <Button onClick={loadCommittees}>Load Committees</Button>
-                    <Button onClick={loadBillSponsors}>Load Bill Sponsors</Button>
-                    <Button onClick={loadCommitteMembers}>Load Committee Members</Button>
+                    <Button onClick={legislatorJob}>Edge load Legislators</Button>
+                    <Button onClick={legislatorInfoJob}>Edge load Legislator Info</Button>
                     <hr />
-                    <Button onClick={legislatorInfoJob}>Edge load Legislator </Button>
+                    <Button onClick={loadCommitteesJob}>Edge Load Committees</Button>
+                    <Button onClick={loadCommitteMembersJob}>Edge Load Committee Members</Button>
                     <Button onClick={committeeLeadershipJob}>Edge load Committee Leadership</Button>
-                    <Button onClick={billInfoCachingJob}>Edge load Bill Infos</Button>
+                    <hr />
+                    <Button onClick={billInfoCachingJob}>Edge load Bills</Button>
                     <Button onClick={billDetailCachingJob}>Edge load Bill Details</Button>
                     <Button onClick={billCommitteeCachingJob}>Edge load Bill Committee</Button>
-
+                    <Button onClick={billSponsorsCachingJob}>Edge load Bill Sponsors</Button>
                 </Stack>
             </CardContent>
         </Card>

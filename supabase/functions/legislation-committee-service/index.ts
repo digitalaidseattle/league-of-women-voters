@@ -70,11 +70,6 @@ Deno.serve(async (req) => {
 
     const billsDao = BillsDAO.getInstance();
     const entities = await billsDao.findLastUpdateBefore(sched.next_update, 'committee_update')
-    if (sched.next_update.getTime() > new Date().getTime()) {
-      console.info(`Not time to be updated`, sched.next_update);
-      return standardResponse(origin, `Not time to be updated`);
-    }
-
     if (entities.length === 0) {
       await resetSchedule(sched);
       console.info(`Found nothing to update.  Nect scheduled check`, sched.next_update);
@@ -103,7 +98,7 @@ Deno.serve(async (req) => {
       }
       await billsDao.upsert(updatedDBBill);
     }
-    console.log(`Updated ${entities.length} bills with committee information.`);
+    console.info(`Updated ${entities.length} bills with committee information.`);
     return standardResponse(origin, `Done`);
   } catch (err) {
     return errorResponse(origin, err);

@@ -88,7 +88,7 @@ Deno.serve(async (req) => {
       allUpdated.push(await billsDao.upsert(updatedDBBill));
     };
     await resetSchedule(sched);
-    console.log(`Saved ${allUpdated.length} bills to the database.`);
+    console.info(`Saved ${allUpdated.length} bills to the database.`);
     return standardResponse(origin, `Updated ${allUpdated.length} bills.`);
   } catch (err) {
     return errorResponse(origin, err);

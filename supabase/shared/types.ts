@@ -102,4 +102,9 @@ export type Legislation = {
   }
 };
 
-export type Bill = LegislationInfo & Legislation & { InCommittee: Committee | null }
+export type Bill = LegislationInfo
+  & Legislation
+  & {
+    Sponsors?: Member[];
+    InCommittee: Committee | null;
+  };
