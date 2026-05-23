@@ -1,17 +1,12 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { supabaseClient } from "@digitalaidseattle/supabase";
-import type { LegislativeDocument } from "./bill";
-
-
-const CURRENT_BIENNIUM = import.meta.env.VITE_LWVW_CURRENT_BIENNIUM;
-if (!CURRENT_BIENNIUM) {
-  throw new Error("VITE_LWVW_CURRENT_BIENNIUM is required but was not provided.");
-}
+import { Identifier } from "@digitalaidseattle/core";
+import { LegislationInfo } from "./bill";
+import { CommitteeDao } from "./committeeDao";
+import { CommitteesDB } from "./database/CommitteesDB";
 
 class LegislatureService {
-  private static instance: LegislatureService;
 
-  private constructor() { }
+  private static instance: LegislatureService;
 
   public static getInstance(): LegislatureService {
     if (!LegislatureService.instance) {
@@ -20,53 +15,48 @@ class LegislatureService {
     return LegislatureService.instance;
   }
 
-  public async getSponsors(): Promise<Member[]> {
-    return supabaseClient.functions
-      .invoke("sponsors", {
-        body: { biennium: CURRENT_BIENNIUM },
-      })
-      .then((resp: any) => resp.data as Member[]);
+  dao: CommitteesDB;
+
+  private constructor() {
+    this.dao = CommitteesDB.getInstance();
   }
 
-  public async getCommittees(): Promise<Committee[]> {
-    return supabaseClient.functions
-      .invoke("committee-services", {
-        body: { operation: 'GetActiveCommittees' },
-      })
-      .then((resp: any) => resp.data as Committee[]);
+  async getAll(): Promise<Committee[]> {
+    return this.dao.getAll();
   }
 
-  public async getCommitteeMembers(
+  async getById(id: Identifier) {
+    return this.dao.getById(id);
+  }
+
+  async findCommitteesByMember(member: Member): Promise<Committee[]> {
+    const committees = await this.getAll();
+    return committees.filter(committee =>
+      (committee.Members ?? []).find(mem => mem.Name === member.Name) !== undefined
+    )
+  }
+
+  async getCommitteeMembers(
     agency: string,
     committeeName: string,
   ): Promise<Member[]> {
-    return supabaseClient.functions
-      .invoke("committee-services", {
-        body: { operation: 'GetActiveCommitteeMembers', agency: agency, committeeName: committeeName },
-      })
-      .then((resp: any) => resp.data as Member[]);
+    return CommitteeDao.getInstance().getCommitteeMembers(agency, committeeName);
   }
 
-  public async GetCommitteeReferralsByCommittee(
+  async GetCommitteeReferralsByCommittee(
     agency: string,
     committeeName: string,
   ): Promise<Member[]> {
-    return supabaseClient.functions
-      .invoke("committee-services", {
-        body: { operation: 'GetCommitteeReferralsByCommittee', biennium: CURRENT_BIENNIUM, agency: agency, committeeName: committeeName },
-      })
-      .then((resp: any) => resp.data as Member[]);
+    return CommitteeDao.getInstance().getCommitteeReferralsByCommittee(agency, committeeName);
   }
 
-  public async getBills(
-    documentClass: string,
-  ): Promise<LegislativeDocument[]> {
-    return supabaseClient.functions
-      .invoke("bills-services", {
-        body: { biennium: CURRENT_BIENNIUM, documentClass },
-      })
-      .then((resp: any) => resp.data as LegislativeDocument[]);
+  async getInCommittee(
+    agency: string,
+    committeeName: string,
+  ): Promise<LegislationInfo[]> {
+    return CommitteeDao.getInstance().getInCommittee(agency, committeeName);
   }
 }
+
 
 export { LegislatureService };

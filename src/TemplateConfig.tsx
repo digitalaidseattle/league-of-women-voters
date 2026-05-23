@@ -2,7 +2,9 @@
 
 import {
     FileTextOutlined,
-    TeamOutlined
+    TeamOutlined,
+    ToolOutlined,
+    UserOutlined
 } from '@ant-design/icons';
 import logo from "./assets/images/LWV_Logo2_500x337_rgb.jpg";
 
@@ -14,7 +16,6 @@ export const TemplateConfig = () => {
         id: 'example',
         type: 'group',
         children: [
-
             {
                 id: 'committees',
                 title: 'Committees',
@@ -23,11 +24,11 @@ export const TemplateConfig = () => {
                 icon: <TeamOutlined />
             } as MenuItem,
             {
-                id: 'sponsors',
-                title: 'Sponsors',
+                id: 'legislators',
+                title: 'Legislators',
                 type: 'item',
-                url: '/sponsors',
-                icon: <TeamOutlined />
+                url: '/legislators',
+                icon: <UserOutlined />
             } as MenuItem,
             {
                 id: 'bills',
@@ -35,13 +36,21 @@ export const TemplateConfig = () => {
                 type: 'item',
                 url: '/bills',
                 icon: <FileTextOutlined />
-            } as MenuItem,
+            } as MenuItem
+        ]
+    } as MenuItem;
+
+    const admin = {
+        id: 'admin',
+        type: 'group',
+        title: 'Admin',
+        children: [
             {
-                id: 'legislators',
-                title: 'Legislators',
+                id: 'adminPage',
+                title: 'Caching Tools',
                 type: 'item',
-                url: '/legislators',
-                icon: <TeamOutlined />
+                url: '/admin',
+                icon: <ToolOutlined />
             } as MenuItem
         ]
     } as MenuItem;
@@ -50,7 +59,7 @@ export const TemplateConfig = () => {
         appName: 'League of Women Voters',
         logoUrl: logo,
         drawerWidth: 240,
-        menuItems: [pages],
+        menuItems: [pages, admin],
         toolbarItems: [],
         version: packageJson.version,
     });

@@ -4,23 +4,23 @@
  *  @copyright 2024 Digital Aid Seattle
  *
  */
-// project import
+import React, { useEffect } from 'react';
+import { createBrowserRouter, RouterProvider } from 'react-router-dom';
+
 import {
   AuthServiceProvider,
+  setCoreServices,
   StorageServiceProvider,
   UserContextProvider
 } from "@digitalaidseattle/core";
 import { LayoutConfigurationProvider } from "@digitalaidseattle/mui";
-import React from 'react';
-import { RouterProvider, createBrowserRouter } from 'react-router-dom';
+import { SupabaseAuthService, SupabaseConfiguration, SupabaseStorageService } from '@digitalaidseattle/supabase';
 
-import {
-  SupabaseAuthService,
-  SupabaseStorageService
-} from '@digitalaidseattle/supabase';
+// project import
 import { routes } from './pages/routes';
 import { TemplateConfig } from './TemplateConfig';
 
+// Styles
 import "./App.css";
 
 // ==============================|| APP - THEME, ROUTER, LOCAL  ||============================== //
@@ -28,9 +28,29 @@ import "./App.css";
 const router = createBrowserRouter(routes);
 
 const App: React.FC = () => {
-  return (
-    <AuthServiceProvider authService={new SupabaseAuthService()} >
-      <StorageServiceProvider storageService={new SupabaseStorageService()} >
+  const [initialized, setInitialized] = React.useState<boolean>(false);
+
+  useEffect(() => {
+    configure();
+  }, []);
+
+  function configure() {
+    SupabaseConfiguration.props({
+      supabaseUrl: import.meta.env.VITE_SUPABASE_URL,
+      anonKey: import.meta.env.VITE_SUPABASE_ANON_KEY
+    });
+
+    setCoreServices({
+      authService: SupabaseAuthService.getInstance(),
+      storageService: SupabaseStorageService.getInstance()
+    })
+
+    setInitialized(true);
+
+  }
+  return (initialized &&
+    <AuthServiceProvider authService={SupabaseAuthService.getInstance()} >
+      <StorageServiceProvider storageService={SupabaseStorageService.getInstance()} >
         <UserContextProvider>
           <LayoutConfigurationProvider configuration={TemplateConfig()}>
             <RouterProvider router={router} />

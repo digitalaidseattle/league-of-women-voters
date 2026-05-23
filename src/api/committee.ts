@@ -1,5 +1,3 @@
-// This is mainly for documentation purposes, as the API is not used directly in the codebase.
-
 
 type Committee = {
   Acronym: string;
@@ -8,6 +6,8 @@ type Committee = {
   LongName: string;
   Name: string;
   Phone: string;
+  Members: Member[];
+  Leadership: { role: string, name: string }[]
 };
 
 type Member = {
@@ -22,6 +22,8 @@ type Member = {
   Email: string;
   FirstName: string;
   LastName: string;
+  Address?: string;
+  LegislativeAssistant?: { name: string, phone: string }[];
 };
 
 type LegislationInfo = {

@@ -1,5 +1,9 @@
-import CommitteesPage from './extra-pages/CommitteesPage';
-
+/**
+ *  Routes.tsx
+ *
+ *  @copyright 2026 Digital Aid Seattle
+ *
+ */
 import {
   Error,
   Login,
@@ -7,12 +11,13 @@ import {
   MarkdownPage,
   MinimalLayout
 } from "@digitalaidseattle/mui";
-import CommitteePage from './extra-pages/CommitteePage';
-import BillsPage from './extra-pages/BillsPage';
-import BillDetailPage from './extra-pages/BillDetailPage';
-import SponsorPage from './extra-pages/SponsorPage';
-import SponsorsPage from './extra-pages/SponsorsPage';
-import LegislatorsPage from './extra-pages/LegislatorsPage';
+import { AdminPage } from "./AdminPage";
+import { BillPage } from "./BillPage";
+import { BillsPage } from "./BillsPage";
+import CommitteePage from './CommitteePage';
+import CommitteesPage from './CommitteesPage';
+import SponsorPage from './LegislatorPage';
+import { LegislatorsPage } from './LegislatorsPage';
 
 const routes = [
   {
@@ -32,28 +37,32 @@ const routes = [
         element: <CommitteePage />,
       },
       {
+        path: "committee/:id",
+        element: <CommitteePage />,
+      },
+      {
         path: "bills",
         element: <BillsPage />,
       },
       {
-        path: "bill",
-        element: <BillDetailPage />,
-      },
-      {
-        path: "sponsors",
-        element: <SponsorsPage />,
-      },
-      {
-        path: "sponsor",
-        element: <SponsorPage />,
+        path: "bill/:id",
+        element: <BillPage />,
       },
       {
         path: "legislators",
         element: <LegislatorsPage />,
       },
       {
+        path: "legislator/:id",
+        element: <SponsorPage />,
+      },
+      {
+        path: "admin",
+        element: <AdminPage />,
+      },
+      {
         path: "privacy",
-        element: <MarkdownPage filepath='privacy.md'/>,
+        element: <MarkdownPage filepath='privacy.md' />,
       }
     ]
   },
