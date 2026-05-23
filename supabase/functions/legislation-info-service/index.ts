@@ -20,7 +20,6 @@ async function fetchData(year: number): Promise<LegislationInfo[]> {
   const response = await fetch(url);
   const xmlText = await response.text();
   const json = parser.parse(xmlText);
-  const now = new Date();
   return json["ArrayOfLegislationInfo"]["LegislationInfo"];
 }
 
@@ -34,9 +33,7 @@ async function save(data: DBBill[]): Promise<DBBill[]> {
     console.log(`Saved bill summary ${bill.id} to the database.`);
   }
   return saved;
-
 }
-
 
 Deno.serve(async (req) => {
   const origin = req.headers.get("origin") || "*";

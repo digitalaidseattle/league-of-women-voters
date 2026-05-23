@@ -1,5 +1,4 @@
 import { Identifier } from "@digitalaidseattle/core";
-import { DAO } from "./DAO";
 import { SponsorsDB } from "./database/SponsorsDB";
 
 class LegislatorService {
@@ -13,7 +12,7 @@ class LegislatorService {
     }
 
     biennium: string;
-    dao: DAO<Member>;
+    dao: SponsorsDB;
 
     constructor() {
         const current = import.meta.env.VITE_LWVW_CURRENT_BIENNIUM;

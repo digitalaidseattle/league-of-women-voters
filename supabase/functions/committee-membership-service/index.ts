@@ -61,7 +61,7 @@ Deno.serve(async (req) => {
       const detail = await fetchDetail(dbCommittee.committee, params.biennium);
       const updatedCommittee = {
         ...dbCommittee.committee,
-        ...detail,
+        Members: detail,
       }
       // const searchKey = calcCommitteeSearchKey(updatedCommittee);
       const updatedDBCommittee = {

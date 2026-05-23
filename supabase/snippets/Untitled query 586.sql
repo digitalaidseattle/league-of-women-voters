@@ -1,2 +1,2 @@
-UPDATE "Bills"
-SET committee_update = null
+UPDATE "Committees"
+SET membership_update = null

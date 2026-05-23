@@ -1,9 +1,8 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { Identifier } from "@digitalaidseattle/core";
-import { CommitteeDao } from "./committeeDao";
-import { DAO } from "./DAO";
-import { CommitteesDB } from "./database/CommitteesDB";
 import { LegislationInfo } from "./bill";
+import { CommitteeDao } from "./committeeDao";
+import { CommitteesDB } from "./database/CommitteesDB";
 
 class LegislatureService {
 
@@ -16,7 +15,7 @@ class LegislatureService {
     return LegislatureService.instance;
   }
 
-  dao: DAO<Committee>;
+  dao: CommitteesDB;
 
   private constructor() {
     this.dao = CommitteesDB.getInstance();
