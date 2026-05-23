@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { Identifier } from "@digitalaidseattle/core";
+import { LegislationInfo } from "./bill";
 import { CommitteeDao } from "./committeeDao";
-import { DAO } from "./DAO";
 import { CommitteesDB } from "./database/CommitteesDB";
 
 class LegislatureService {
@@ -15,7 +15,7 @@ class LegislatureService {
     return LegislatureService.instance;
   }
 
-  dao: DAO<Committee>;
+  dao: CommitteesDB;
 
   private constructor() {
     this.dao = CommitteesDB.getInstance();
@@ -50,6 +50,12 @@ class LegislatureService {
     return CommitteeDao.getInstance().getCommitteeReferralsByCommittee(agency, committeeName);
   }
 
+  async getInCommittee(
+    agency: string,
+    committeeName: string,
+  ): Promise<LegislationInfo[]> {
+    return CommitteeDao.getInstance().getInCommittee(agency, committeeName);
+  }
 }
 
 

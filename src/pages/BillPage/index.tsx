@@ -9,7 +9,7 @@ import { LoadingContext } from "@digitalaidseattle/core";
 import { Breadcrumbs, Card, CardHeader, IconButton, Typography } from '@mui/material';
 import { useContext, useEffect, useState } from 'react';
 import { NavLink, useParams } from "react-router-dom";
-import { LegislativeDocument } from "../../api/bill";
+import { Bill } from "../../api/bill";
 import { BillService } from "../../api/billService";
 import { LoadingOverlay } from "../../components/LoadingOverlay";
 
@@ -19,7 +19,7 @@ export const BillPage = () => {
   const { id } = useParams<string>();
   const { loading, setLoading } = useContext(LoadingContext);
 
-  const [bill, setBill] = useState<LegislativeDocument>()
+  const [bill, setBill] = useState<Bill>()
 
   useEffect(() => {
     console.log(id)
@@ -38,10 +38,10 @@ export const BillPage = () => {
       <Breadcrumbs aria-label="breadcrumb">
         <NavLink to="/" ><IconButton size="medium"><HomeOutlined /></IconButton></NavLink>
         <NavLink to="/bills" >Bills</NavLink>
-        <Typography color="text.primary">Bill Detail: {bill?.Id} </Typography>
+        <Typography color="text.primary">Bill Detail: {bill?.BillId} </Typography>
       </Breadcrumbs>
       <Card>
-        <CardHeader title={`${bill?.Id}`} />
+        <CardHeader title={`${bill?.BillId}`} />
       </Card>
     </>
   )
