@@ -18,18 +18,23 @@ export class BillsDAO extends SupabaseDAO<DBBill> {
   }
 
   async findLastUpdateBefore(date: Date, field?: string): Promise<DBBill[]> {
-    const check = field ?? 'updated_at';
-    const dateString = date.toISOString();
-    return this.client
-      .from(this.tableName)
-      .select('*')
-      .or(`${check}.lt.${dateString},${check}.is.null`)
-      .then((resp: any) => resp.data as DBBill[])
+    try {
+      const check = field ?? 'updated_at';
+      const dateString = date.toISOString();
+      return this.client
+        .from(this.tableName)
+        .select('*')
+        .or(`${check}.lt.${dateString},${check}.is.null`)
+        .then((resp: any) => resp.data as DBBill[])
+    }
+    catch (err) {
+      console.error('Unexpected error during select', err, date, field);
+      throw err;
+    }
   }
 
   async findById(entityId: Identifier): Promise<DBBill | null> {
     try {
-
       const { data, error } = await this.client
         .from(this.tableName)
         .select('*')
@@ -41,7 +46,7 @@ export class BillsDAO extends SupabaseDAO<DBBill> {
       }
       return data;
     } catch (err) {
-      console.error('Unexpected error during select:', err);
+      console.error('Unexpected error during select:', err, entityId);
       throw err;
     }
   }

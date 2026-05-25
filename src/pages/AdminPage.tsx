@@ -144,7 +144,7 @@ export const AdminPage = () => {
             notify.error('Failed to load.')
         }
         finally {
-            notify.success('Loaded committe members.')
+            notify.success('Loaded bill details.')
             setLoading(false)
         };
     }
