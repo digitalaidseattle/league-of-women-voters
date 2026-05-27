@@ -25,7 +25,7 @@ export class UpdateScheduleDAO extends SupabaseDAO<UpdateSchedule> {
                 console.error('Unexpected error during select', error);
                 throw new Error('Unexpected error during select');
             }
-            console.info('Schedule data retrieved:', data);
+            console.info(data, data.next_update, new Date(data.next_update))
             return ({
                 ...data,
                 next_update: new Date(data.next_update)

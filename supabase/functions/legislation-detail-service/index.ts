@@ -15,11 +15,13 @@ const BASE_URL = "https://wslwebservices.leg.wa.gov/LegislationService.asmx";
 const parser = new XMLParser();
 
 async function fetchDetail(bill: Bill): Promise<Bill> {
-  const bilUrl = `${BASE_URL}/GetLegislation?biennium=${bill.Biennium}&billNumber=${bill.BillNumber}`;
-  const response = await fetch(bilUrl);
+  const billUrl = `${BASE_URL}/GetLegislation?biennium=${bill.Biennium}&billNumber=${bill.BillNumber}`;
+  const response = await fetch(billUrl);
   const xml = await response.text();
   const json = parser.parse(xml);
+  console.info(billUrl, json);
   const legislation = json["ArrayOfLegislation"]["Legislation"];
+  console.info(legislation);
   return (Array.isArray(legislation) ? legislation : [legislation]).find((l: any) => l.BillId === bill.BillId) as Bill;
 }
 
@@ -37,7 +39,7 @@ Deno.serve(async (req) => {
 
     const sched: UpdateSchedule = await updateScheduleDAO
       .getByName('bill_detail_update');
-      console.info('Found schedule:', sched);
+    console.info('Found schedule:', sched);
 
     if (sched.next_update.getTime() > new Date().getTime()) {
       console.info(`Not time to be updated`, sched.next_update);

@@ -56,9 +56,11 @@ Deno.serve(async (req) => {
       console.info(`Not time to be updated`, sched.next_update);
       return standardResponse(origin, `Not time to be updated`);
     }
-    const year = 2025;  // TODO get year from request
+    const params = await req.json();
+    const year = params.year;  // TODO get year from request
     const infos = await fetchData(year);
-
+    // console.log(infos)
+    
     const now = new Date();
     const allUpdated: DBBill[] = [];
     for (let i = 0; i < infos.length; i++) {

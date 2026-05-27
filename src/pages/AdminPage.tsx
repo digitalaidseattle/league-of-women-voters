@@ -118,7 +118,9 @@ export const AdminPage = () => {
         try {
             SupabaseConfiguration.getInstance()
                 .getSupabaseClient().functions
-                .invoke("legislation-info-service")
+                .invoke("legislation-info-service", {
+                    body: { year: 2026 },
+                })
                 .then((resp: any) => resp.data);
         }
         catch (error) {
