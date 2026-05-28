@@ -22,17 +22,7 @@ async function fetchInCommitteeMap(biennium: string): Promise<Map<Committee, Leg
 
   for (let i = 0; i < committees.length; i++) {
     const committee = committees[i].committee;
-    const baseUrl = "https://wslwebservices.leg.wa.gov/CommitteeActionService.asmx";
-    const service = "GetInCommittee";
-    const eBiennium = encodeURIComponent(biennium);
-    const agency = encodeURIComponent(committee.Agency);
-    const committeeName = encodeURIComponent(committee.Name!);
-    const url = `${baseUrl}/${service}?biennium=${eBiennium}&agency=${agency}&committeeName=${committeeName}`
-    const response = await fetch(url);
-    const xmlText = await response.text();
-    const json = parser.parse(xmlText);
-    const infos = json["ArrayOfLegislationInfo"]["LegislationInfo"];
-    map.set(committee, infos)
+    map.set(committee, committee.InCommittee ?? [])
   }
   return map
 }
