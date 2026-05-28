@@ -48,8 +48,10 @@ export type DBBill = {
   id: Identifier;
   created_at: Date;
   updated_at: Date;
+  info_update: Date;
   detail_update: Date;
   committee_update: Date;
+  sponsors_update: Date;
   bill: Bill;
   OriginalAgency?: string;
   PrimeSponsorID?: number;
