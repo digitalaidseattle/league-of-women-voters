@@ -1,12 +1,12 @@
 import { PageInfo } from "@digitalaidseattle/core";
 import { DataGrid, GridColDef, useGridApiRef } from "@mui/x-data-grid";
 import { useEffect, useState } from "react";
-import { LegislatureService } from "../../api/legislatureService";
+import { Committee } from "../../api/committee";
 import { LegislationInfo } from "../../api/bill";
 
 const PAGE_SIZE = 25;
 
-const InCommitteeGrid = (props: { agency: string, committeeName: string }) => {
+const InCommitteeGrid = (props: { committee: Committee }) => {
   const apiRef = useGridApiRef();
   const [paginationModel, setPaginationModel] = useState({
     page: 0,
@@ -33,29 +33,17 @@ const InCommitteeGrid = (props: { agency: string, committeeName: string }) => {
   ]
 
   useEffect(() => {
-    if (props.committeeName && props.agency) {
+    if (props.committee) {
       refresh()
     }
   }, [props]);
 
   function refresh() {
+    const inCommittee = props.committee.InCommittee ?? [];
     setPageInfo({
-      rows: [],
-      totalRowCount: 0,
+      rows: inCommittee,
+      totalRowCount: inCommittee.length,
     })
-
-    LegislatureService.getInstance()
-      .getInCommittee(props.agency, props.committeeName)
-      .then(response => {
-        console.log("Response from getInCommittee:", response);
-        setPageInfo({
-          rows: response,
-          totalRowCount: response.length,
-        })
-      })
-      .catch(error => {
-        console.error('Error invoking function:', error);
-      });
   }
 
   return (

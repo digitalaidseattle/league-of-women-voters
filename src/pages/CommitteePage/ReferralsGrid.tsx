@@ -1,7 +1,7 @@
-import { PageInfo, useNotifications } from "@digitalaidseattle/core";
+import { PageInfo } from "@digitalaidseattle/core";
 import { DataGrid, GridColDef, useGridApiRef } from "@mui/x-data-grid";
 import { useEffect, useState } from "react";
-import { LegislatureService } from "../../api/legislatureService";
+import { Committee } from "../../api/committee";
 
 const PAGE_SIZE = 25;
 
@@ -16,7 +16,7 @@ type Referral = {
 }
 
 
-const ReferralsGrid = (props: { agency: string, committeeName: string }) => {
+const ReferralsGrid = (props: { committee: Committee }) => {
   const apiRef = useGridApiRef();
   const [paginationModel, setPaginationModel] = useState({
     page: 0,
@@ -28,14 +28,13 @@ const ReferralsGrid = (props: { agency: string, committeeName: string }) => {
     rows: [],
     totalRowCount: 0,
   });
-  const notifications = useNotifications();
 
   useEffect(() => {
     setColumns(getColumns());
   }, []);
 
   useEffect(() => {
-    if (props.committeeName && props.agency) {
+    if (props.committee) {
       refresh()
     }
   }, [props]);
@@ -56,28 +55,12 @@ const ReferralsGrid = (props: { agency: string, committeeName: string }) => {
   // }
 
   function refresh() {
+    const referrals = (props.committee.Referrals ?? [])
+      .map(referral => toReferral(referral) as Referral);
     setPageInfo({
-      rows: [],
-      totalRowCount: 0,
+      rows: referrals,
+      totalRowCount: referrals.length,
     })
-
-    LegislatureService.getInstance()
-      .GetCommitteeReferralsByCommittee(props.agency, props.committeeName)
-      .then(response => {
-        console.log("Response from GetCommitteeReferralsByCommittee:", response);
-        if (response) {
-          const referrals = response.map((referral: any) => toReferral(referral))
-          setPageInfo({
-            rows: referrals,
-            totalRowCount: referrals.length,
-          })
-        } else {
-          notifications.error('Cound not get the committee referrals.')
-        }
-      })
-      .catch(error => {
-        console.error('Error invoking function:', error);
-      });
   }
 
   function toReferral(referral: any): Referral {

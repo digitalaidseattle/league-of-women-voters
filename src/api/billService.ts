@@ -8,6 +8,7 @@
 import { DataAccessOptions, PageInfo, QueryModel } from "@digitalaidseattle/core";
 import type { Bill } from "./bill";
 import { BillsDB } from "./database/BillsDB";
+import { Member } from "./committee";
 
 export class BillService {
   private static instance: BillService;

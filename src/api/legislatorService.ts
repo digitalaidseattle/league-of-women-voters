@@ -1,5 +1,6 @@
 import { Identifier } from "@digitalaidseattle/core";
 import { SponsorsDB } from "./database/SponsorsDB";
+import { Member } from "./committee";
 
 class LegislatorService {
     private static instance: LegislatorService;
