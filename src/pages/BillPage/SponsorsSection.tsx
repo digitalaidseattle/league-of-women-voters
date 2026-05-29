@@ -7,7 +7,6 @@
 
 import { Card, CardHeader, Grid, Stack, Typography } from '@mui/material';
 import { useEffect, useState } from 'react';
-import { NavLink } from 'react-router-dom';
 import { Bill } from '../../api/bill';
 import { Member } from '../../api/committee';
 import { BILL_CONSTANTS } from './constants';
