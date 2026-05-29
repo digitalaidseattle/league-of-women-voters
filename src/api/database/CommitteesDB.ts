@@ -1,6 +1,7 @@
 import { Identifier } from "@digitalaidseattle/core";
 import { SupabaseConfiguration, SupabaseDAO } from "@digitalaidseattle/supabase";
 import { DAO } from "../DAO";
+import { Committee } from "../committee";
 
 export type DBCommittee = {
     id: Identifier,

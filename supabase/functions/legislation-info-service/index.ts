@@ -35,6 +35,17 @@ async function save(data: DBBill[]): Promise<DBBill[]> {
   return saved;
 }
 
+function isNewOrStale(dbBill: DBBill | null, sched: UpdateSchedule): boolean {
+  if (!dbBill) {
+    return true;
+  }
+  // Handle old data
+  if (!dbBill.info_update) {
+    return true;
+  }
+  return dbBill.info_update.getTime() < sched.next_update.getTime()
+}
+
 Deno.serve(async (req) => {
   const origin = req.headers.get("origin") || "*";
 
@@ -56,38 +67,48 @@ Deno.serve(async (req) => {
       console.info(`Not time to be updated`, sched.next_update);
       return standardResponse(origin, `Not time to be updated`);
     }
-    const year = 2025;  // TODO get year from request
+    const params = await req.json();
+    const year = params.year;
     const infos = await fetchData(year);
+    console.info(`Found ${infos.length} bills to update for year : ${year}.`);
 
     const now = new Date();
     const allUpdated: DBBill[] = [];
     for (let i = 0; i < infos.length; i++) {
       const info = infos[i];
+      console.info(`Saving ${info.BillId}.`);
       const current = await billsDao.findById(info.BillId);
-      const updatedBill = current
-        ? {
-          ...current.bill,
-          ...info
+
+      if (isNewOrStale(current, sched)) {
+        // console.info(`Updating ${current?.id}.`);
+        const updatedBill = current
+          ? {
+            ...current.bill,
+            ...info
+          }
+          : {
+            ...info,
+          }
+        const searchKey = calcSearchKey(updatedBill as Bill);
+        const updatedDBBill = {
+          ...current,
+          id: current ? current.id : updatedBill.BillId,
+          bill: updatedBill,
+          updated_at: now,
+          info_update: now,
+          OriginalAgency: info.OriginalAgency,
+          SearchKey: searchKey
         }
-        : {
-          ...info,
-        }
-      const searchKey = calcSearchKey(updatedBill as Bill);
-      const updatedDBBill = {
-        ...current,
-        id: current ? current.id : updatedBill.BillId,
-        bill: updatedBill,
-        updated_at: now,
-        info_update: now,
-        OriginalAgency: info.OriginalAgency,
-        SearchKey: searchKey
+        const upserted = await billsDao.upsert(updatedDBBill);
+        console.info(`Saved ${upserted.id}.`);
+        allUpdated.push(upserted);
       }
-      allUpdated.push(await billsDao.upsert(updatedDBBill));
     };
     await resetSchedule(sched);
     console.info(`Saved ${allUpdated.length} bills to the database.`);
     return standardResponse(origin, `Updated ${allUpdated.length} bills.`);
   } catch (err) {
+    console.error(`Could not update`, err);
     return errorResponse(origin, err);
   }
 });

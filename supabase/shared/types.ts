@@ -8,7 +8,9 @@ export type Committee = {
   Name: string;
   Phone: string;
   Members: Member[];
-  Leadership: { role: string, name: string }[]
+  Leadership: { role: string, name: string }[];
+  Referrals?: CommitteeReferral[];
+  InCommittee?: LegislationInfo[];
 };
 
 export type Member = {
@@ -48,8 +50,10 @@ export type DBBill = {
   id: Identifier;
   created_at: Date;
   updated_at: Date;
+  info_update: Date;
   detail_update: Date;
   committee_update: Date;
+  sponsors_update: Date;
   bill: Bill;
   OriginalAgency?: string;
   PrimeSponsorID?: number;
@@ -108,3 +112,9 @@ export type Bill = LegislationInfo
     Sponsors?: Member[];
     InCommittee: Committee | null;
   };
+
+export type CommitteeReferral = {
+  LegislationInfo: LegislationInfo;
+  CommitteePhone: string;
+  ReferredDate: string;
+}

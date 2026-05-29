@@ -37,7 +37,6 @@ export const AdminPage = () => {
         };
     }
 
-
     async function legislatorInfoJob(): Promise<void> {
         setLoading(true);
         try {
@@ -108,7 +107,47 @@ export const AdminPage = () => {
             notify.error('Failed to load.')
         }
         finally {
-            notify.success('Loaded committe members.')
+            notify.success('Loaded committee members.')
+            setLoading(false)
+        };
+    }
+
+    async function committeeReferralJob(): Promise<void> {
+        setLoading(true);
+        try {
+            SupabaseConfiguration.getInstance()
+                .getSupabaseClient().functions
+                .invoke("committee-referral-service", {
+                    body: { biennium: "2025-26" },
+                })
+                .then((resp: any) => resp.data);
+        }
+        catch (error) {
+            console.log(error);
+            notify.error('Failed to load.')
+        }
+        finally {
+            notify.success('Loaded committee referrals.')
+            setLoading(false)
+        };
+    }
+
+    async function committeeInCommitteeJob(): Promise<void> {
+        setLoading(true);
+        try {
+            SupabaseConfiguration.getInstance()
+                .getSupabaseClient().functions
+                .invoke("committee-incommittee-service", {
+                    body: { biennium: "2025-26" },
+                })
+                .then((resp: any) => resp.data);
+        }
+        catch (error) {
+            console.log(error);
+            notify.error('Failed to load.')
+        }
+        finally {
+            notify.success('Loaded committee in-committee information.')
             setLoading(false)
         };
     }
@@ -118,7 +157,9 @@ export const AdminPage = () => {
         try {
             SupabaseConfiguration.getInstance()
                 .getSupabaseClient().functions
-                .invoke("legislation-info-service")
+                .invoke("legislation-info-service", {
+                    body: { year: 2026 },
+                })
                 .then((resp: any) => resp.data);
         }
         catch (error) {
@@ -144,7 +185,7 @@ export const AdminPage = () => {
             notify.error('Failed to load.')
         }
         finally {
-            notify.success('Loaded committe members.')
+            notify.success('Loaded bill details.')
             setLoading(false)
         };
     }
@@ -205,7 +246,9 @@ export const AdminPage = () => {
                     <hr />
                     <Button onClick={loadCommitteesJob}>Edge Load Committees</Button>
                     <Button onClick={loadCommitteMembersJob}>Edge Load Committee Members</Button>
-                    <Button onClick={committeeLeadershipJob}>Edge load Committee Leadership</Button>
+                    <Button onClick={committeeLeadershipJob}>Edge Load Committee Leadership</Button>
+                    <Button onClick={committeeReferralJob}>Edge Load Committee Referrals</Button>
+                    <Button onClick={committeeInCommitteeJob}>Edge Load Committee In-Committee</Button>
                     <hr />
                     <Button onClick={billInfoCachingJob}>Edge load Bills</Button>
                     <Button onClick={billDetailCachingJob}>Edge load Bill Details</Button>

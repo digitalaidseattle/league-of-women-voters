@@ -1,5 +1,6 @@
+import { LegislationInfo } from "./bill";
 
-type Committee = {
+export type Committee = {
   Acronym: string;
   Agency: string;
   Id: number;
@@ -7,10 +8,12 @@ type Committee = {
   Name: string;
   Phone: string;
   Members: Member[];
-  Leadership: { role: string, name: string }[]
+  Leadership: { role: string, name: string }[];
+  Referrals?: CommitteeReferral[];
+  InCommittee?: LegislationInfo[];
 };
 
-type Member = {
+export type Member = {
   Id: number;
   Name: string;
   LongName: string;
@@ -26,20 +29,28 @@ type Member = {
   LegislativeAssistant?: { name: string, phone: string }[];
 };
 
-type LegislationInfo = {
-  Biennium: string;
-  BillId: string;
-  BillNumber: number;
-  SubstituteVersion: number;
-  EngrossedVersion: number;
-  ShortLegislationType: { Type: string; Description: string };
-  OriginalAgency: string;
-  Active: boolean;
-  DisplayNumber: number;
-};
+/* from WA Leg
+<CommitteeReferral>
+  <LegislationInfo>
+    <Biennium>string</Biennium>
+    <BillId>string</BillId>
+    <BillNumber>int</BillNumber>
+    <SubstituteVersion>int</SubstituteVersion>
+    <EngrossedVersion>int</EngrossedVersion>
+    <ShortLegislationType xsi:nil="true" />
+    <OriginalAgency>string</OriginalAgency>
+    <Active>boolean</Active>
+    <DisplayNumber>string</DisplayNumber>
+  </LegislationInfo>
+  <Committee>
+    <Phone>string</Phone>
+  </Committee>
+  <ReferredDate>dateTime</ReferredDate>
+</CommitteeReferral>    
+ */
 
-type Referral = {
-  legislationInfo: LegislationInfo;
-  committee: Committee;
+export type CommitteeReferral = {
+  LegislationInfo: LegislationInfo;
+  CommitteePhone: string;
   ReferredDate: string;
-};
+}

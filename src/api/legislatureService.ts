@@ -1,7 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { Identifier } from "@digitalaidseattle/core";
-import { LegislationInfo } from "./bill";
-import { CommitteeDao } from "./committeeDao";
+import { Committee, Member } from "./committee";
 import { CommitteesDB } from "./database/CommitteesDB";
 
 class LegislatureService {
@@ -36,26 +35,6 @@ class LegislatureService {
     )
   }
 
-  async getCommitteeMembers(
-    agency: string,
-    committeeName: string,
-  ): Promise<Member[]> {
-    return CommitteeDao.getInstance().getCommitteeMembers(agency, committeeName);
-  }
-
-  async GetCommitteeReferralsByCommittee(
-    agency: string,
-    committeeName: string,
-  ): Promise<Member[]> {
-    return CommitteeDao.getInstance().getCommitteeReferralsByCommittee(agency, committeeName);
-  }
-
-  async getInCommittee(
-    agency: string,
-    committeeName: string,
-  ): Promise<LegislationInfo[]> {
-    return CommitteeDao.getInstance().getInCommittee(agency, committeeName);
-  }
 }
 
 

@@ -15,11 +15,13 @@ const BASE_URL = "https://wslwebservices.leg.wa.gov/LegislationService.asmx";
 const parser = new XMLParser();
 
 async function fetchDetail(bill: Bill): Promise<Bill> {
-  const bilUrl = `${BASE_URL}/GetLegislation?biennium=${bill.Biennium}&billNumber=${bill.BillNumber}`;
-  const response = await fetch(bilUrl);
+  const billUrl = `${BASE_URL}/GetLegislation?biennium=${bill.Biennium}&billNumber=${bill.BillNumber}`;
+  const response = await fetch(billUrl);
   const xml = await response.text();
   const json = parser.parse(xml);
+  console.info(billUrl, json);
   const legislation = json["ArrayOfLegislation"]["Legislation"];
+  console.info(legislation);
   return (Array.isArray(legislation) ? legislation : [legislation]).find((l: any) => l.BillId === bill.BillId) as Bill;
 }
 
@@ -32,11 +34,12 @@ Deno.serve(async (req) => {
   }
 
   try {
-    console.log("Starting legistation detail service...");
+    console.info("Starting legistation detail service...");
     const updateScheduleDAO = new UpdateScheduleDAO();
 
     const sched: UpdateSchedule = await updateScheduleDAO
       .getByName('bill_detail_update');
+    console.info('Found schedule:', sched);
 
     if (sched.next_update.getTime() > new Date().getTime()) {
       console.info(`Not time to be updated`, sched.next_update);
@@ -47,7 +50,7 @@ Deno.serve(async (req) => {
     const entities = await billsDao.findLastUpdateBefore(sched.next_update, 'detail_update')
     if (entities.length === 0) {
       await resetSchedule(sched);
-      console.info(`Found nothing to update.  Nect scheduled check`, sched.next_update);
+      console.info(`Found nothing to update.  Next scheduled check`, sched.next_update);
       return standardResponse(origin, `Found nothing to update. Next check ${sched.next_update}`);
     }
 
@@ -73,6 +76,7 @@ Deno.serve(async (req) => {
     console.info(`Updated ${entities.length} bills with detail information.`);
     return standardResponse(origin, `Done`);
   } catch (err) {
+    console.error(`Failed to update bill details`, err);
     return errorResponse(origin, err);
   }
 });

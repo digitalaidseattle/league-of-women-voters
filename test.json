@@ -1,0 +1,2513 @@
+{
+    "Id": 31638,
+    "Name": "Postsecondary Education & Workforce",
+    "LongName": "House Committee on Postsecondary Education & Workforce",
+    "Agency": "House",
+    "Acronym": "PEW",
+    "Phone": "(360) 786-7167",
+    "InCommittee": [
+        {
+            "Biennium": "2025-26",
+            "BillId": "HB 1035",
+            "BillNumber": 1035,
+            "SubstituteVersion": 0,
+            "EngrossedVersion": 0,
+            "ShortLegislationType": {
+                "ShortLegislationType": "B",
+                "LongLegislationType": "Bill"
+            },
+            "OriginalAgency": "House",
+            "Active": true,
+            "DisplayNumber": 1035
+        },
+        {
+            "Biennium": "2025-26",
+            "BillId": "SHB 1036",
+            "BillNumber": 1036,
+            "SubstituteVersion": 1,
+            "EngrossedVersion": 0,
+            "ShortLegislationType": {
+                "ShortLegislationType": "B",
+                "LongLegislationType": "Bill"
+            },
+            "OriginalAgency": "House",
+            "Active": true,
+            "DisplayNumber": "1036-S"
+        },
+        {
+            "Biennium": "2025-26",
+            "BillId": "HB 1143",
+            "BillNumber": 1143,
+            "SubstituteVersion": 0,
+            "EngrossedVersion": 0,
+            "ShortLegislationType": {
+                "ShortLegislationType": "B",
+                "LongLegislationType": "Bill"
+            },
+            "OriginalAgency": "House",
+            "Active": true,
+            "DisplayNumber": 1143
+        },
+        {
+            "Biennium": "2025-26",
+            "BillId": "HB 1166",
+            "BillNumber": 1166,
+            "SubstituteVersion": 0,
+            "EngrossedVersion": 0,
+            "ShortLegislationType": {
+                "ShortLegislationType": "B",
+                "LongLegislationType": "Bill"
+            },
+            "OriginalAgency": "House",
+            "Active": true,
+            "DisplayNumber": 1166
+        },
+        {
+            "Biennium": "2025-26",
+            "BillId": "HB 1259",
+            "BillNumber": 1259,
+            "SubstituteVersion": 0,
+            "EngrossedVersion": 0,
+            "ShortLegislationType": {
+                "ShortLegislationType": "B",
+                "LongLegislationType": "Bill"
+            },
+            "OriginalAgency": "House",
+            "Active": true,
+            "DisplayNumber": 1259
+        },
+        {
+            "Biennium": "2025-26",
+            "BillId": "HB 1278",
+            "BillNumber": 1278,
+            "SubstituteVersion": 0,
+            "EngrossedVersion": 0,
+            "ShortLegislationType": {
+                "ShortLegislationType": "B",
+                "LongLegislationType": "Bill"
+            },
+            "OriginalAgency": "House",
+            "Active": true,
+            "DisplayNumber": 1278
+        },
+        {
+            "Biennium": "2025-26",
+            "BillId": "HB 1447",
+            "BillNumber": 1447,
+            "SubstituteVersion": 0,
+            "EngrossedVersion": 0,
+            "ShortLegislationType": {
+                "ShortLegislationType": "B",
+                "LongLegislationType": "Bill"
+            },
+            "OriginalAgency": "House",
+            "Active": true,
+            "DisplayNumber": 1447
+        },
+        {
+            "Biennium": "2025-26",
+            "BillId": "HB 1492",
+            "BillNumber": 1492,
+            "SubstituteVersion": 0,
+            "EngrossedVersion": 0,
+            "ShortLegislationType": {
+                "ShortLegislationType": "B",
+                "LongLegislationType": "Bill"
+            },
+            "OriginalAgency": "House",
+            "Active": true,
+            "DisplayNumber": 1492
+        },
+        {
+            "Biennium": "2025-26",
+            "BillId": "HB 1568",
+            "BillNumber": 1568,
+            "SubstituteVersion": 0,
+            "EngrossedVersion": 0,
+            "ShortLegislationType": {
+                "ShortLegislationType": "B",
+                "LongLegislationType": "Bill"
+            },
+            "OriginalAgency": "House",
+            "Active": true,
+            "DisplayNumber": 1568
+        },
+        {
+            "Biennium": "2025-26",
+            "BillId": "HB 1617",
+            "BillNumber": 1617,
+            "SubstituteVersion": 0,
+            "EngrossedVersion": 0,
+            "ShortLegislationType": {
+                "ShortLegislationType": "B",
+                "LongLegislationType": "Bill"
+            },
+            "OriginalAgency": "House",
+            "Active": true,
+            "DisplayNumber": 1617
+        },
+        {
+            "Biennium": "2025-26",
+            "BillId": "HB 1657",
+            "BillNumber": 1657,
+            "SubstituteVersion": 0,
+            "EngrossedVersion": 0,
+            "ShortLegislationType": {
+                "ShortLegislationType": "B",
+                "LongLegislationType": "Bill"
+            },
+            "OriginalAgency": "House",
+            "Active": true,
+            "DisplayNumber": 1657
+        },
+        {
+            "Biennium": "2025-26",
+            "BillId": "HB 1677",
+            "BillNumber": 1677,
+            "SubstituteVersion": 0,
+            "EngrossedVersion": 0,
+            "ShortLegislationType": {
+                "ShortLegislationType": "B",
+                "LongLegislationType": "Bill"
+            },
+            "OriginalAgency": "House",
+            "Active": true,
+            "DisplayNumber": 1677
+        },
+        {
+            "Biennium": "2025-26",
+            "BillId": "HB 1762",
+            "BillNumber": 1762,
+            "SubstituteVersion": 0,
+            "EngrossedVersion": 0,
+            "ShortLegislationType": {
+                "ShortLegislationType": "B",
+                "LongLegislationType": "Bill"
+            },
+            "OriginalAgency": "House",
+            "Active": true,
+            "DisplayNumber": 1762
+        },
+        {
+            "Biennium": "2025-26",
+            "BillId": "HB 1777",
+            "BillNumber": 1777,
+            "SubstituteVersion": 0,
+            "EngrossedVersion": 0,
+            "ShortLegislationType": {
+                "ShortLegislationType": "B",
+                "LongLegislationType": "Bill"
+            },
+            "OriginalAgency": "House",
+            "Active": true,
+            "DisplayNumber": 1777
+        },
+        {
+            "Biennium": "2025-26",
+            "BillId": "SHB 1783",
+            "BillNumber": 1783,
+            "SubstituteVersion": 1,
+            "EngrossedVersion": 0,
+            "ShortLegislationType": {
+                "ShortLegislationType": "B",
+                "LongLegislationType": "Bill"
+            },
+            "OriginalAgency": "House",
+            "Active": true,
+            "DisplayNumber": "1783-S"
+        },
+        {
+            "Biennium": "2025-26",
+            "BillId": "HB 1851",
+            "BillNumber": 1851,
+            "SubstituteVersion": 0,
+            "EngrossedVersion": 0,
+            "ShortLegislationType": {
+                "ShortLegislationType": "B",
+                "LongLegislationType": "Bill"
+            },
+            "OriginalAgency": "House",
+            "Active": true,
+            "DisplayNumber": 1851
+        },
+        {
+            "Biennium": "2025-26",
+            "BillId": "HB 2063",
+            "BillNumber": 2063,
+            "SubstituteVersion": 0,
+            "EngrossedVersion": 0,
+            "ShortLegislationType": {
+                "ShortLegislationType": "B",
+                "LongLegislationType": "Bill"
+            },
+            "OriginalAgency": "House",
+            "Active": true,
+            "DisplayNumber": 2063
+        },
+        {
+            "Biennium": "2025-26",
+            "BillId": "HB 2065",
+            "BillNumber": 2065,
+            "SubstituteVersion": 0,
+            "EngrossedVersion": 0,
+            "ShortLegislationType": {
+                "ShortLegislationType": "B",
+                "LongLegislationType": "Bill"
+            },
+            "OriginalAgency": "House",
+            "Active": true,
+            "DisplayNumber": 2065
+        },
+        {
+            "Biennium": "2025-26",
+            "BillId": "HB 2070",
+            "BillNumber": 2070,
+            "SubstituteVersion": 0,
+            "EngrossedVersion": 0,
+            "ShortLegislationType": {
+                "ShortLegislationType": "B",
+                "LongLegislationType": "Bill"
+            },
+            "OriginalAgency": "House",
+            "Active": true,
+            "DisplayNumber": 2070
+        },
+        {
+            "Biennium": "2025-26",
+            "BillId": "HB 2098",
+            "BillNumber": 2098,
+            "SubstituteVersion": 0,
+            "EngrossedVersion": 0,
+            "ShortLegislationType": {
+                "ShortLegislationType": "B",
+                "LongLegislationType": "Bill"
+            },
+            "OriginalAgency": "House",
+            "Active": true,
+            "DisplayNumber": 2098
+        },
+        {
+            "Biennium": "2025-26",
+            "BillId": "HB 2148",
+            "BillNumber": 2148,
+            "SubstituteVersion": 0,
+            "EngrossedVersion": 0,
+            "ShortLegislationType": {
+                "ShortLegislationType": "B",
+                "LongLegislationType": "Bill"
+            },
+            "OriginalAgency": "House",
+            "Active": true,
+            "DisplayNumber": 2148
+        },
+        {
+            "Biennium": "2025-26",
+            "BillId": "HB 2286",
+            "BillNumber": 2286,
+            "SubstituteVersion": 0,
+            "EngrossedVersion": 0,
+            "ShortLegislationType": {
+                "ShortLegislationType": "B",
+                "LongLegislationType": "Bill"
+            },
+            "OriginalAgency": "House",
+            "Active": true,
+            "DisplayNumber": 2286
+        },
+        {
+            "Biennium": "2025-26",
+            "BillId": "HB 2337",
+            "BillNumber": 2337,
+            "SubstituteVersion": 0,
+            "EngrossedVersion": 0,
+            "ShortLegislationType": {
+                "ShortLegislationType": "B",
+                "LongLegislationType": "Bill"
+            },
+            "OriginalAgency": "House",
+            "Active": true,
+            "DisplayNumber": 2337
+        },
+        {
+            "Biennium": "2025-26",
+            "BillId": "HB 2427",
+            "BillNumber": 2427,
+            "SubstituteVersion": 0,
+            "EngrossedVersion": 0,
+            "ShortLegislationType": {
+                "ShortLegislationType": "B",
+                "LongLegislationType": "Bill"
+            },
+            "OriginalAgency": "House",
+            "Active": true,
+            "DisplayNumber": 2427
+        },
+        {
+            "Biennium": "2025-26",
+            "BillId": "HB 2443",
+            "BillNumber": 2443,
+            "SubstituteVersion": 0,
+            "EngrossedVersion": 0,
+            "ShortLegislationType": {
+                "ShortLegislationType": "B",
+                "LongLegislationType": "Bill"
+            },
+            "OriginalAgency": "House",
+            "Active": true,
+            "DisplayNumber": 2443
+        },
+        {
+            "Biennium": "2025-26",
+            "BillId": "HB 2498",
+            "BillNumber": 2498,
+            "SubstituteVersion": 0,
+            "EngrossedVersion": 0,
+            "ShortLegislationType": {
+                "ShortLegislationType": "B",
+                "LongLegislationType": "Bill"
+            },
+            "OriginalAgency": "House",
+            "Active": true,
+            "DisplayNumber": 2498
+        },
+        {
+            "Biennium": "2025-26",
+            "BillId": "HB 2535",
+            "BillNumber": 2535,
+            "SubstituteVersion": 0,
+            "EngrossedVersion": 0,
+            "ShortLegislationType": {
+                "ShortLegislationType": "B",
+                "LongLegislationType": "Bill"
+            },
+            "OriginalAgency": "House",
+            "Active": true,
+            "DisplayNumber": 2535
+        },
+        {
+            "Biennium": "2025-26",
+            "BillId": "HB 2538",
+            "BillNumber": 2538,
+            "SubstituteVersion": 0,
+            "EngrossedVersion": 0,
+            "ShortLegislationType": {
+                "ShortLegislationType": "B",
+                "LongLegislationType": "Bill"
+            },
+            "OriginalAgency": "House",
+            "Active": true,
+            "DisplayNumber": 2538
+        },
+        {
+            "Biennium": "2025-26",
+            "BillId": "HB 2567",
+            "BillNumber": 2567,
+            "SubstituteVersion": 0,
+            "EngrossedVersion": 0,
+            "ShortLegislationType": {
+                "ShortLegislationType": "B",
+                "LongLegislationType": "Bill"
+            },
+            "OriginalAgency": "House",
+            "Active": true,
+            "DisplayNumber": 2567
+        },
+        {
+            "Biennium": "2025-26",
+            "BillId": "HB 2589",
+            "BillNumber": 2589,
+            "SubstituteVersion": 0,
+            "EngrossedVersion": 0,
+            "ShortLegislationType": {
+                "ShortLegislationType": "B",
+                "LongLegislationType": "Bill"
+            },
+            "OriginalAgency": "House",
+            "Active": true,
+            "DisplayNumber": 2589
+        },
+        {
+            "Biennium": "2025-26",
+            "BillId": "HB 2617",
+            "BillNumber": 2617,
+            "SubstituteVersion": 0,
+            "EngrossedVersion": 0,
+            "ShortLegislationType": {
+                "ShortLegislationType": "B",
+                "LongLegislationType": "Bill"
+            },
+            "OriginalAgency": "House",
+            "Active": true,
+            "DisplayNumber": 2617
+        },
+        {
+            "Biennium": "2025-26",
+            "BillId": "HB 2652",
+            "BillNumber": 2652,
+            "SubstituteVersion": 0,
+            "EngrossedVersion": 0,
+            "ShortLegislationType": {
+                "ShortLegislationType": "B",
+                "LongLegislationType": "Bill"
+            },
+            "OriginalAgency": "House",
+            "Active": true,
+            "DisplayNumber": 2652
+        },
+        {
+            "Biennium": "2025-26",
+            "BillId": "HB 2671",
+            "BillNumber": 2671,
+            "SubstituteVersion": 0,
+            "EngrossedVersion": 0,
+            "ShortLegislationType": {
+                "ShortLegislationType": "B",
+                "LongLegislationType": "Bill"
+            },
+            "OriginalAgency": "House",
+            "Active": true,
+            "DisplayNumber": 2671
+        },
+        {
+            "Biennium": "2025-26",
+            "BillId": "HB 2739",
+            "BillNumber": 2739,
+            "SubstituteVersion": 0,
+            "EngrossedVersion": 0,
+            "ShortLegislationType": {
+                "ShortLegislationType": "B",
+                "LongLegislationType": "Bill"
+            },
+            "OriginalAgency": "House",
+            "Active": true,
+            "DisplayNumber": 2739
+        }
+    ],
+    "Referrals": [
+        {
+            "LegislationInfo": {
+                "Biennium": "2025-26",
+                "BillId": "HB 1023",
+                "BillNumber": 1023,
+                "SubstituteVersion": 0,
+                "EngrossedVersion": 0,
+                "ShortLegislationType": {
+                    "ShortLegislationType": "B",
+                    "LongLegislationType": "Bill"
+                },
+                "OriginalAgency": "House",
+                "Active": false,
+                "DisplayNumber": 1023
+            },
+            "Committee": {
+                "Id": 31638,
+                "Name": "Postsecondary Education & Workforce",
+                "LongName": "House Postsecondary Education & Workforce",
+                "Agency": "House",
+                "Acronym": "PEW",
+                "Phone": ""
+            },
+            "ReferredDate": "2025-01-13T00:00:00"
+        },
+        {
+            "LegislationInfo": {
+                "Biennium": "2025-26",
+                "BillId": "HB 1035",
+                "BillNumber": 1035,
+                "SubstituteVersion": 0,
+                "EngrossedVersion": 0,
+                "ShortLegislationType": {
+                    "ShortLegislationType": "B",
+                    "LongLegislationType": "Bill"
+                },
+                "OriginalAgency": "House",
+                "Active": true,
+                "DisplayNumber": 1035
+            },
+            "Committee": {
+                "Id": 31638,
+                "Name": "Postsecondary Education & Workforce",
+                "LongName": "House Postsecondary Education & Workforce",
+                "Agency": "House",
+                "Acronym": "PEW",
+                "Phone": ""
+            },
+            "ReferredDate": "2025-01-13T00:00:00"
+        },
+        {
+            "LegislationInfo": {
+                "Biennium": "2025-26",
+                "BillId": "HB 1036",
+                "BillNumber": 1036,
+                "SubstituteVersion": 0,
+                "EngrossedVersion": 0,
+                "ShortLegislationType": {
+                    "ShortLegislationType": "B",
+                    "LongLegislationType": "Bill"
+                },
+                "OriginalAgency": "House",
+                "Active": true,
+                "DisplayNumber": 1036
+            },
+            "Committee": {
+                "Id": 31638,
+                "Name": "Postsecondary Education & Workforce",
+                "LongName": "House Postsecondary Education & Workforce",
+                "Agency": "House",
+                "Acronym": "PEW",
+                "Phone": ""
+            },
+            "ReferredDate": "2025-01-13T00:00:00"
+        },
+        {
+            "LegislationInfo": {
+                "Biennium": "2025-26",
+                "BillId": "HB 1036",
+                "BillNumber": 1036,
+                "SubstituteVersion": 0,
+                "EngrossedVersion": 0,
+                "ShortLegislationType": {
+                    "ShortLegislationType": "B",
+                    "LongLegislationType": "Bill"
+                },
+                "OriginalAgency": "House",
+                "Active": true,
+                "DisplayNumber": 1036
+            },
+            "Committee": {
+                "Id": 31638,
+                "Name": "Postsecondary Education & Workforce",
+                "LongName": "House Postsecondary Education & Workforce",
+                "Agency": "House",
+                "Acronym": "PEW",
+                "Phone": ""
+            },
+            "ReferredDate": "2026-01-12T00:00:00"
+        },
+        {
+            "LegislationInfo": {
+                "Biennium": "2025-26",
+                "BillId": "HB 1114",
+                "BillNumber": 1114,
+                "SubstituteVersion": 0,
+                "EngrossedVersion": 0,
+                "ShortLegislationType": {
+                    "ShortLegislationType": "B",
+                    "LongLegislationType": "Bill"
+                },
+                "OriginalAgency": "House",
+                "Active": true,
+                "DisplayNumber": 1114
+            },
+            "Committee": {
+                "Id": 31638,
+                "Name": "Postsecondary Education & Workforce",
+                "LongName": "House Postsecondary Education & Workforce",
+                "Agency": "House",
+                "Acronym": "PEW",
+                "Phone": ""
+            },
+            "ReferredDate": "2025-01-13T00:00:00"
+        },
+        {
+            "LegislationInfo": {
+                "Biennium": "2025-26",
+                "BillId": "SB 5110",
+                "BillNumber": 5110,
+                "SubstituteVersion": 0,
+                "EngrossedVersion": 0,
+                "ShortLegislationType": {
+                    "ShortLegislationType": "B",
+                    "LongLegislationType": "Bill"
+                },
+                "OriginalAgency": "Senate",
+                "Active": true,
+                "DisplayNumber": 5110
+            },
+            "Committee": {
+                "Id": 31638,
+                "Name": "Postsecondary Education & Workforce",
+                "LongName": "House Postsecondary Education & Workforce",
+                "Agency": "House",
+                "Acronym": "PEW",
+                "Phone": ""
+            },
+            "ReferredDate": "2025-03-04T00:00:00"
+        },
+        {
+            "LegislationInfo": {
+                "Biennium": "2025-26",
+                "BillId": "HB 1136",
+                "BillNumber": 1136,
+                "SubstituteVersion": 0,
+                "EngrossedVersion": 0,
+                "ShortLegislationType": {
+                    "ShortLegislationType": "B",
+                    "LongLegislationType": "Bill"
+                },
+                "OriginalAgency": "House",
+                "Active": true,
+                "DisplayNumber": 1136
+            },
+            "Committee": {
+                "Id": 31638,
+                "Name": "Postsecondary Education & Workforce",
+                "LongName": "House Postsecondary Education & Workforce",
+                "Agency": "House",
+                "Acronym": "PEW",
+                "Phone": ""
+            },
+            "ReferredDate": "2025-01-13T00:00:00"
+        },
+        {
+            "LegislationInfo": {
+                "Biennium": "2025-26",
+                "BillId": "HB 1142",
+                "BillNumber": 1142,
+                "SubstituteVersion": 0,
+                "EngrossedVersion": 0,
+                "ShortLegislationType": {
+                    "ShortLegislationType": "B",
+                    "LongLegislationType": "Bill"
+                },
+                "OriginalAgency": "House",
+                "Active": false,
+                "DisplayNumber": 1142
+            },
+            "Committee": {
+                "Id": 31638,
+                "Name": "Postsecondary Education & Workforce",
+                "LongName": "House Postsecondary Education & Workforce",
+                "Agency": "House",
+                "Acronym": "PEW",
+                "Phone": ""
+            },
+            "ReferredDate": "2025-01-13T00:00:00"
+        },
+        {
+            "LegislationInfo": {
+                "Biennium": "2025-26",
+                "BillId": "HB 1143",
+                "BillNumber": 1143,
+                "SubstituteVersion": 0,
+                "EngrossedVersion": 0,
+                "ShortLegislationType": {
+                    "ShortLegislationType": "B",
+                    "LongLegislationType": "Bill"
+                },
+                "OriginalAgency": "House",
+                "Active": true,
+                "DisplayNumber": 1143
+            },
+            "Committee": {
+                "Id": 31638,
+                "Name": "Postsecondary Education & Workforce",
+                "LongName": "House Postsecondary Education & Workforce",
+                "Agency": "House",
+                "Acronym": "PEW",
+                "Phone": ""
+            },
+            "ReferredDate": "2025-01-13T00:00:00"
+        },
+        {
+            "LegislationInfo": {
+                "Biennium": "2025-26",
+                "BillId": "HB 1161",
+                "BillNumber": 1161,
+                "SubstituteVersion": 0,
+                "EngrossedVersion": 0,
+                "ShortLegislationType": {
+                    "ShortLegislationType": "B",
+                    "LongLegislationType": "Bill"
+                },
+                "OriginalAgency": "House",
+                "Active": true,
+                "DisplayNumber": 1161
+            },
+            "Committee": {
+                "Id": 31638,
+                "Name": "Postsecondary Education & Workforce",
+                "LongName": "House Postsecondary Education & Workforce",
+                "Agency": "House",
+                "Acronym": "PEW",
+                "Phone": ""
+            },
+            "ReferredDate": "2025-01-13T00:00:00"
+        },
+        {
+            "LegislationInfo": {
+                "Biennium": "2025-26",
+                "BillId": "HB 1166",
+                "BillNumber": 1166,
+                "SubstituteVersion": 0,
+                "EngrossedVersion": 0,
+                "ShortLegislationType": {
+                    "ShortLegislationType": "B",
+                    "LongLegislationType": "Bill"
+                },
+                "OriginalAgency": "House",
+                "Active": true,
+                "DisplayNumber": 1166
+            },
+            "Committee": {
+                "Id": 31638,
+                "Name": "Postsecondary Education & Workforce",
+                "LongName": "House Postsecondary Education & Workforce",
+                "Agency": "House",
+                "Acronym": "PEW",
+                "Phone": ""
+            },
+            "ReferredDate": "2025-01-13T00:00:00"
+        },
+        {
+            "LegislationInfo": {
+                "Biennium": "2025-26",
+                "BillId": "HB 1167",
+                "BillNumber": 1167,
+                "SubstituteVersion": 0,
+                "EngrossedVersion": 0,
+                "ShortLegislationType": {
+                    "ShortLegislationType": "B",
+                    "LongLegislationType": "Bill"
+                },
+                "OriginalAgency": "House",
+                "Active": true,
+                "DisplayNumber": 1167
+            },
+            "Committee": {
+                "Id": 31638,
+                "Name": "Postsecondary Education & Workforce",
+                "LongName": "House Postsecondary Education & Workforce",
+                "Agency": "House",
+                "Acronym": "PEW",
+                "Phone": ""
+            },
+            "ReferredDate": "2025-01-13T00:00:00"
+        },
+        {
+            "LegislationInfo": {
+                "Biennium": "2025-26",
+                "BillId": "SB 5158",
+                "BillNumber": 5158,
+                "SubstituteVersion": 0,
+                "EngrossedVersion": 0,
+                "ShortLegislationType": {
+                    "ShortLegislationType": "B",
+                    "LongLegislationType": "Bill"
+                },
+                "OriginalAgency": "Senate",
+                "Active": true,
+                "DisplayNumber": 5158
+            },
+            "Committee": {
+                "Id": 31638,
+                "Name": "Postsecondary Education & Workforce",
+                "LongName": "House Postsecondary Education & Workforce",
+                "Agency": "House",
+                "Acronym": "PEW",
+                "Phone": ""
+            },
+            "ReferredDate": "2025-02-07T00:00:00"
+        },
+        {
+            "LegislationInfo": {
+                "Biennium": "2025-26",
+                "BillId": "HB 1259",
+                "BillNumber": 1259,
+                "SubstituteVersion": 0,
+                "EngrossedVersion": 0,
+                "ShortLegislationType": {
+                    "ShortLegislationType": "B",
+                    "LongLegislationType": "Bill"
+                },
+                "OriginalAgency": "House",
+                "Active": true,
+                "DisplayNumber": 1259
+            },
+            "Committee": {
+                "Id": 31638,
+                "Name": "Postsecondary Education & Workforce",
+                "LongName": "House Postsecondary Education & Workforce",
+                "Agency": "House",
+                "Acronym": "PEW",
+                "Phone": ""
+            },
+            "ReferredDate": "2025-01-13T00:00:00"
+        },
+        {
+            "LegislationInfo": {
+                "Biennium": "2025-26",
+                "BillId": "HB 1273",
+                "BillNumber": 1273,
+                "SubstituteVersion": 0,
+                "EngrossedVersion": 0,
+                "ShortLegislationType": {
+                    "ShortLegislationType": "B",
+                    "LongLegislationType": "Bill"
+                },
+                "OriginalAgency": "House",
+                "Active": false,
+                "DisplayNumber": 1273
+            },
+            "Committee": {
+                "Id": 31638,
+                "Name": "Postsecondary Education & Workforce",
+                "LongName": "House Postsecondary Education & Workforce",
+                "Agency": "House",
+                "Acronym": "PEW",
+                "Phone": ""
+            },
+            "ReferredDate": "2025-01-14T00:00:00"
+        },
+        {
+            "LegislationInfo": {
+                "Biennium": "2025-26",
+                "BillId": "HB 1278",
+                "BillNumber": 1278,
+                "SubstituteVersion": 0,
+                "EngrossedVersion": 0,
+                "ShortLegislationType": {
+                    "ShortLegislationType": "B",
+                    "LongLegislationType": "Bill"
+                },
+                "OriginalAgency": "House",
+                "Active": true,
+                "DisplayNumber": 1278
+            },
+            "Committee": {
+                "Id": 31638,
+                "Name": "Postsecondary Education & Workforce",
+                "LongName": "House Postsecondary Education & Workforce",
+                "Agency": "House",
+                "Acronym": "PEW",
+                "Phone": ""
+            },
+            "ReferredDate": "2025-01-14T00:00:00"
+        },
+        {
+            "LegislationInfo": {
+                "Biennium": "2025-26",
+                "BillId": "EHB 1279",
+                "BillNumber": 1279,
+                "SubstituteVersion": 0,
+                "EngrossedVersion": 1,
+                "ShortLegislationType": {
+                    "ShortLegislationType": "B",
+                    "LongLegislationType": "Bill"
+                },
+                "OriginalAgency": "House",
+                "Active": true,
+                "DisplayNumber": 1279
+            },
+            "Committee": {
+                "Id": 31638,
+                "Name": "Postsecondary Education & Workforce",
+                "LongName": "House Postsecondary Education & Workforce",
+                "Agency": "House",
+                "Acronym": "PEW",
+                "Phone": ""
+            },
+            "ReferredDate": "2025-01-14T00:00:00"
+        },
+        {
+            "LegislationInfo": {
+                "Biennium": "2025-26",
+                "BillId": "HB 1298",
+                "BillNumber": 1298,
+                "SubstituteVersion": 0,
+                "EngrossedVersion": 0,
+                "ShortLegislationType": {
+                    "ShortLegislationType": "B",
+                    "LongLegislationType": "Bill"
+                },
+                "OriginalAgency": "House",
+                "Active": true,
+                "DisplayNumber": 1298
+            },
+            "Committee": {
+                "Id": 31638,
+                "Name": "Postsecondary Education & Workforce",
+                "LongName": "House Postsecondary Education & Workforce",
+                "Agency": "House",
+                "Acronym": "PEW",
+                "Phone": ""
+            },
+            "ReferredDate": "2025-01-15T00:00:00"
+        },
+        {
+            "LegislationInfo": {
+                "Biennium": "2025-26",
+                "BillId": "HB 1337",
+                "BillNumber": 1337,
+                "SubstituteVersion": 0,
+                "EngrossedVersion": 0,
+                "ShortLegislationType": {
+                    "ShortLegislationType": "B",
+                    "LongLegislationType": "Bill"
+                },
+                "OriginalAgency": "House",
+                "Active": true,
+                "DisplayNumber": 1337
+            },
+            "Committee": {
+                "Id": 31638,
+                "Name": "Postsecondary Education & Workforce",
+                "LongName": "House Postsecondary Education & Workforce",
+                "Agency": "House",
+                "Acronym": "PEW",
+                "Phone": ""
+            },
+            "ReferredDate": "2025-01-16T00:00:00"
+        },
+        {
+            "LegislationInfo": {
+                "Biennium": "2025-26",
+                "BillId": "HB 1343",
+                "BillNumber": 1343,
+                "SubstituteVersion": 0,
+                "EngrossedVersion": 0,
+                "ShortLegislationType": {
+                    "ShortLegislationType": "B",
+                    "LongLegislationType": "Bill"
+                },
+                "OriginalAgency": "House",
+                "Active": true,
+                "DisplayNumber": 1343
+            },
+            "Committee": {
+                "Id": 31638,
+                "Name": "Postsecondary Education & Workforce",
+                "LongName": "House Postsecondary Education & Workforce",
+                "Agency": "House",
+                "Acronym": "PEW",
+                "Phone": ""
+            },
+            "ReferredDate": "2025-01-16T00:00:00"
+        },
+        {
+            "LegislationInfo": {
+                "Biennium": "2025-26",
+                "BillId": "HB 1395",
+                "BillNumber": 1395,
+                "SubstituteVersion": 0,
+                "EngrossedVersion": 0,
+                "ShortLegislationType": {
+                    "ShortLegislationType": "B",
+                    "LongLegislationType": "Bill"
+                },
+                "OriginalAgency": "House",
+                "Active": false,
+                "DisplayNumber": 1395
+            },
+            "Committee": {
+                "Id": 31638,
+                "Name": "Postsecondary Education & Workforce",
+                "LongName": "House Postsecondary Education & Workforce",
+                "Agency": "House",
+                "Acronym": "PEW",
+                "Phone": ""
+            },
+            "ReferredDate": "2025-01-20T00:00:00"
+        },
+        {
+            "LegislationInfo": {
+                "Biennium": "2025-26",
+                "BillId": "HB 1447",
+                "BillNumber": 1447,
+                "SubstituteVersion": 0,
+                "EngrossedVersion": 0,
+                "ShortLegislationType": {
+                    "ShortLegislationType": "B",
+                    "LongLegislationType": "Bill"
+                },
+                "OriginalAgency": "House",
+                "Active": true,
+                "DisplayNumber": 1447
+            },
+            "Committee": {
+                "Id": 31638,
+                "Name": "Postsecondary Education & Workforce",
+                "LongName": "House Postsecondary Education & Workforce",
+                "Agency": "House",
+                "Acronym": "PEW",
+                "Phone": ""
+            },
+            "ReferredDate": "2025-01-21T00:00:00"
+        },
+        {
+            "LegislationInfo": {
+                "Biennium": "2025-26",
+                "BillId": "HB 1485",
+                "BillNumber": 1485,
+                "SubstituteVersion": 0,
+                "EngrossedVersion": 0,
+                "ShortLegislationType": {
+                    "ShortLegislationType": "B",
+                    "LongLegislationType": "Bill"
+                },
+                "OriginalAgency": "House",
+                "Active": true,
+                "DisplayNumber": 1485
+            },
+            "Committee": {
+                "Id": 31638,
+                "Name": "Postsecondary Education & Workforce",
+                "LongName": "House Postsecondary Education & Workforce",
+                "Agency": "House",
+                "Acronym": "PEW",
+                "Phone": ""
+            },
+            "ReferredDate": "2025-01-21T00:00:00"
+        },
+        {
+            "LegislationInfo": {
+                "Biennium": "2025-26",
+                "BillId": "HB 1486",
+                "BillNumber": 1486,
+                "SubstituteVersion": 0,
+                "EngrossedVersion": 0,
+                "ShortLegislationType": {
+                    "ShortLegislationType": "B",
+                    "LongLegislationType": "Bill"
+                },
+                "OriginalAgency": "House",
+                "Active": false,
+                "DisplayNumber": 1486
+            },
+            "Committee": {
+                "Id": 31638,
+                "Name": "Postsecondary Education & Workforce",
+                "LongName": "House Postsecondary Education & Workforce",
+                "Agency": "House",
+                "Acronym": "PEW",
+                "Phone": ""
+            },
+            "ReferredDate": "2025-01-21T00:00:00"
+        },
+        {
+            "LegislationInfo": {
+                "Biennium": "2025-26",
+                "BillId": "HB 1492",
+                "BillNumber": 1492,
+                "SubstituteVersion": 0,
+                "EngrossedVersion": 0,
+                "ShortLegislationType": {
+                    "ShortLegislationType": "B",
+                    "LongLegislationType": "Bill"
+                },
+                "OriginalAgency": "House",
+                "Active": true,
+                "DisplayNumber": 1492
+            },
+            "Committee": {
+                "Id": 31638,
+                "Name": "Postsecondary Education & Workforce",
+                "LongName": "House Postsecondary Education & Workforce",
+                "Agency": "House",
+                "Acronym": "PEW",
+                "Phone": ""
+            },
+            "ReferredDate": "2025-01-21T00:00:00"
+        },
+        {
+            "LegislationInfo": {
+                "Biennium": "2025-26",
+                "BillId": "HB 1554",
+                "BillNumber": 1554,
+                "SubstituteVersion": 0,
+                "EngrossedVersion": 0,
+                "ShortLegislationType": {
+                    "ShortLegislationType": "B",
+                    "LongLegislationType": "Bill"
+                },
+                "OriginalAgency": "House",
+                "Active": true,
+                "DisplayNumber": 1554
+            },
+            "Committee": {
+                "Id": 31638,
+                "Name": "Postsecondary Education & Workforce",
+                "LongName": "House Postsecondary Education & Workforce",
+                "Agency": "House",
+                "Acronym": "PEW",
+                "Phone": ""
+            },
+            "ReferredDate": "2025-01-23T00:00:00"
+        },
+        {
+            "LegislationInfo": {
+                "Biennium": "2025-26",
+                "BillId": "HB 1556",
+                "BillNumber": 1556,
+                "SubstituteVersion": 0,
+                "EngrossedVersion": 0,
+                "ShortLegislationType": {
+                    "ShortLegislationType": "B",
+                    "LongLegislationType": "Bill"
+                },
+                "OriginalAgency": "House",
+                "Active": true,
+                "DisplayNumber": 1556
+            },
+            "Committee": {
+                "Id": 31638,
+                "Name": "Postsecondary Education & Workforce",
+                "LongName": "House Postsecondary Education & Workforce",
+                "Agency": "House",
+                "Acronym": "PEW",
+                "Phone": ""
+            },
+            "ReferredDate": "2025-01-23T00:00:00"
+        },
+        {
+            "LegislationInfo": {
+                "Biennium": "2025-26",
+                "BillId": "HB 1557",
+                "BillNumber": 1557,
+                "SubstituteVersion": 0,
+                "EngrossedVersion": 0,
+                "ShortLegislationType": {
+                    "ShortLegislationType": "B",
+                    "LongLegislationType": "Bill"
+                },
+                "OriginalAgency": "House",
+                "Active": true,
+                "DisplayNumber": 1557
+            },
+            "Committee": {
+                "Id": 31638,
+                "Name": "Postsecondary Education & Workforce",
+                "LongName": "House Postsecondary Education & Workforce",
+                "Agency": "House",
+                "Acronym": "PEW",
+                "Phone": ""
+            },
+            "ReferredDate": "2025-01-23T00:00:00"
+        },
+        {
+            "LegislationInfo": {
+                "Biennium": "2025-26",
+                "BillId": "HB 1565",
+                "BillNumber": 1565,
+                "SubstituteVersion": 0,
+                "EngrossedVersion": 0,
+                "ShortLegislationType": {
+                    "ShortLegislationType": "B",
+                    "LongLegislationType": "Bill"
+                },
+                "OriginalAgency": "House",
+                "Active": true,
+                "DisplayNumber": 1565
+            },
+            "Committee": {
+                "Id": 31638,
+                "Name": "Postsecondary Education & Workforce",
+                "LongName": "House Postsecondary Education & Workforce",
+                "Agency": "House",
+                "Acronym": "PEW",
+                "Phone": ""
+            },
+            "ReferredDate": "2025-01-23T00:00:00"
+        },
+        {
+            "LegislationInfo": {
+                "Biennium": "2025-26",
+                "BillId": "HB 1568",
+                "BillNumber": 1568,
+                "SubstituteVersion": 0,
+                "EngrossedVersion": 0,
+                "ShortLegislationType": {
+                    "ShortLegislationType": "B",
+                    "LongLegislationType": "Bill"
+                },
+                "OriginalAgency": "House",
+                "Active": true,
+                "DisplayNumber": 1568
+            },
+            "Committee": {
+                "Id": 31638,
+                "Name": "Postsecondary Education & Workforce",
+                "LongName": "House Postsecondary Education & Workforce",
+                "Agency": "House",
+                "Acronym": "PEW",
+                "Phone": ""
+            },
+            "ReferredDate": "2025-01-24T00:00:00"
+        },
+        {
+            "LegislationInfo": {
+                "Biennium": "2025-26",
+                "BillId": "HB 1572",
+                "BillNumber": 1572,
+                "SubstituteVersion": 0,
+                "EngrossedVersion": 0,
+                "ShortLegislationType": {
+                    "ShortLegislationType": "B",
+                    "LongLegislationType": "Bill"
+                },
+                "OriginalAgency": "House",
+                "Active": false,
+                "DisplayNumber": 1572
+            },
+            "Committee": {
+                "Id": 31638,
+                "Name": "Postsecondary Education & Workforce",
+                "LongName": "House Postsecondary Education & Workforce",
+                "Agency": "House",
+                "Acronym": "PEW",
+                "Phone": ""
+            },
+            "ReferredDate": "2025-01-24T00:00:00"
+        },
+        {
+            "LegislationInfo": {
+                "Biennium": "2025-26",
+                "BillId": "HB 1587",
+                "BillNumber": 1587,
+                "SubstituteVersion": 0,
+                "EngrossedVersion": 0,
+                "ShortLegislationType": {
+                    "ShortLegislationType": "B",
+                    "LongLegislationType": "Bill"
+                },
+                "OriginalAgency": "House",
+                "Active": false,
+                "DisplayNumber": 1587
+            },
+            "Committee": {
+                "Id": 31638,
+                "Name": "Postsecondary Education & Workforce",
+                "LongName": "House Postsecondary Education & Workforce",
+                "Agency": "House",
+                "Acronym": "PEW",
+                "Phone": ""
+            },
+            "ReferredDate": "2025-01-24T00:00:00"
+        },
+        {
+            "LegislationInfo": {
+                "Biennium": "2025-26",
+                "BillId": "HB 1617",
+                "BillNumber": 1617,
+                "SubstituteVersion": 0,
+                "EngrossedVersion": 0,
+                "ShortLegislationType": {
+                    "ShortLegislationType": "B",
+                    "LongLegislationType": "Bill"
+                },
+                "OriginalAgency": "House",
+                "Active": true,
+                "DisplayNumber": 1617
+            },
+            "Committee": {
+                "Id": 31638,
+                "Name": "Postsecondary Education & Workforce",
+                "LongName": "House Postsecondary Education & Workforce",
+                "Agency": "House",
+                "Acronym": "PEW",
+                "Phone": ""
+            },
+            "ReferredDate": "2025-01-27T00:00:00"
+        },
+        {
+            "LegislationInfo": {
+                "Biennium": "2025-26",
+                "BillId": "SB 5542",
+                "BillNumber": 5542,
+                "SubstituteVersion": 0,
+                "EngrossedVersion": 0,
+                "ShortLegislationType": {
+                    "ShortLegislationType": "B",
+                    "LongLegislationType": "Bill"
+                },
+                "OriginalAgency": "Senate",
+                "Active": true,
+                "DisplayNumber": 5542
+            },
+            "Committee": {
+                "Id": 31638,
+                "Name": "Postsecondary Education & Workforce",
+                "LongName": "House Postsecondary Education & Workforce",
+                "Agency": "House",
+                "Acronym": "PEW",
+                "Phone": ""
+            },
+            "ReferredDate": "2025-03-08T00:00:00"
+        },
+        {
+            "LegislationInfo": {
+                "Biennium": "2025-26",
+                "BillId": "SB 5543",
+                "BillNumber": 5543,
+                "SubstituteVersion": 0,
+                "EngrossedVersion": 0,
+                "ShortLegislationType": {
+                    "ShortLegislationType": "B",
+                    "LongLegislationType": "Bill"
+                },
+                "OriginalAgency": "Senate",
+                "Active": true,
+                "DisplayNumber": 5543
+            },
+            "Committee": {
+                "Id": 31638,
+                "Name": "Postsecondary Education & Workforce",
+                "LongName": "House Postsecondary Education & Workforce",
+                "Agency": "House",
+                "Acronym": "PEW",
+                "Phone": ""
+            },
+            "ReferredDate": "2025-03-09T00:00:00"
+        },
+        {
+            "LegislationInfo": {
+                "Biennium": "2025-26",
+                "BillId": "HB 1657",
+                "BillNumber": 1657,
+                "SubstituteVersion": 0,
+                "EngrossedVersion": 0,
+                "ShortLegislationType": {
+                    "ShortLegislationType": "B",
+                    "LongLegislationType": "Bill"
+                },
+                "OriginalAgency": "House",
+                "Active": true,
+                "DisplayNumber": 1657
+            },
+            "Committee": {
+                "Id": 31638,
+                "Name": "Postsecondary Education & Workforce",
+                "LongName": "House Postsecondary Education & Workforce",
+                "Agency": "House",
+                "Acronym": "PEW",
+                "Phone": ""
+            },
+            "ReferredDate": "2025-01-28T00:00:00"
+        },
+        {
+            "LegislationInfo": {
+                "Biennium": "2025-26",
+                "BillId": "HB 1677",
+                "BillNumber": 1677,
+                "SubstituteVersion": 0,
+                "EngrossedVersion": 0,
+                "ShortLegislationType": {
+                    "ShortLegislationType": "B",
+                    "LongLegislationType": "Bill"
+                },
+                "OriginalAgency": "House",
+                "Active": true,
+                "DisplayNumber": 1677
+            },
+            "Committee": {
+                "Id": 31638,
+                "Name": "Postsecondary Education & Workforce",
+                "LongName": "House Postsecondary Education & Workforce",
+                "Agency": "House",
+                "Acronym": "PEW",
+                "Phone": ""
+            },
+            "ReferredDate": "2025-01-28T00:00:00"
+        },
+        {
+            "LegislationInfo": {
+                "Biennium": "2025-26",
+                "BillId": "EHB 1705",
+                "BillNumber": 1705,
+                "SubstituteVersion": 0,
+                "EngrossedVersion": 1,
+                "ShortLegislationType": {
+                    "ShortLegislationType": "B",
+                    "LongLegislationType": "Bill"
+                },
+                "OriginalAgency": "House",
+                "Active": true,
+                "DisplayNumber": 1705
+            },
+            "Committee": {
+                "Id": 31638,
+                "Name": "Postsecondary Education & Workforce",
+                "LongName": "House Postsecondary Education & Workforce",
+                "Agency": "House",
+                "Acronym": "PEW",
+                "Phone": ""
+            },
+            "ReferredDate": "2025-01-29T00:00:00"
+        },
+        {
+            "LegislationInfo": {
+                "Biennium": "2025-26",
+                "BillId": "HB 1762",
+                "BillNumber": 1762,
+                "SubstituteVersion": 0,
+                "EngrossedVersion": 0,
+                "ShortLegislationType": {
+                    "ShortLegislationType": "B",
+                    "LongLegislationType": "Bill"
+                },
+                "OriginalAgency": "House",
+                "Active": true,
+                "DisplayNumber": 1762
+            },
+            "Committee": {
+                "Id": 31638,
+                "Name": "Postsecondary Education & Workforce",
+                "LongName": "House Postsecondary Education & Workforce",
+                "Agency": "House",
+                "Acronym": "PEW",
+                "Phone": ""
+            },
+            "ReferredDate": "2025-01-31T00:00:00"
+        },
+        {
+            "LegislationInfo": {
+                "Biennium": "2025-26",
+                "BillId": "HB 1777",
+                "BillNumber": 1777,
+                "SubstituteVersion": 0,
+                "EngrossedVersion": 0,
+                "ShortLegislationType": {
+                    "ShortLegislationType": "B",
+                    "LongLegislationType": "Bill"
+                },
+                "OriginalAgency": "House",
+                "Active": true,
+                "DisplayNumber": 1777
+            },
+            "Committee": {
+                "Id": 31638,
+                "Name": "Postsecondary Education & Workforce",
+                "LongName": "House Postsecondary Education & Workforce",
+                "Agency": "House",
+                "Acronym": "PEW",
+                "Phone": ""
+            },
+            "ReferredDate": "2025-02-03T00:00:00"
+        },
+        {
+            "LegislationInfo": {
+                "Biennium": "2025-26",
+                "BillId": "HB 1783",
+                "BillNumber": 1783,
+                "SubstituteVersion": 0,
+                "EngrossedVersion": 0,
+                "ShortLegislationType": {
+                    "ShortLegislationType": "B",
+                    "LongLegislationType": "Bill"
+                },
+                "OriginalAgency": "House",
+                "Active": true,
+                "DisplayNumber": 1783
+            },
+            "Committee": {
+                "Id": 31638,
+                "Name": "Postsecondary Education & Workforce",
+                "LongName": "House Postsecondary Education & Workforce",
+                "Agency": "House",
+                "Acronym": "PEW",
+                "Phone": ""
+            },
+            "ReferredDate": "2025-02-03T00:00:00"
+        },
+        {
+            "LegislationInfo": {
+                "Biennium": "2025-26",
+                "BillId": "HB 1783",
+                "BillNumber": 1783,
+                "SubstituteVersion": 0,
+                "EngrossedVersion": 0,
+                "ShortLegislationType": {
+                    "ShortLegislationType": "B",
+                    "LongLegislationType": "Bill"
+                },
+                "OriginalAgency": "House",
+                "Active": true,
+                "DisplayNumber": 1783
+            },
+            "Committee": {
+                "Id": 31638,
+                "Name": "Postsecondary Education & Workforce",
+                "LongName": "House Postsecondary Education & Workforce",
+                "Agency": "House",
+                "Acronym": "PEW",
+                "Phone": ""
+            },
+            "ReferredDate": "2026-01-12T00:00:00"
+        },
+        {
+            "LegislationInfo": {
+                "Biennium": "2025-26",
+                "BillId": "HB 1851",
+                "BillNumber": 1851,
+                "SubstituteVersion": 0,
+                "EngrossedVersion": 0,
+                "ShortLegislationType": {
+                    "ShortLegislationType": "B",
+                    "LongLegislationType": "Bill"
+                },
+                "OriginalAgency": "House",
+                "Active": true,
+                "DisplayNumber": 1851
+            },
+            "Committee": {
+                "Id": 31638,
+                "Name": "Postsecondary Education & Workforce",
+                "LongName": "House Postsecondary Education & Workforce",
+                "Agency": "House",
+                "Acronym": "PEW",
+                "Phone": ""
+            },
+            "ReferredDate": "2025-02-05T00:00:00"
+        },
+        {
+            "LegislationInfo": {
+                "Biennium": "2025-26",
+                "BillId": "EHB 1874",
+                "BillNumber": 1874,
+                "SubstituteVersion": 0,
+                "EngrossedVersion": 1,
+                "ShortLegislationType": {
+                    "ShortLegislationType": "B",
+                    "LongLegislationType": "Bill"
+                },
+                "OriginalAgency": "House",
+                "Active": true,
+                "DisplayNumber": 1874
+            },
+            "Committee": {
+                "Id": 31638,
+                "Name": "Postsecondary Education & Workforce",
+                "LongName": "House Postsecondary Education & Workforce",
+                "Agency": "House",
+                "Acronym": "PEW",
+                "Phone": ""
+            },
+            "ReferredDate": "2025-02-06T00:00:00"
+        },
+        {
+            "LegislationInfo": {
+                "Biennium": "2025-26",
+                "BillId": "HB 1926",
+                "BillNumber": 1926,
+                "SubstituteVersion": 0,
+                "EngrossedVersion": 0,
+                "ShortLegislationType": {
+                    "ShortLegislationType": "B",
+                    "LongLegislationType": "Bill"
+                },
+                "OriginalAgency": "House",
+                "Active": true,
+                "DisplayNumber": 1926
+            },
+            "Committee": {
+                "Id": 31638,
+                "Name": "Postsecondary Education & Workforce",
+                "LongName": "House Postsecondary Education & Workforce",
+                "Agency": "House",
+                "Acronym": "PEW",
+                "Phone": ""
+            },
+            "ReferredDate": "2025-02-10T00:00:00"
+        },
+        {
+            "LegislationInfo": {
+                "Biennium": "2025-26",
+                "BillId": "ESSB 5663",
+                "BillNumber": 5663,
+                "SubstituteVersion": 1,
+                "EngrossedVersion": 1,
+                "ShortLegislationType": {
+                    "ShortLegislationType": "B",
+                    "LongLegislationType": "Bill"
+                },
+                "OriginalAgency": "Senate",
+                "Active": true,
+                "DisplayNumber": "5663-S"
+            },
+            "Committee": {
+                "Id": 31638,
+                "Name": "Postsecondary Education & Workforce",
+                "LongName": "House Postsecondary Education & Workforce",
+                "Agency": "House",
+                "Acronym": "PEW",
+                "Phone": ""
+            },
+            "ReferredDate": "2025-03-06T00:00:00"
+        },
+        {
+            "LegislationInfo": {
+                "Biennium": "2025-26",
+                "BillId": "E2SSB 5355",
+                "BillNumber": 5355,
+                "SubstituteVersion": 2,
+                "EngrossedVersion": 1,
+                "ShortLegislationType": {
+                    "ShortLegislationType": "B",
+                    "LongLegislationType": "Bill"
+                },
+                "OriginalAgency": "Senate",
+                "Active": true,
+                "DisplayNumber": "5355-S2"
+            },
+            "Committee": {
+                "Id": 31638,
+                "Name": "Postsecondary Education & Workforce",
+                "LongName": "House Postsecondary Education & Workforce",
+                "Agency": "House",
+                "Acronym": "PEW",
+                "Phone": ""
+            },
+            "ReferredDate": "2025-03-14T00:00:00"
+        },
+        {
+            "LegislationInfo": {
+                "Biennium": "2025-26",
+                "BillId": "HB 2063",
+                "BillNumber": 2063,
+                "SubstituteVersion": 0,
+                "EngrossedVersion": 0,
+                "ShortLegislationType": {
+                    "ShortLegislationType": "B",
+                    "LongLegislationType": "Bill"
+                },
+                "OriginalAgency": "House",
+                "Active": true,
+                "DisplayNumber": 2063
+            },
+            "Committee": {
+                "Id": 31638,
+                "Name": "Postsecondary Education & Workforce",
+                "LongName": "House Postsecondary Education & Workforce",
+                "Agency": "House",
+                "Acronym": "PEW",
+                "Phone": ""
+            },
+            "ReferredDate": "2025-03-27T00:00:00"
+        },
+        {
+            "LegislationInfo": {
+                "Biennium": "2025-26",
+                "BillId": "HB 2065",
+                "BillNumber": 2065,
+                "SubstituteVersion": 0,
+                "EngrossedVersion": 0,
+                "ShortLegislationType": {
+                    "ShortLegislationType": "B",
+                    "LongLegislationType": "Bill"
+                },
+                "OriginalAgency": "House",
+                "Active": true,
+                "DisplayNumber": 2065
+            },
+            "Committee": {
+                "Id": 31638,
+                "Name": "Postsecondary Education & Workforce",
+                "LongName": "House Postsecondary Education & Workforce",
+                "Agency": "House",
+                "Acronym": "PEW",
+                "Phone": ""
+            },
+            "ReferredDate": "2025-03-28T00:00:00"
+        },
+        {
+            "LegislationInfo": {
+                "Biennium": "2025-26",
+                "BillId": "HB 2070",
+                "BillNumber": 2070,
+                "SubstituteVersion": 0,
+                "EngrossedVersion": 0,
+                "ShortLegislationType": {
+                    "ShortLegislationType": "B",
+                    "LongLegislationType": "Bill"
+                },
+                "OriginalAgency": "House",
+                "Active": true,
+                "DisplayNumber": 2070
+            },
+            "Committee": {
+                "Id": 31638,
+                "Name": "Postsecondary Education & Workforce",
+                "LongName": "House Postsecondary Education & Workforce",
+                "Agency": "House",
+                "Acronym": "PEW",
+                "Phone": ""
+            },
+            "ReferredDate": "2025-04-04T00:00:00"
+        },
+        {
+            "LegislationInfo": {
+                "Biennium": "2025-26",
+                "BillId": "HB 2088",
+                "BillNumber": 2088,
+                "SubstituteVersion": 0,
+                "EngrossedVersion": 0,
+                "ShortLegislationType": {
+                    "ShortLegislationType": "B",
+                    "LongLegislationType": "Bill"
+                },
+                "OriginalAgency": "House",
+                "Active": false,
+                "DisplayNumber": 2088
+            },
+            "Committee": {
+                "Id": 31638,
+                "Name": "Postsecondary Education & Workforce",
+                "LongName": "House Postsecondary Education & Workforce",
+                "Agency": "House",
+                "Acronym": "PEW",
+                "Phone": ""
+            },
+            "ReferredDate": "2026-01-12T00:00:00"
+        },
+        {
+            "LegislationInfo": {
+                "Biennium": "2025-26",
+                "BillId": "HB 2098",
+                "BillNumber": 2098,
+                "SubstituteVersion": 0,
+                "EngrossedVersion": 0,
+                "ShortLegislationType": {
+                    "ShortLegislationType": "B",
+                    "LongLegislationType": "Bill"
+                },
+                "OriginalAgency": "House",
+                "Active": true,
+                "DisplayNumber": 2098
+            },
+            "Committee": {
+                "Id": 31638,
+                "Name": "Postsecondary Education & Workforce",
+                "LongName": "House Postsecondary Education & Workforce",
+                "Agency": "House",
+                "Acronym": "PEW",
+                "Phone": ""
+            },
+            "ReferredDate": "2026-01-12T00:00:00"
+        },
+        {
+            "LegislationInfo": {
+                "Biennium": "2025-26",
+                "BillId": "HB 2132",
+                "BillNumber": 2132,
+                "SubstituteVersion": 0,
+                "EngrossedVersion": 0,
+                "ShortLegislationType": {
+                    "ShortLegislationType": "B",
+                    "LongLegislationType": "Bill"
+                },
+                "OriginalAgency": "House",
+                "Active": true,
+                "DisplayNumber": 2132
+            },
+            "Committee": {
+                "Id": 31638,
+                "Name": "Postsecondary Education & Workforce",
+                "LongName": "House Postsecondary Education & Workforce",
+                "Agency": "House",
+                "Acronym": "PEW",
+                "Phone": ""
+            },
+            "ReferredDate": "2026-01-12T00:00:00"
+        },
+        {
+            "LegislationInfo": {
+                "Biennium": "2025-26",
+                "BillId": "HB 2148",
+                "BillNumber": 2148,
+                "SubstituteVersion": 0,
+                "EngrossedVersion": 0,
+                "ShortLegislationType": {
+                    "ShortLegislationType": "B",
+                    "LongLegislationType": "Bill"
+                },
+                "OriginalAgency": "House",
+                "Active": true,
+                "DisplayNumber": 2148
+            },
+            "Committee": {
+                "Id": 31638,
+                "Name": "Postsecondary Education & Workforce",
+                "LongName": "House Postsecondary Education & Workforce",
+                "Agency": "House",
+                "Acronym": "PEW",
+                "Phone": ""
+            },
+            "ReferredDate": "2026-01-12T00:00:00"
+        },
+        {
+            "LegislationInfo": {
+                "Biennium": "2025-26",
+                "BillId": "SB 5963",
+                "BillNumber": 5963,
+                "SubstituteVersion": 0,
+                "EngrossedVersion": 0,
+                "ShortLegislationType": {
+                    "ShortLegislationType": "B",
+                    "LongLegislationType": "Bill"
+                },
+                "OriginalAgency": "Senate",
+                "Active": true,
+                "DisplayNumber": 5963
+            },
+            "Committee": {
+                "Id": 31638,
+                "Name": "Postsecondary Education & Workforce",
+                "LongName": "House Postsecondary Education & Workforce",
+                "Agency": "House",
+                "Acronym": "PEW",
+                "Phone": ""
+            },
+            "ReferredDate": "2026-02-17T00:00:00"
+        },
+        {
+            "LegislationInfo": {
+                "Biennium": "2025-26",
+                "BillId": "HB 2286",
+                "BillNumber": 2286,
+                "SubstituteVersion": 0,
+                "EngrossedVersion": 0,
+                "ShortLegislationType": {
+                    "ShortLegislationType": "B",
+                    "LongLegislationType": "Bill"
+                },
+                "OriginalAgency": "House",
+                "Active": true,
+                "DisplayNumber": 2286
+            },
+            "Committee": {
+                "Id": 31638,
+                "Name": "Postsecondary Education & Workforce",
+                "LongName": "House Postsecondary Education & Workforce",
+                "Agency": "House",
+                "Acronym": "PEW",
+                "Phone": ""
+            },
+            "ReferredDate": "2026-01-12T00:00:00"
+        },
+        {
+            "LegislationInfo": {
+                "Biennium": "2025-26",
+                "BillId": "HB 2311",
+                "BillNumber": 2311,
+                "SubstituteVersion": 0,
+                "EngrossedVersion": 0,
+                "ShortLegislationType": {
+                    "ShortLegislationType": "B",
+                    "LongLegislationType": "Bill"
+                },
+                "OriginalAgency": "House",
+                "Active": true,
+                "DisplayNumber": 2311
+            },
+            "Committee": {
+                "Id": 31638,
+                "Name": "Postsecondary Education & Workforce",
+                "LongName": "House Postsecondary Education & Workforce",
+                "Agency": "House",
+                "Acronym": "PEW",
+                "Phone": ""
+            },
+            "ReferredDate": "2026-01-12T00:00:00"
+        },
+        {
+            "LegislationInfo": {
+                "Biennium": "2025-26",
+                "BillId": "HB 2324",
+                "BillNumber": 2324,
+                "SubstituteVersion": 0,
+                "EngrossedVersion": 0,
+                "ShortLegislationType": {
+                    "ShortLegislationType": "B",
+                    "LongLegislationType": "Bill"
+                },
+                "OriginalAgency": "House",
+                "Active": true,
+                "DisplayNumber": 2324
+            },
+            "Committee": {
+                "Id": 31638,
+                "Name": "Postsecondary Education & Workforce",
+                "LongName": "House Postsecondary Education & Workforce",
+                "Agency": "House",
+                "Acronym": "PEW",
+                "Phone": ""
+            },
+            "ReferredDate": "2026-01-12T00:00:00"
+        },
+        {
+            "LegislationInfo": {
+                "Biennium": "2025-26",
+                "BillId": "HB 2337",
+                "BillNumber": 2337,
+                "SubstituteVersion": 0,
+                "EngrossedVersion": 0,
+                "ShortLegislationType": {
+                    "ShortLegislationType": "B",
+                    "LongLegislationType": "Bill"
+                },
+                "OriginalAgency": "House",
+                "Active": true,
+                "DisplayNumber": 2337
+            },
+            "Committee": {
+                "Id": 31638,
+                "Name": "Postsecondary Education & Workforce",
+                "LongName": "House Postsecondary Education & Workforce",
+                "Agency": "House",
+                "Acronym": "PEW",
+                "Phone": ""
+            },
+            "ReferredDate": "2026-01-12T00:00:00"
+        },
+        {
+            "LegislationInfo": {
+                "Biennium": "2025-26",
+                "BillId": "HB 2363",
+                "BillNumber": 2363,
+                "SubstituteVersion": 0,
+                "EngrossedVersion": 0,
+                "ShortLegislationType": {
+                    "ShortLegislationType": "B",
+                    "LongLegislationType": "Bill"
+                },
+                "OriginalAgency": "House",
+                "Active": false,
+                "DisplayNumber": 2363
+            },
+            "Committee": {
+                "Id": 31638,
+                "Name": "Postsecondary Education & Workforce",
+                "LongName": "House Postsecondary Education & Workforce",
+                "Agency": "House",
+                "Acronym": "PEW",
+                "Phone": ""
+            },
+            "ReferredDate": "2026-01-12T00:00:00"
+        },
+        {
+            "LegislationInfo": {
+                "Biennium": "2025-26",
+                "BillId": "HB 2422",
+                "BillNumber": 2422,
+                "SubstituteVersion": 0,
+                "EngrossedVersion": 0,
+                "ShortLegislationType": {
+                    "ShortLegislationType": "B",
+                    "LongLegislationType": "Bill"
+                },
+                "OriginalAgency": "House",
+                "Active": true,
+                "DisplayNumber": 2422
+            },
+            "Committee": {
+                "Id": 31638,
+                "Name": "Postsecondary Education & Workforce",
+                "LongName": "House Postsecondary Education & Workforce",
+                "Agency": "House",
+                "Acronym": "PEW",
+                "Phone": ""
+            },
+            "ReferredDate": "2026-01-13T00:00:00"
+        },
+        {
+            "LegislationInfo": {
+                "Biennium": "2025-26",
+                "BillId": "HB 2427",
+                "BillNumber": 2427,
+                "SubstituteVersion": 0,
+                "EngrossedVersion": 0,
+                "ShortLegislationType": {
+                    "ShortLegislationType": "B",
+                    "LongLegislationType": "Bill"
+                },
+                "OriginalAgency": "House",
+                "Active": true,
+                "DisplayNumber": 2427
+            },
+            "Committee": {
+                "Id": 31638,
+                "Name": "Postsecondary Education & Workforce",
+                "LongName": "House Postsecondary Education & Workforce",
+                "Agency": "House",
+                "Acronym": "PEW",
+                "Phone": ""
+            },
+            "ReferredDate": "2026-01-13T00:00:00"
+        },
+        {
+            "LegislationInfo": {
+                "Biennium": "2025-26",
+                "BillId": "HB 2438",
+                "BillNumber": 2438,
+                "SubstituteVersion": 0,
+                "EngrossedVersion": 0,
+                "ShortLegislationType": {
+                    "ShortLegislationType": "B",
+                    "LongLegislationType": "Bill"
+                },
+                "OriginalAgency": "House",
+                "Active": true,
+                "DisplayNumber": 2438
+            },
+            "Committee": {
+                "Id": 31638,
+                "Name": "Postsecondary Education & Workforce",
+                "LongName": "House Postsecondary Education & Workforce",
+                "Agency": "House",
+                "Acronym": "PEW",
+                "Phone": ""
+            },
+            "ReferredDate": "2026-01-13T00:00:00"
+        },
+        {
+            "LegislationInfo": {
+                "Biennium": "2025-26",
+                "BillId": "HB 2443",
+                "BillNumber": 2443,
+                "SubstituteVersion": 0,
+                "EngrossedVersion": 0,
+                "ShortLegislationType": {
+                    "ShortLegislationType": "B",
+                    "LongLegislationType": "Bill"
+                },
+                "OriginalAgency": "House",
+                "Active": true,
+                "DisplayNumber": 2443
+            },
+            "Committee": {
+                "Id": 31638,
+                "Name": "Postsecondary Education & Workforce",
+                "LongName": "House Postsecondary Education & Workforce",
+                "Agency": "House",
+                "Acronym": "PEW",
+                "Phone": ""
+            },
+            "ReferredDate": "2026-01-13T00:00:00"
+        },
+        {
+            "LegislationInfo": {
+                "Biennium": "2025-26",
+                "BillId": "HB 2458",
+                "BillNumber": 2458,
+                "SubstituteVersion": 0,
+                "EngrossedVersion": 0,
+                "ShortLegislationType": {
+                    "ShortLegislationType": "B",
+                    "LongLegislationType": "Bill"
+                },
+                "OriginalAgency": "House",
+                "Active": true,
+                "DisplayNumber": 2458
+            },
+            "Committee": {
+                "Id": 31638,
+                "Name": "Postsecondary Education & Workforce",
+                "LongName": "House Postsecondary Education & Workforce",
+                "Agency": "House",
+                "Acronym": "PEW",
+                "Phone": ""
+            },
+            "ReferredDate": "2026-01-14T00:00:00"
+        },
+        {
+            "LegislationInfo": {
+                "Biennium": "2025-26",
+                "BillId": "HB 2474",
+                "BillNumber": 2474,
+                "SubstituteVersion": 0,
+                "EngrossedVersion": 0,
+                "ShortLegislationType": {
+                    "ShortLegislationType": "B",
+                    "LongLegislationType": "Bill"
+                },
+                "OriginalAgency": "House",
+                "Active": true,
+                "DisplayNumber": 2474
+            },
+            "Committee": {
+                "Id": 31638,
+                "Name": "Postsecondary Education & Workforce",
+                "LongName": "House Postsecondary Education & Workforce",
+                "Agency": "House",
+                "Acronym": "PEW",
+                "Phone": ""
+            },
+            "ReferredDate": "2026-01-14T00:00:00"
+        },
+        {
+            "LegislationInfo": {
+                "Biennium": "2025-26",
+                "BillId": "HB 2498",
+                "BillNumber": 2498,
+                "SubstituteVersion": 0,
+                "EngrossedVersion": 0,
+                "ShortLegislationType": {
+                    "ShortLegislationType": "B",
+                    "LongLegislationType": "Bill"
+                },
+                "OriginalAgency": "House",
+                "Active": true,
+                "DisplayNumber": 2498
+            },
+            "Committee": {
+                "Id": 31638,
+                "Name": "Postsecondary Education & Workforce",
+                "LongName": "House Postsecondary Education & Workforce",
+                "Agency": "House",
+                "Acronym": "PEW",
+                "Phone": ""
+            },
+            "ReferredDate": "2026-01-15T00:00:00"
+        },
+        {
+            "LegislationInfo": {
+                "Biennium": "2025-26",
+                "BillId": "HB 2525",
+                "BillNumber": 2525,
+                "SubstituteVersion": 0,
+                "EngrossedVersion": 0,
+                "ShortLegislationType": {
+                    "ShortLegislationType": "B",
+                    "LongLegislationType": "Bill"
+                },
+                "OriginalAgency": "House",
+                "Active": false,
+                "DisplayNumber": 2525
+            },
+            "Committee": {
+                "Id": 31638,
+                "Name": "Postsecondary Education & Workforce",
+                "LongName": "House Postsecondary Education & Workforce",
+                "Agency": "House",
+                "Acronym": "PEW",
+                "Phone": ""
+            },
+            "ReferredDate": "2026-01-16T00:00:00"
+        },
+        {
+            "LegislationInfo": {
+                "Biennium": "2025-26",
+                "BillId": "HB 2535",
+                "BillNumber": 2535,
+                "SubstituteVersion": 0,
+                "EngrossedVersion": 0,
+                "ShortLegislationType": {
+                    "ShortLegislationType": "B",
+                    "LongLegislationType": "Bill"
+                },
+                "OriginalAgency": "House",
+                "Active": true,
+                "DisplayNumber": 2535
+            },
+            "Committee": {
+                "Id": 31638,
+                "Name": "Postsecondary Education & Workforce",
+                "LongName": "House Postsecondary Education & Workforce",
+                "Agency": "House",
+                "Acronym": "PEW",
+                "Phone": ""
+            },
+            "ReferredDate": "2026-01-16T00:00:00"
+        },
+        {
+            "LegislationInfo": {
+                "Biennium": "2025-26",
+                "BillId": "HB 2538",
+                "BillNumber": 2538,
+                "SubstituteVersion": 0,
+                "EngrossedVersion": 0,
+                "ShortLegislationType": {
+                    "ShortLegislationType": "B",
+                    "LongLegislationType": "Bill"
+                },
+                "OriginalAgency": "House",
+                "Active": true,
+                "DisplayNumber": 2538
+            },
+            "Committee": {
+                "Id": 31638,
+                "Name": "Postsecondary Education & Workforce",
+                "LongName": "House Postsecondary Education & Workforce",
+                "Agency": "House",
+                "Acronym": "PEW",
+                "Phone": ""
+            },
+            "ReferredDate": "2026-01-16T00:00:00"
+        },
+        {
+            "LegislationInfo": {
+                "Biennium": "2025-26",
+                "BillId": "HB 2540",
+                "BillNumber": 2540,
+                "SubstituteVersion": 0,
+                "EngrossedVersion": 0,
+                "ShortLegislationType": {
+                    "ShortLegislationType": "B",
+                    "LongLegislationType": "Bill"
+                },
+                "OriginalAgency": "House",
+                "Active": true,
+                "DisplayNumber": 2540
+            },
+            "Committee": {
+                "Id": 31638,
+                "Name": "Postsecondary Education & Workforce",
+                "LongName": "House Postsecondary Education & Workforce",
+                "Agency": "House",
+                "Acronym": "PEW",
+                "Phone": ""
+            },
+            "ReferredDate": "2026-01-16T00:00:00"
+        },
+        {
+            "LegislationInfo": {
+                "Biennium": "2025-26",
+                "BillId": "HB 2565",
+                "BillNumber": 2565,
+                "SubstituteVersion": 0,
+                "EngrossedVersion": 0,
+                "ShortLegislationType": {
+                    "ShortLegislationType": "B",
+                    "LongLegislationType": "Bill"
+                },
+                "OriginalAgency": "House",
+                "Active": true,
+                "DisplayNumber": 2565
+            },
+            "Committee": {
+                "Id": 31638,
+                "Name": "Postsecondary Education & Workforce",
+                "LongName": "House Postsecondary Education & Workforce",
+                "Agency": "House",
+                "Acronym": "PEW",
+                "Phone": ""
+            },
+            "ReferredDate": "2026-01-19T00:00:00"
+        },
+        {
+            "LegislationInfo": {
+                "Biennium": "2025-26",
+                "BillId": "HB 2567",
+                "BillNumber": 2567,
+                "SubstituteVersion": 0,
+                "EngrossedVersion": 0,
+                "ShortLegislationType": {
+                    "ShortLegislationType": "B",
+                    "LongLegislationType": "Bill"
+                },
+                "OriginalAgency": "House",
+                "Active": true,
+                "DisplayNumber": 2567
+            },
+            "Committee": {
+                "Id": 31638,
+                "Name": "Postsecondary Education & Workforce",
+                "LongName": "House Postsecondary Education & Workforce",
+                "Agency": "House",
+                "Acronym": "PEW",
+                "Phone": ""
+            },
+            "ReferredDate": "2026-01-19T00:00:00"
+        },
+        {
+            "LegislationInfo": {
+                "Biennium": "2025-26",
+                "BillId": "HB 2586",
+                "BillNumber": 2586,
+                "SubstituteVersion": 0,
+                "EngrossedVersion": 0,
+                "ShortLegislationType": {
+                    "ShortLegislationType": "B",
+                    "LongLegislationType": "Bill"
+                },
+                "OriginalAgency": "House",
+                "Active": true,
+                "DisplayNumber": 2586
+            },
+            "Committee": {
+                "Id": 31638,
+                "Name": "Postsecondary Education & Workforce",
+                "LongName": "House Postsecondary Education & Workforce",
+                "Agency": "House",
+                "Acronym": "PEW",
+                "Phone": ""
+            },
+            "ReferredDate": "2026-01-20T00:00:00"
+        },
+        {
+            "LegislationInfo": {
+                "Biennium": "2025-26",
+                "BillId": "HB 2589",
+                "BillNumber": 2589,
+                "SubstituteVersion": 0,
+                "EngrossedVersion": 0,
+                "ShortLegislationType": {
+                    "ShortLegislationType": "B",
+                    "LongLegislationType": "Bill"
+                },
+                "OriginalAgency": "House",
+                "Active": true,
+                "DisplayNumber": 2589
+            },
+            "Committee": {
+                "Id": 31638,
+                "Name": "Postsecondary Education & Workforce",
+                "LongName": "House Postsecondary Education & Workforce",
+                "Agency": "House",
+                "Acronym": "PEW",
+                "Phone": ""
+            },
+            "ReferredDate": "2026-01-20T00:00:00"
+        },
+        {
+            "LegislationInfo": {
+                "Biennium": "2025-26",
+                "BillId": "SB 6258",
+                "BillNumber": 6258,
+                "SubstituteVersion": 0,
+                "EngrossedVersion": 0,
+                "ShortLegislationType": {
+                    "ShortLegislationType": "B",
+                    "LongLegislationType": "Bill"
+                },
+                "OriginalAgency": "Senate",
+                "Active": true,
+                "DisplayNumber": 6258
+            },
+            "Committee": {
+                "Id": 31638,
+                "Name": "Postsecondary Education & Workforce",
+                "LongName": "House Postsecondary Education & Workforce",
+                "Agency": "House",
+                "Acronym": "PEW",
+                "Phone": ""
+            },
+            "ReferredDate": "2026-02-17T00:00:00"
+        },
+        {
+            "LegislationInfo": {
+                "Biennium": "2025-26",
+                "BillId": "HB 2617",
+                "BillNumber": 2617,
+                "SubstituteVersion": 0,
+                "EngrossedVersion": 0,
+                "ShortLegislationType": {
+                    "ShortLegislationType": "B",
+                    "LongLegislationType": "Bill"
+                },
+                "OriginalAgency": "House",
+                "Active": true,
+                "DisplayNumber": 2617
+            },
+            "Committee": {
+                "Id": 31638,
+                "Name": "Postsecondary Education & Workforce",
+                "LongName": "House Postsecondary Education & Workforce",
+                "Agency": "House",
+                "Acronym": "PEW",
+                "Phone": ""
+            },
+            "ReferredDate": "2026-01-22T00:00:00"
+        },
+        {
+            "LegislationInfo": {
+                "Biennium": "2025-26",
+                "BillId": "HB 2652",
+                "BillNumber": 2652,
+                "SubstituteVersion": 0,
+                "EngrossedVersion": 0,
+                "ShortLegislationType": {
+                    "ShortLegislationType": "B",
+                    "LongLegislationType": "Bill"
+                },
+                "OriginalAgency": "House",
+                "Active": true,
+                "DisplayNumber": 2652
+            },
+            "Committee": {
+                "Id": 31638,
+                "Name": "Postsecondary Education & Workforce",
+                "LongName": "House Postsecondary Education & Workforce",
+                "Agency": "House",
+                "Acronym": "PEW",
+                "Phone": ""
+            },
+            "ReferredDate": "2026-01-26T00:00:00"
+        },
+        {
+            "LegislationInfo": {
+                "Biennium": "2025-26",
+                "BillId": "SSB 5931",
+                "BillNumber": 5931,
+                "SubstituteVersion": 1,
+                "EngrossedVersion": 0,
+                "ShortLegislationType": {
+                    "ShortLegislationType": "B",
+                    "LongLegislationType": "Bill"
+                },
+                "OriginalAgency": "Senate",
+                "Active": true,
+                "DisplayNumber": "5931-S"
+            },
+            "Committee": {
+                "Id": 31638,
+                "Name": "Postsecondary Education & Workforce",
+                "LongName": "House Postsecondary Education & Workforce",
+                "Agency": "House",
+                "Acronym": "PEW",
+                "Phone": ""
+            },
+            "ReferredDate": "2026-02-12T00:00:00"
+        },
+        {
+            "LegislationInfo": {
+                "Biennium": "2025-26",
+                "BillId": "HB 2671",
+                "BillNumber": 2671,
+                "SubstituteVersion": 0,
+                "EngrossedVersion": 0,
+                "ShortLegislationType": {
+                    "ShortLegislationType": "B",
+                    "LongLegislationType": "Bill"
+                },
+                "OriginalAgency": "House",
+                "Active": true,
+                "DisplayNumber": 2671
+            },
+            "Committee": {
+                "Id": 31638,
+                "Name": "Postsecondary Education & Workforce",
+                "LongName": "House Postsecondary Education & Workforce",
+                "Agency": "House",
+                "Acronym": "PEW",
+                "Phone": ""
+            },
+            "ReferredDate": "2026-01-26T00:00:00"
+        },
+        {
+            "LegislationInfo": {
+                "Biennium": "2025-26",
+                "BillId": "HB 2739",
+                "BillNumber": 2739,
+                "SubstituteVersion": 0,
+                "EngrossedVersion": 0,
+                "ShortLegislationType": {
+                    "ShortLegislationType": "B",
+                    "LongLegislationType": "Bill"
+                },
+                "OriginalAgency": "House",
+                "Active": true,
+                "DisplayNumber": 2739
+            },
+            "Committee": {
+                "Id": 31638,
+                "Name": "Postsecondary Education & Workforce",
+                "LongName": "House Postsecondary Education & Workforce",
+                "Agency": "House",
+                "Acronym": "PEW",
+                "Phone": ""
+            },
+            "ReferredDate": "2026-02-24T00:00:00"
+        }
+    ]
+}

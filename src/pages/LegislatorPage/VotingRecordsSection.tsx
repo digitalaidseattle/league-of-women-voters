@@ -7,6 +7,7 @@
 
 import { Card, CardContent, CardHeader, Link } from '@mui/material';
 import { LEGISLATORS_CONSTANTS } from './constants';
+import { Member } from '../../api/committee';
 
 export function VotingRecordsSection({ legislator }: { legislator: Member }) {
   return (

@@ -17,6 +17,7 @@ import { PageInfo } from "@digitalaidseattle/core";
 import { LegislatorService } from '../api/legislatorService';
 import { CHAMBER_TYPE, ChamberButtonGroup } from "../components/ChamberButtonGroup";
 import { LoadingOverlay } from '../components/LoadingOverlay';
+import { Member } from '../api/committee';
 // project import
 
 // ==============================|| SAMPLE PAGE ||============================== //
@@ -135,7 +136,7 @@ export const LegislatorsPage = () => {
       </Toolbar>
     );
   }
-  
+
   return (<>
     <LoadingOverlay loading={loading} />
     <Breadcrumbs aria-label="breadcrumb">

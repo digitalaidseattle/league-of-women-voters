@@ -16,6 +16,7 @@ import { LoadingContext, PageInfo } from "@digitalaidseattle/core";
 import { LegislatureService } from '../api/legislatureService';
 import { CHAMBER_TYPE, ChamberButtonGroup } from "../components/ChamberButtonGroup";
 import { LoadingOverlay } from "../components/LoadingOverlay";
+import { Committee } from '../api/committee';
 // project import
 
 // ==============================|| SAMPLE PAGE ||============================== //
