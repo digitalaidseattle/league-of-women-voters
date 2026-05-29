@@ -8,7 +8,8 @@
 import { DataAccessOptions, PageInfo, QueryModel } from "@digitalaidseattle/core";
 import type { Bill } from "./bill";
 import { BillsDB } from "./database/BillsDB";
-import { Member } from "./committee";
+import { Committee, Member } from "./committee";
+import { LegislatureService } from "./legislatureService";
 
 export class BillService {
   private static instance: BillService;
@@ -41,5 +42,34 @@ export class BillService {
   async find(queryModel: QueryModel, opts?: DataAccessOptions<Bill>): Promise<PageInfo<Bill>> {
     return this.dao.find(queryModel, opts);
   }
+
+  getBillUrl(bill: Bill): string {
+    const year = bill.Biennium.split('-')[0];
+    const billNumber = bill.BillNumber
+    return `https://app.leg.wa.gov/billsummary/?BillNumber=${billNumber}&Year=${year}`
+  }
+
+  // async findInCommittee(bill: Bill): Promise<Committee | undefined> {
+  //   const committee = bill.InCommittee;
+  //   if (committee) {
+  //     return committee;
+  //   }
+  //   return undefined
+  // };
+
+  async findInCommittee(bill: Bill): Promise<Committee | undefined> {
+    return LegislatureService.getInstance()
+      .getAll()
+      .then(committees => {
+        for (const committee of committees) {
+          if (committee.InCommittee) {
+            if (committee.InCommittee.find(info => info.BillId === bill.BillId)) {
+              return committee;
+            }
+          }
+        }
+        return undefined;
+      })
+  };
 
 }

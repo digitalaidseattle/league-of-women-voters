@@ -106,11 +106,36 @@ export type Legislation = {
   }
 };
 
+export type BillHearing = {
+  BillId: string;
+  Biennium: string;
+  CommitteeMeeting: {
+    AgendaId: number;
+    Agency: string;
+    Committees: Committee[];
+    Room: string;
+    Building: string;
+    Address: string;
+    City: string;
+    State: string;
+    ZipCode: string;
+    Date: Date;
+    Cancelled: boolean;
+    RevisedDate: Date;
+    ContactInformation: string;
+    CommitteeType: string;
+    Notes: string;
+  }
+  HearingType: string;
+  HearingTypeDescription: string;
+}
+
 export type Bill = LegislationInfo
   & Legislation
   & {
     Sponsors?: Member[];
     InCommittee: Committee | null;
+    Hearings?: BillHearing[];
   };
 
 export type CommitteeReferral = {
