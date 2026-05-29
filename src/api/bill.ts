@@ -1,4 +1,5 @@
 import { Entity } from "@digitalaidseattle/core";
+import { Committee, Member } from "./committee";
 
 type DocumentHistoryLine = {
   ActionDate?: string;
@@ -104,7 +105,7 @@ type Legislation = {
 
 type Bill = Entity & LegislationInfo & Legislation & {
   Sponsors?: Member[];
-  InCommittee?: Committee;  
+  InCommittee?: Committee;
 };
 
 type LegislativeDocument = {

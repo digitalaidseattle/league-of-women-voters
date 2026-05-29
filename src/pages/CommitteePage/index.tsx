@@ -13,6 +13,7 @@ import { LegislatureService } from "../../api/legislatureService";
 import MembersGrid from './MembersGrid';
 import ReferralsGrid from './ReferralsGrid';
 import InCommitteeGrid from "./InCommitteeGrid";
+import { Committee } from "../../api/committee";
 // project import
 
 interface TabPanelProps {
@@ -84,14 +85,14 @@ const CommitteePage = () => {
             </Tabs>
           </Box>
           <CustomTabPanel value={value} index={0}>
-            <InCommitteeGrid agency={committee.Agency} committeeName={committee.Name} />
+            <InCommitteeGrid committee={committee} />
           </CustomTabPanel>
           <CustomTabPanel value={value} index={1}>
             <MembersGrid committee={committee!} />
           </CustomTabPanel>
 
           <CustomTabPanel value={value} index={2}>
-            <ReferralsGrid agency={committee.Agency} committeeName={committee.Name} />
+            <ReferralsGrid committee={committee} />
           </CustomTabPanel>
         </CardContent>
       </Card>

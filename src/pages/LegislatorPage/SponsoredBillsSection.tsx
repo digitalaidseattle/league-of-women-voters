@@ -11,6 +11,7 @@ import { Bill } from '../../api/bill';
 import { BillService } from '../../api/billService';
 import { sleep } from '../../utils/sleep';
 import { LEGISLATORS_CONSTANTS } from './constants';
+import { Member } from '../../api/committee';
 
 export function SponsoredBillsSection({ legislator }: { legislator: Member }) {
   const [bills, setBills] = useState<Bill[]>([]);

@@ -5,6 +5,7 @@ import { DataGrid, GridColDef, useGridApiRef } from "@mui/x-data-grid";
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { LegislatorService } from "../../api/legislatorService";
+import { Committee, Member } from "../../api/committee";
 
 const PAGE_SIZE = 25;
 

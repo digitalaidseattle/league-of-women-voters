@@ -1,6 +1,7 @@
 import { Identifier } from "@digitalaidseattle/core";
 import { SupabaseConfiguration, SupabaseDAO } from "@digitalaidseattle/supabase";
 import { DAO } from "../DAO";
+import { Member } from "../committee";
 
 type DBSponsor = {
     id: Identifier,

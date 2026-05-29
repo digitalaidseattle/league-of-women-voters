@@ -17,6 +17,7 @@ import { InfoSection } from "./InfoSection";
 import { SponsoredBillsSection } from "./SponsoredBillsSection";
 import { VotingRecordsSection } from "./VotingRecordsSection";
 import { LEGISLATORS_CONSTANTS } from "./constants";
+import { Member } from "../../api/committee";
 
 const LegislatorPage = () => {
   const { id } = useParams<string>();
