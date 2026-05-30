@@ -8,6 +8,7 @@ import { useContext, useEffect, useState } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
 
 import {
+  ExportOutlined,
   HomeOutlined,
   ReloadOutlined
 } from "@ant-design/icons";
@@ -28,7 +29,7 @@ import {
   useGridApiRef
 } from "@mui/x-data-grid";
 
-import { FilterItem, LoadingContext, PageInfo, QueryModel } from "@digitalaidseattle/core";
+import { FilterItem, LoadingContext, PageInfo, QueryModel, useNotifications } from "@digitalaidseattle/core";
 import type { Bill } from "../api/bill";
 import { BillService } from "../api/billService";
 import { CHAMBER_TYPE, ChamberButtonGroup } from "../components/ChamberButtonGroup";
@@ -41,24 +42,46 @@ const PAGE_SIZE = 25;
 export const BillsPage = () => {
   const apiRef = useGridApiRef();
   const navigate = useNavigate();
-  const [search, setSearch] = useState("");
+  const notifications = useNotifications();
+  const { loading, setLoading } = useContext(LoadingContext);
+
   const [paginationModel, setPaginationModel] = useState({ page: 0, pageSize: PAGE_SIZE });
   const [sortModel, setSortModel] = useState<GridSortModel>([{ field: 'id', sort: 'asc' }]);
   const [filterModel, setFilterModel] = useState<GridFilterModel>({ items: [] });
   const [pageInfo, setPageInfo] = useState<PageInfo<Bill>>({ rows: [], totalRowCount: 0, });
-  const { loading, setLoading } = useContext(LoadingContext);
+
+  const [search, setSearch] = useState("");
   const [chamber, setChamber] = useState<CHAMBER_TYPE>('all');
 
   useEffect(() => {
     fetchData();
   }, [chamber, search, paginationModel, sortModel, filterModel]);
 
-  useEffect(() => {
-    console.log(filterModel);
-  }, [filterModel]);
-
   function fetchData() {
     setLoading(true);
+    BillService.getInstance()
+      .find(createQueryModel())
+      .then(data => setPageInfo(data))
+      .catch(err => {
+        notifications.error('Error fetching bills.');
+        console.error('Error fetching bills:', err);
+      })
+      .finally(() => setLoading(false));
+  };
+
+  function exportData() {
+    setLoading(true);
+    BillService.getInstance()
+      .exportData(createQueryModel())
+      .then(() => notifications.success('Bills exported successfully'))
+      .catch(err => {
+        notifications.error('Error exporting bills.');
+        console.error('Error exporting bills:', err);
+      })
+      .finally(() => setLoading(false));
+  };
+
+  function createQueryModel(): QueryModel {
     const filterItems: FilterItem[] = [];
     const agency = chamber === 'house' ? "House" : (chamber === 'senate' ? "Senate" : undefined);
     if (agency) {
@@ -86,18 +109,15 @@ export const BillsPage = () => {
 
     const sortField = sortModel && sortModel.length > 0 ? sortModel![0].field : '';
     const sortDirection = sortModel && sortModel.length > 0 ? sortModel![0].sort : '';
-    BillService.getInstance()
-      .find({
-        ...paginationModel,
-        sortField: sortField,
-        sortDirection: sortDirection,
-        filterModel: {
-          items: filterItems
-        }
-      } as QueryModel)
-      .then(data => setPageInfo(data))
-      .finally(() => setLoading(false));
-  };
+    return {
+      ...paginationModel,
+      sortField: sortField,
+      sortDirection: sortDirection,
+      filterModel: {
+        items: filterItems
+      }
+    } as QueryModel;
+  }
 
   const columns: GridColDef<Bill>[] = [
     {
@@ -195,6 +215,11 @@ export const BillsPage = () => {
           chamber={chamber}
           onChange={handleChamberChange} />
         <SearchField value={search} onChange={(value) => setSearch(value)} />
+        <Tooltip title="Export">
+          <IconButton color="primary" size="small" onClick={exportData}>
+            <ExportOutlined />
+          </IconButton>
+        </Tooltip>
         <Tooltip title="Refresh">
           <IconButton color="primary" size="small" onClick={fetchData}>
             <ReloadOutlined />
@@ -218,6 +243,7 @@ export const BillsPage = () => {
         getRowId={(row) => row.BillId}
         columns={columns}
 
+        pageSizeOptions={[10, 25, 50, 100]}
         paginationMode='server'
         paginationModel={paginationModel}
         rowCount={pageInfo.totalRowCount}
@@ -231,7 +257,6 @@ export const BillsPage = () => {
         filterModel={filterModel}
         onFilterModelChange={setFilterModel}
 
-        pageSizeOptions={[10, 25, 50, 100]}
         onRowDoubleClick={params => navigate(`/bill/${params.row.BillId}`)}
         showToolbar={true}
         slots={{ toolbar: CustomToolbar }}

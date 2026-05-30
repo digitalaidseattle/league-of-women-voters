@@ -43,7 +43,8 @@ export type DBCommittee = {
   updated_at: Date,
   membership_update: Date,
   leadership_update: Date,
-  committee: Committee
+  committee: Committee,
+  Agency: string
 }
 
 export type DBBill = {
