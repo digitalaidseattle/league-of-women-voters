@@ -4,17 +4,16 @@
  *  @copyright 2024 Digital Aid Seattle
  *
  */
-import { HomeOutlined } from "@ant-design/icons";
-import { Box, Breadcrumbs, Card, CardContent, CardHeader, IconButton, Tab, Tabs, Typography } from '@mui/material';
+import { ExpandAltOutlined, HomeOutlined, ReloadOutlined } from "@ant-design/icons";
+import { Box, Breadcrumbs, Card, CardContent, CardHeader, IconButton, Tab, Tabs, Tooltip, Typography } from '@mui/material';
 import { useEffect, useState } from 'react';
 import { NavLink, useParams } from "react-router-dom";
-
-import { LegislatureService } from "../../api/legislatureService";
-import MembersGrid from './MembersGrid';
-import ReferralsGrid from './ReferralsGrid';
-import InCommitteeGrid from "./InCommitteeGrid";
 import { Committee } from "../../api/committee";
-// project import
+import { LegislatureService } from "../../api/legislatureService";
+import { SearchField } from "../../components/SearchField";
+import { getCommitteePageTitle } from "../../utils/committees";
+import InCommitteeGrid from "./InCommitteeGrid";
+import MembersGrid from './MembersGrid';
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -27,18 +26,16 @@ const CommitteePage = () => {
 
   const [value, setValue] = useState(0);
   const [committee, setCommittee] = useState<Committee>();
+  const [search, setSearch] = useState("");
+  const [refreshKey, setRefreshKey] = useState(0);
 
   useEffect(() => {
     if (id) {
       LegislatureService.getInstance()
         .getById(id)
-        .then(cc => setCommittee(cc))
+        .then(cc => setCommittee(cc));
     }
-  }, [id]);
-
-  useEffect(() => {
-    console.log(committee)
-  }, [committee]);
+  }, [id, refreshKey]);
 
   function a11yProps(index: number) {
     return {
@@ -62,10 +59,14 @@ const CommitteePage = () => {
         aria-labelledby={`simple-tab-${index}`}
         {...other}
       >
-        {value === index && <Box sx={{ p: 3 }}>{children}</Box>}
+        {value === index && <Box>{children}</Box>}
       </div>
     );
   }
+
+  const externalUrl = committee
+    ? `https://leg.wa.gov/about-the-legislature/committees/${committee.Agency.toLowerCase()}/`
+    : "https://leg.wa.gov/about-the-legislature/committees/";
 
   return (committee &&
     <>
@@ -75,29 +76,53 @@ const CommitteePage = () => {
         <Typography color="text.primary">Committee Detail</Typography>
       </Breadcrumbs>
       <Card>
-        <CardHeader title={`${committee?.Agency}: ${committee?.Name}`} />
+        <CardHeader
+          title={getCommitteePageTitle(committee)}
+          action={
+            <>
+              <SearchField value={search} onChange={(value) => setSearch(value)} />
+              <Tooltip title="Open committee directory">
+                <IconButton
+                  color="primary"
+                  onClick={() => window.open(externalUrl, "_blank", "noopener")}
+                  aria-label="Open committee directory"
+                >
+                  <ExpandAltOutlined />
+                </IconButton>
+              </Tooltip>
+              <Tooltip title="Refresh">
+                <IconButton
+                  color="primary"
+                  onClick={() => setRefreshKey((current) => current + 1)}
+                  aria-label="Refresh committee data"
+                >
+                  <ReloadOutlined />
+                </IconButton>
+              </Tooltip>
+            </>
+          }
+        />
         <CardContent>
           <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
-            <Tabs value={value} onChange={handleChange} aria-label="basic tabs example">
-              <Tab label="Bills (In Committee)" {...a11yProps(0)} />
+            <Tabs value={value} onChange={handleChange} aria-label="committee detail tabs">
+              <Tab label="Bills" {...a11yProps(0)} />
               <Tab label="Members" {...a11yProps(1)} />
-              <Tab label="Bills" {...a11yProps(2)} />
             </Tabs>
           </Box>
           <CustomTabPanel value={value} index={0}>
-            <InCommitteeGrid committee={committee} />
+            <InCommitteeGrid
+              committee={committee}
+              search={search}
+              refreshKey={refreshKey}
+            />
           </CustomTabPanel>
           <CustomTabPanel value={value} index={1}>
-            <MembersGrid committee={committee!} />
-          </CustomTabPanel>
-
-          <CustomTabPanel value={value} index={2}>
-            <ReferralsGrid committee={committee} />
+            <MembersGrid committee={committee} search={search} />
           </CustomTabPanel>
         </CardContent>
       </Card>
     </>
-  )
+  );
 };
 
 export default CommitteePage;
