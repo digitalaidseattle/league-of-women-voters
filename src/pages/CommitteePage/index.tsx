@@ -4,12 +4,14 @@
  *  @copyright 2024 Digital Aid Seattle
  *
  */
-import { ExpandAltOutlined, LeftOutlined, ReloadOutlined, SearchOutlined } from "@ant-design/icons";
-import { Box, Card, CardContent, IconButton, InputAdornment, Tab, Tabs, TextField, Tooltip, Typography } from '@mui/material';
+import { ExpandAltOutlined, HomeOutlined, ReloadOutlined } from "@ant-design/icons";
+import { Box, Breadcrumbs, Card, CardContent, CardHeader, IconButton, Tab, Tabs, Tooltip, Typography } from '@mui/material';
 import { useEffect, useState } from 'react';
-import { Link as RouterLink, useParams } from "react-router-dom";
+import { NavLink, useParams } from "react-router-dom";
 import { Committee } from "../../api/committee";
 import { LegislatureService } from "../../api/legislatureService";
+import { SearchField } from "../../components/SearchField";
+import { getCommitteePageTitle } from "../../utils/committees";
 import InCommitteeGrid from "./InCommitteeGrid";
 import MembersGrid from './MembersGrid';
 
@@ -62,66 +64,23 @@ const CommitteePage = () => {
     );
   }
 
-  function getPageTitle(committee: Committee) {
-    const shortName = committee.Name.replace(/\s*Committee$/i, "");
-    return `${committee.Agency} Committee Legislation: ${shortName}`;
-  }
-
   const externalUrl = committee
     ? `https://leg.wa.gov/about-the-legislature/committees/${committee.Agency.toLowerCase()}/`
     : "https://leg.wa.gov/about-the-legislature/committees/";
 
   return (committee &&
     <>
-      <Card sx={{ mx: { xs: 1, md: 3 }, my: { xs: 2, md: 3 } }}>
-        <CardContent>
-          <Box
-            component={RouterLink}
-            to="/committees"
-            sx={{
-              display: "inline-flex",
-              alignItems: "center",
-              gap: 0.75,
-              color: "text.secondary",
-              textDecoration: "none",
-              mb: 4,
-              fontSize: 18
-            }}
-          >
-            <LeftOutlined aria-hidden />
-            Back to all Committees
-          </Box>
-          <Box
-            sx={{
-              display: "flex",
-              alignItems: { xs: "stretch", md: "center" },
-              justifyContent: "space-between",
-              gap: 2,
-              flexDirection: { xs: "column", md: "row" },
-              mb: 2.5
-            }}
-          >
-            <Typography component="h1" variant="h3" sx={{ fontSize: { xs: 28, md: 34 }, fontWeight: 700 }}>
-              {getPageTitle(committee)}
-            </Typography>
-            <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-              <TextField
-                value={search}
-                onChange={(event) => setSearch(event.target.value)}
-                size="small"
-                placeholder="Search"
-                aria-label={value === 0 ? "Search committee bills" : "Search committee members"}
-                sx={{ width: { xs: "100%", sm: 260 } }}
-                slotProps={{
-                  input: {
-                    startAdornment: (
-                      <InputAdornment position="start">
-                        <SearchOutlined />
-                      </InputAdornment>
-                    )
-                  }
-                }}
-              />
+      <Breadcrumbs aria-label="breadcrumb">
+        <NavLink to="/" ><IconButton size="medium"><HomeOutlined /></IconButton></NavLink>
+        <NavLink to="/committees" >Committees</NavLink>
+        <Typography color="text.primary">Committee Detail</Typography>
+      </Breadcrumbs>
+      <Card>
+        <CardHeader
+          title={getCommitteePageTitle(committee)}
+          action={
+            <>
+              <SearchField value={search} onChange={(value) => setSearch(value)} />
               <Tooltip title="Open committee directory">
                 <IconButton
                   color="primary"
@@ -140,8 +99,10 @@ const CommitteePage = () => {
                   <ReloadOutlined />
                 </IconButton>
               </Tooltip>
-            </Box>
-          </Box>
+            </>
+          }
+        />
+        <CardContent>
           <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
             <Tabs value={value} onChange={handleChange} aria-label="committee detail tabs">
               <Tab label="Bills" {...a11yProps(0)} />
