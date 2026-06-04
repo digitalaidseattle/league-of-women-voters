@@ -1,76 +1,80 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-import { ServiceWorker } from "../types.ts";
 
+import { XMLParser } from "https://esm.sh/fast-xml-parser@4.3.5";
+import { configure } from "../../shared/configuration.ts";
+import { corsResponse } from "../../shared/corsResponse.ts";
+import { errorResponse } from "../../shared/errorResponse.ts";
+import { resetSchedule } from "../../shared/resetSchedule.ts";
+import { SponsorDAO } from "../../shared/SponsorDAO.ts";
+import { standardResponse } from "../../shared/standardResponse.ts";
+import {  DBSponsor, Member } from "../../shared/types.ts";
+import { UpdateSchedule, UpdateScheduleDAO } from "../../shared/UpdateScheduleDAO.ts";
 
-type LegislatorParams = {
-  biennium?: string;
-};
+configure();
+const BASE_URL = "https://wslwebservices.leg.wa.gov/SponsorService.asmx";
+const parser = new XMLParser();
+const dao = SponsorDAO.getInstance();
 
-class LegislatorWorker implements ServiceWorker<LegislatorParams> {
+async function fetchData(biennium: string): Promise<Member[]> {
+  const service = "GetSponsors";
+  const eBiennium = encodeURIComponent(biennium)
+  const url = `${BASE_URL}/${service}?biennium=${encodeURIComponent(eBiennium)}`
 
-  validate(params: LegislatorParams) {
-
-  }
-
-  getLegUrl(params: LegislatorParams): string {
-    return `https://v3.openstates.org/people?apikey=${API_KEY}&jurisdiction=${JURISDITION}&per_page=${PAGE_SIZE}`;
-  }
-
-  getEntities(json: any): any {
-    return json;
-  }
-
+  const response = await fetch(url);
+  const xmlText = await response.text();
+  const json = parser.parse(xmlText);
+  return json["ArrayOfMember"]["Member"];
 }
-
-function getWorker(_params: LegislatorParams): ServiceWorker<LegislatorParams> {
-  return new LegislatorWorker();
-}
-
-const API_KEY = Deno.env.get('OPEN_STATES_API_KEY');
-const JURISDITION = 'ocd-jurisdiction/country:us/state:wa/government';
-const PAGE_SIZE = 50;
 
 Deno.serve(async (req) => {
   const origin = req.headers.get("origin") || "*";
+
   // Handle preflight CORS (OPTIONS)
   if (req.method === "OPTIONS") {
-    return new Response(null, {
-      status: 204,
-      headers: {
-        "Access-Control-Allow-Origin": origin,
-        "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
-        "Access-Control-Allow-Headers":
-          "Content-Type, Authorization, apikey, x-client-info",
-        "Access-Control-Max-Age": "86400",
-      },
-    });
+    return corsResponse(origin);
   }
 
   try {
-    const params = await req.json();
+    console.log("Starting committee info caching service...");
 
-    const worker = getWorker(params);
+    const updateScheduleDAO = new UpdateScheduleDAO();
 
-    worker.validate(params);
+    const sched: UpdateSchedule = await updateScheduleDAO
+      .getByName('legislator_update');
 
-    let all: any[] = [];
-
-    // TODO figure out looping
-    // Calling 3 times because max-page is 50 and WA leg has 148 reps.
-    for (let page = 1; page <= 3; page++) {
-      const resp = await fetch(`https://v3.openstates.org/people?apikey=${API_KEY}&jurisdiction=${JURISDITION}&per_page=${PAGE_SIZE}&page=${page}`);
-      const json = await resp.json();
-      all = all.concat(json.results);
+    if (sched.next_update.getTime() > new Date().getTime()) {
+      console.info(`Not time to be updated`, sched.next_update);
+      return standardResponse(origin, `Not time to be updated`);
     }
 
-    return new Response(JSON.stringify(all), {
-      headers: {
-        "Content-Type": "application/json",
-        "Access-Control-Allow-Origin": origin,
-      },
-    });
+    const params = await req.json();
+    const infos = await fetchData(params.biennium);
+
+    const now = new Date();
+    const allUpdated: DBSponsor[] = [];
+    for (let i = 0; i < infos.length; i++) {
+      const info = infos[i];
+      const current = await dao.findById(info.Id);
+      const updatedMember: Member = current
+        ? {
+          ...current.committee,
+          ...info
+        }
+        : {
+          ...info,
+        }
+      //const searchKey = calcCommitteeSearchKey(updatedCommittee as Bill);
+      const updatedDBCommittee = {
+        ...current,
+        id: current ? current.id : updatedMember.Id,
+        sponsor: updatedMember,
+        updated_at: now
+      }
+      allUpdated.push(await dao.upsert(updatedDBCommittee));
+    };
+    await resetSchedule(sched);
+    console.info(`Saved ${allUpdated.length} legislators to the database.`);
+    return standardResponse(origin, `Updated ${allUpdated.length} legislators.`);
   } catch (err) {
-    console.error("SOAP request failed:", err);
-    throw err;
+    return errorResponse(origin, err);
   }
 });

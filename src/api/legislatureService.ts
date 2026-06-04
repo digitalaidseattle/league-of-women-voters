@@ -1,9 +1,8 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { Identifier } from "@digitalaidseattle/core";
-import { CommitteeDao } from "./committeeDao";
-import { DAO } from "./DAO";
+import { DataAccessOptions, Identifier, PageInfo, QueryModel } from "@digitalaidseattle/core";
+import { Committee, Member } from "./committee";
 import { CommitteesDB } from "./database/CommitteesDB";
-import { LegislationInfo } from "./bill";
+import { LegislatureExporter } from "./legislatureExporter";
 
 class LegislatureService {
 
@@ -16,7 +15,7 @@ class LegislatureService {
     return LegislatureService.instance;
   }
 
-  dao: DAO<Committee>;
+  dao: CommitteesDB;
 
   private constructor() {
     this.dao = CommitteesDB.getInstance();
@@ -30,32 +29,18 @@ class LegislatureService {
     return this.dao.getById(id);
   }
 
+  async find(queryModel: QueryModel, opts?: DataAccessOptions<Committee>): Promise<PageInfo<Committee>> {
+    return this.dao.find(queryModel, opts);
+  }
+
   async findCommitteesByMember(member: Member): Promise<Committee[]> {
     const committees = await this.getAll();
     return committees.filter(committee =>
       (committee.Members ?? []).find(mem => mem.Name === member.Name) !== undefined
     )
   }
-
-  async getCommitteeMembers(
-    agency: string,
-    committeeName: string,
-  ): Promise<Member[]> {
-    return CommitteeDao.getInstance().getCommitteeMembers(agency, committeeName);
-  }
-
-  async GetCommitteeReferralsByCommittee(
-    agency: string,
-    committeeName: string,
-  ): Promise<Member[]> {
-    return CommitteeDao.getInstance().getCommitteeReferralsByCommittee(agency, committeeName);
-  }
-
-  async getInCommittee(
-    agency: string,
-    committeeName: string,
-  ): Promise<LegislationInfo[]> {
-    return CommitteeDao.getInstance().getInCommittee(agency, committeeName);
+  async exportData(queryModel: QueryModel): Promise<void> {
+    return LegislatureExporter.getInstance().exportData(queryModel);
   }
 }
 

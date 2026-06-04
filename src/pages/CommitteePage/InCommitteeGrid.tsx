@@ -3,11 +3,9 @@ import { Link as MuiLink } from "@mui/material";
 import { DataGrid, GridColDef, GridRenderCellParams, useGridApiRef } from "@mui/x-data-grid";
 import { useEffect, useMemo, useState } from "react";
 import { Link as RouterLink } from "react-router-dom";
-import type { BillRow, LegislativeDocument } from "../../api/bill";
+import { Bill, LegislationInfo } from "../../api/bill";
 import { BillService } from "../../api/billService";
-import { LegislatureService } from "../../api/legislatureService";
-import { LegislationInfo } from "../../api/bill";
-import { BillsService } from "../../utils/bills";
+import { Committee } from "../../api/committee";
 
 const PAGE_SIZE = 25;
 
@@ -22,7 +20,7 @@ type CommitteeBillRow = {
   billSearchUrl: string;
 };
 
-const InCommitteeGrid = (props: { agency: string, committeeName: string, search?: string, refreshKey?: number }) => {
+const InCommitteeGrid = (props: { committee: Committee, search?: string, refreshKey?: number }) => {
   const apiRef = useGridApiRef();
   const [paginationModel, setPaginationModel] = useState({
     page: 0,
@@ -131,76 +129,105 @@ const InCommitteeGrid = (props: { agency: string, committeeName: string, search?
         );
       }
     }
-  ]
+  ];
 
   useEffect(() => {
-    if (props.committeeName && props.agency) {
-      refresh()
+    if (props.committee) {
+      refresh();
     }
-  }, [props.agency, props.committeeName, props.refreshKey]);
+  }, [props.committee, props.refreshKey]);
 
   function refresh() {
+    const inCommittee = props.committee.InCommittee ?? [];
     setPageInfo({
       rows: [],
       totalRowCount: 0,
-    })
+    });
 
-    Promise.all([
-      LegislatureService.getInstance().getInCommittee(props.agency, props.committeeName),
-      BillService.getInstance().getAll()
-    ])
-      .then(([response, bills]) => {
-        const billRows = bills
-          .map((bill) => BillsService.mapLegislativeDocumentToBillRow(bill))
-          .filter((billRow): billRow is BillRow => billRow !== undefined);
-        const rows = response.map((legislation) => toCommitteeBillRow(legislation, bills, billRows));
-
+    BillService.getInstance()
+      .getAll()
+      .then((bills) => {
+        const rows = inCommittee.map((legislation) => toCommitteeBillRow(legislation, bills));
         setPageInfo({
           rows,
           totalRowCount: rows.length,
-        })
+        });
       })
-      .catch(error => {
-        console.error('Error invoking function:', error);
+      .catch((error) => {
+        console.error('Error loading committee bill details:', error);
+        const rows = inCommittee.map((legislation) => toCommitteeBillRow(legislation, []));
+        setPageInfo({
+          rows,
+          totalRowCount: rows.length,
+        });
       });
   }
 
   function toCommitteeBillRow(
     legislation: LegislationInfo,
-    bills: LegislativeDocument[],
-    billRows: BillRow[]
+    bills: Bill[]
   ): CommitteeBillRow {
-    const normalizedBillId = normalizeBillId(legislation.BillId);
-    const billRow = billRows.find((row) =>
-      normalizeBillId(row.billNumber) === normalizedBillId ||
-      row.normalizedBillNumber === legislation.BillNumber?.toString()
-    );
-    const rawBill = billRow
-      ? bills.find((bill) => bill.Id === billRow.id || bill.Name === billRow.id)
-      : undefined;
+    const bill = findBill(legislation, bills);
 
     return {
       id: legislation.BillId,
-      bill: billRow?.billNumber ?? legislation.BillId,
-      originalSponsor: formatSponsor(rawBill),
-      title: billRow?.title ?? "",
-      status: billRow?.status ?? "",
-      history: billRow?.history ?? "",
-      billPageId: billRow?.id,
-      billSearchUrl: `https://app.leg.wa.gov/billsummary?BillNumber=${legislation.BillNumber}&Year=${legislation.Biennium}`
+      bill: bill?.BillId ?? legislation.BillId,
+      originalSponsor: formatSponsor(bill),
+      title: bill?.LegalTitle ?? bill?.LongDescription ?? bill?.ShortDescription ?? "",
+      status: bill?.CurrentStatus?.Status ?? "",
+      history: formatHistory(bill),
+      billPageId: bill?.BillId,
+      billSearchUrl: getBillSearchUrl(bill, legislation)
     };
+  }
+
+  function findBill(legislation: LegislationInfo, bills: Bill[]) {
+    const normalizedBillId = normalizeBillId(legislation.BillId);
+    return bills.find((bill) =>
+      normalizeBillId(bill.BillId) === normalizedBillId ||
+      String(bill.BillNumber) === String(legislation.BillNumber)
+    );
   }
 
   function normalizeBillId(value: string | number | undefined) {
     return String(value ?? "").replace(/\s+/g, "").toUpperCase();
   }
 
-  function formatSponsor(bill?: LegislativeDocument) {
+  function formatSponsor(bill?: Bill) {
     const sponsor = bill?.Sponsors?.[0];
-    if (!sponsor) {
+    if (sponsor) {
+      return sponsor.Name || `${sponsor.FirstName ?? ""} ${sponsor.LastName ?? ""}`.trim();
+    }
+    return bill?.Sponsor ?? "";
+  }
+
+  function formatHistory(bill?: Bill) {
+    if (!bill?.CurrentStatus) {
       return "";
     }
-    return sponsor.Name || `${sponsor.FirstName ?? ""} ${sponsor.LastName ?? ""}`.trim();
+    const date = formatDate(bill.CurrentStatus.ActionDate);
+    return [date, bill.CurrentStatus.HistoryLine].filter(Boolean).join(" ");
+  }
+
+  function formatDate(raw?: string) {
+    if (!raw) {
+      return "";
+    }
+    const date = new Date(raw);
+    if (Number.isNaN(date.getTime())) {
+      return raw;
+    }
+    return new Intl.DateTimeFormat("en-US", {
+      month: "short",
+      day: "numeric"
+    }).format(date);
+  }
+
+  function getBillSearchUrl(bill: Bill | undefined, legislation: LegislationInfo) {
+    const biennium = bill?.Biennium ?? legislation.Biennium;
+    const year = biennium?.split("-")[0] ?? "";
+    const billNumber = bill?.BillNumber ?? legislation.BillNumber;
+    return `https://app.leg.wa.gov/billsummary/?BillNumber=${billNumber}&Year=${year}`;
   }
 
   return (
@@ -227,7 +254,7 @@ const InCommitteeGrid = (props: { agency: string, committeeName: string, search?
         }
       }}
     />
-  )
-}
+  );
+};
 
 export default InCommitteeGrid;

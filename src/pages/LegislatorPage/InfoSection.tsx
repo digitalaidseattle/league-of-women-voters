@@ -7,6 +7,7 @@
 
 import { Grid, Paper } from '@mui/material';
 import { LEGISLATORS_CONSTANTS } from './constants';
+import { Member } from '../../api/committee';
 
 export function InfoSection({ legislator }: { legislator: Member }) {
   return (

@@ -15,8 +15,8 @@
  * </ol>
  */
 
-import { AI, getAI, getGenerativeModel, GoogleAIBackend, Part } from "firebase/ai";
-import { FirebaseConfiguration } from "./FirebaseConfiguration";
+import { AI, getAI, getGenerativeModel, GoogleAIBackend, Part } from "npm:firebase/ai";
+import { FirebaseConfiguration } from "./FirebaseConfiguration.ts";
 
 export type ProjectOutput = {
     name: string;
@@ -25,24 +25,12 @@ export type ProjectOutput = {
 }
 
 export type ProjectContext = {
-    type: string;
-    name: string | null;
-    value: string | null;
-    tokenCount: number;
-    file?: File;
-    fileUrl?: string;
+    value: string;
 }
 
 export type Project = {
-    name: string;
-    rating: number;
-    tags: string[];
-    template: string;
     prompt: string;
     contexts: ProjectContext[];
-    outputs: ProjectOutput[];
-    tokenCount: number;
-    modelType: string; // "gemini-2.5-flash", etc.
 };
 
 export class FirebaseAiService {
@@ -68,12 +56,7 @@ export class FirebaseAiService {
     createParts(project: Project): Part[] {
         const parts: Part[] = [];
         project.contexts.forEach(async (gc) => {
-            if (gc.type === 'text') {
-                parts.push({ text: gc.value! });
-            } else {
-                // const uri = await getCoreServices().storageService!.getUrlAsync(`${this.storageFolder}/${project.id}/${gc.name}`);
-                // parts.push(createPartFromUri(uri, project.contexts[idx].type));
-            }
+            parts.push({ text: gc.value });
         });
         return parts;
     }

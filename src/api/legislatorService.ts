@@ -1,6 +1,7 @@
-import { Identifier } from "@digitalaidseattle/core";
-import { DAO } from "./DAO";
+import { DataAccessOptions, Identifier, PageInfo, QueryModel } from "@digitalaidseattle/core";
+import { Member } from "./committee";
 import { SponsorsDB } from "./database/SponsorsDB";
+import { LegislatorExporter } from "./legislatorExporter";
 
 class LegislatorService {
     private static instance: LegislatorService;
@@ -13,7 +14,7 @@ class LegislatorService {
     }
 
     biennium: string;
-    dao: DAO<Member>;
+    dao: SponsorsDB;
 
     constructor() {
         const current = import.meta.env.VITE_LWVW_CURRENT_BIENNIUM;
@@ -32,6 +33,14 @@ class LegislatorService {
 
     async getById(id: Identifier): Promise<Member> {
         return this.dao.getById(id);
+    }
+
+    async find(queryModel: QueryModel, opts?: DataAccessOptions<Member>): Promise<PageInfo<Member>> {
+        return this.dao.find(queryModel, opts);
+    }
+
+    async exportData(queryModel: QueryModel): Promise<void> {
+        return LegislatorExporter.getInstance().exportData(queryModel);
     }
 }
 

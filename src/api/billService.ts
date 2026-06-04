@@ -5,14 +5,14 @@
  *
  */
 
-import type { LegislativeDocument } from "./bill";
-import { BillDao } from './billDao';
-import { DAO } from "./DAO";
+import { DataAccessOptions, PageInfo, QueryModel } from "@digitalaidseattle/core";
+import type { Bill } from "./bill";
+import { BillExporter } from "./billsExporter";
+import { Member } from "./committee";
 import { BillsDB } from "./database/BillsDB";
 
-const DEFAULT_DOCUMENT_CLASS = "Bills";
-
 export class BillService {
+
   private static instance: BillService;
 
   public static getInstance(): BillService {
@@ -22,34 +22,30 @@ export class BillService {
     return BillService.instance;
   }
 
-  dao: DAO<LegislativeDocument>;
+  dao: BillsDB;
+
   private constructor() {
     this.dao = BillsDB.getInstance();
   }
 
-  async getAll(documentClass?: string): Promise<LegislativeDocument[]> {
-    if (documentClass) {
-      return BillDao.getInstance().getBills(documentClass ?? DEFAULT_DOCUMENT_CLASS);
-    } else {
-      return this.dao.getAll();
-    }
+  async getAll(): Promise<Bill[]> {
+    return this.dao.getAll();
   }
 
-  async getById(id: string): Promise<LegislativeDocument> {
-    const bills = await this.getAll()
-    const found = bills.find(bill => bill.Id === id);
-    if (found) {
-      return found;
-    }
-    throw new Error(`Could not find bill for id = ${id}`);
+  async getById(id: string): Promise<Bill> {
+    return this.dao.getById(id)
   }
 
-  async findBillsBySponsor(sponsor: Member): Promise<LegislativeDocument[]> {
-    const bills = await this.dao.getAll();
-    return bills.filter(b => {
-      const sponsorIds = (b.Sponsors ?? []).map(s => s.Id);
-      return sponsorIds.includes(sponsor.Id);
-    })
+  async findBillsBySponsor(sponsor: Member): Promise<Bill[]> {
+    return this.dao.findByPrimarySponsor(sponsor.Id);
+  }
+
+  async find(queryModel: QueryModel, opts?: DataAccessOptions<Bill>): Promise<PageInfo<Bill>> {
+    return this.dao.find(queryModel, opts);
+  }
+
+  async exportData(queryModel: QueryModel): Promise<void> {
+    return BillExporter.getInstance().exportData(queryModel);
   }
 
 }

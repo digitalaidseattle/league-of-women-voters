@@ -4,37 +4,30 @@
  *  @copyright 2026 Digital Aid Seattle
  *
  */
-// material-ui
-import { ExpandAltOutlined, ReloadOutlined, SearchOutlined } from "@ant-design/icons";
-import { useEffect, useMemo, useState } from 'react';
+import { ExpandAltOutlined, ExportOutlined, ReloadOutlined, SearchOutlined } from "@ant-design/icons";
+import { FilterItem, LoadingContext, PageInfo, QueryModel, useNotifications } from "@digitalaidseattle/core";
 import { Box, Card, CardContent, IconButton, InputAdornment, Link as MuiLink, TextField, Toolbar, Tooltip, Typography } from '@mui/material';
-import { DataGrid, GridColDef, GridRenderCellParams, useGridApiRef } from "@mui/x-data-grid";
+import { DataGrid, GridColDef, GridFilterModel, GridRenderCellParams, GridSortModel, useGridApiRef } from "@mui/x-data-grid";
+import { useContext, useEffect, useMemo, useState } from 'react';
 import { Link as RouterLink, useNavigate } from "react-router-dom";
-
-
-import { PageInfo } from "@digitalaidseattle/core";
+import { Committee } from '../api/committee';
 import { LegislatureService } from '../api/legislatureService';
 import { CHAMBER_TYPE, ChamberButtonGroup } from "../components/ChamberButtonGroup";
 import { LoadingOverlay } from "../components/LoadingOverlay";
-
 
 const PAGE_SIZE = 25;
 const COMMITTEE_SEARCH_URL = "https://leg.wa.gov/about-the-legislature/committees/";
 
 const CommitteesPage = () => {
   const apiRef = useGridApiRef();
-  const [paginationModel, setPaginationModel] = useState({
-    page: 0,
-    pageSize: PAGE_SIZE,
-  });
+  const navigate = useNavigate();
+  const notifications = useNotifications();
+  const { loading, setLoading } = useContext(LoadingContext);
 
-  const [pageInfo, setPageInfo] = useState<PageInfo<Committee>>({
-    rows: [],
-    totalRowCount: 0,
-  });
-
-  const navigate = useNavigate()
-  const [initialized, setInitialized] = useState(false);
+  const [paginationModel, setPaginationModel] = useState({ page: 0, pageSize: PAGE_SIZE });
+  const [sortModel, setSortModel] = useState<GridSortModel>([{ field: 'id', sort: 'asc' }]);
+  const [filterModel, setFilterModel] = useState<GridFilterModel>({ items: [] });
+  const [pageInfo, setPageInfo] = useState<PageInfo<Committee>>({ rows: [], totalRowCount: 0 });
   const [chamber, setChamber] = useState<CHAMBER_TYPE>('all');
   const [search, setSearch] = useState("");
 
@@ -64,7 +57,9 @@ const CommitteesPage = () => {
       flex: 0.8,
       valueGetter: (_value, row) => getLeadershipName(row, "chair"),
       renderCell: (params: GridRenderCellParams<Committee>) => renderName(getLeadershipName(params.row, "chair")),
-      type: "string"
+      type: "string",
+      sortable: false,
+      filterable: false
     },
     {
       field: "viceChair",
@@ -73,7 +68,9 @@ const CommitteesPage = () => {
       flex: 0.85,
       valueGetter: (_value, row) => getLeadershipName(row, "vice"),
       renderCell: (params: GridRenderCellParams<Committee>) => renderName(getLeadershipName(params.row, "vice")),
-      type: "string"
+      type: "string",
+      sortable: false,
+      filterable: false
     },
     {
       field: "minorityChair",
@@ -82,7 +79,9 @@ const CommitteesPage = () => {
       flex: 0.9,
       valueGetter: (_value, row) => getLeadershipName(row, "ranking"),
       renderCell: (params: GridRenderCellParams<Committee>) => renderName(getLeadershipName(params.row, "ranking")),
-      type: "string"
+      type: "string",
+      sortable: false,
+      filterable: false
     },
     {
       field: "majorityChair",
@@ -91,7 +90,9 @@ const CommitteesPage = () => {
       flex: 0.9,
       valueGetter: (_value, row) => getLeadershipName(row, "majority"),
       renderCell: (params: GridRenderCellParams<Committee>) => renderName(getLeadershipName(params.row, "majority")),
-      type: "string"
+      type: "string",
+      sortable: false,
+      filterable: false
     },
     {
       field: "membersCount",
@@ -100,83 +101,86 @@ const CommitteesPage = () => {
       align: "right",
       headerAlign: "right",
       valueGetter: (_value, row) => row.Members?.length ?? 0,
-      type: "number"
+      type: "number",
+      sortable: false,
+      filterable: false
     }
   ], []);
 
   useEffect(() => {
     refresh();
-  }, []);
-
-  const filteredRows = useMemo(() => {
-    const loweredQuery = search.trim().toLowerCase();
-
-    return pageInfo.rows
-      .filter(filterPredicate)
-      .filter((committee) => {
-        if (!loweredQuery) {
-          return true;
-        }
-
-        const haystack = [
-          formatCommitteeName(committee),
-          committee.Name,
-          committee.LongName,
-          committee.Agency,
-          getLeadershipName(committee, "chair"),
-          getLeadershipName(committee, "vice"),
-          getLeadershipName(committee, "ranking"),
-          getLeadershipName(committee, "majority"),
-          String(committee.Members?.length ?? 0)
-        ]
-          .join(" ")
-          .toLowerCase();
-
-        return haystack.includes(loweredQuery);
-      });
-  }, [pageInfo.rows, chamber, search]);
+  }, [chamber, search, paginationModel, sortModel, filterModel]);
 
   function refresh() {
-    setInitialized(false);
-    setPageInfo({
-      rows: [],
-      totalRowCount: 0,
-    });
+    setLoading(true);
     LegislatureService.getInstance()
-      .getAll()
-      .then(committees => {
-        setPageInfo({
-          rows: committees,
-          totalRowCount: committees.length,
-        });
-      }).finally(() => {
-        setInitialized(true);
+      .find(createQueryModel())
+      .then(data => setPageInfo(data))
+      .catch(err => {
+        notifications.error('Error fetching committees.');
+        console.error('Error fetching committees:', err);
       })
-  }
-
-  const openCommittee = (params: any) => {
-    const committee = params.row;
-    navigate(`/committee/${committee.Id}`);
-    //    navigate(`/committee?agency=${committee.Agency}&committeeName=${encodeURIComponent(committee.Name)}`);
-  };
-
-
-  function filterPredicate(committee: Committee): boolean {
-    switch (chamber) {
-      case 'house':
-        return committee.Agency === 'House'
-      case 'senate':
-        return committee.Agency === 'Senate'
-      case 'joint':
-        return committee.Agency === 'Joint'
-      case 'all':
-      default:
-        return true;
-    }
+      .finally(() => setLoading(false));
   }
 
   function handleChamberChange(value: CHAMBER_TYPE): void {
     setChamber(value);
+  }
+
+  function createQueryModel(): QueryModel {
+    const filterItems: FilterItem[] = [];
+    const agency = chamber === 'house' ? "House" : chamber === 'senate' ? "Senate" : chamber === 'joint' ? "Joint" : undefined;
+
+    if (agency) {
+      filterItems.push({
+        field: 'Agency',
+        operator: '=',
+        value: agency
+      });
+    }
+
+    if (search.trim().length > 0) {
+      filterItems.push({
+        field: 'SearchKey',
+        operator: 'contains',
+        value: search
+      });
+    }
+
+    if (filterModel.items.length > 0) {
+      const filterItem = filterModel.items[0];
+      if (filterItem.value !== undefined && filterItem.value !== null && filterItem.value !== '') {
+        filterItems.push({
+          field: filterItem.field,
+          operator: filterItem.operator,
+          value: filterItem.value
+        });
+      }
+    }
+
+    const sortField = sortModel.length > 0 ? sortModel[0].field : 'id';
+    const sortDirection = sortModel.length > 0 ? sortModel[0].sort : 'asc';
+
+    return {
+      ...paginationModel,
+      sortField,
+      sortDirection,
+      filterModel: {
+        items: filterItems
+      }
+    } as QueryModel;
+  }
+
+  function exportData() {
+    setLoading(true);
+    LegislatureService.getInstance()
+      .exportData(createQueryModel())
+      .then(() => notifications.success('Committees exported successfully'))
+      .catch(err => {
+        notifications.error('Error exporting committees.');
+        console.error('Error exporting committees:', err);
+      })
+      .finally(() => setLoading(false));
   }
 
   function CustomToolbar() {
@@ -219,11 +223,16 @@ const CommitteesPage = () => {
               <ExpandAltOutlined />
             </IconButton>
           </Tooltip>
-        <Tooltip title="Refresh">
-          <IconButton color="primary" onClick={refresh} aria-label="Refresh committees">
-            <ReloadOutlined />
-          </IconButton>
-        </Tooltip>
+          <Tooltip title="Export">
+            <IconButton color="primary" size="small" onClick={exportData} aria-label="Export committees">
+              <ExportOutlined />
+            </IconButton>
+          </Tooltip>
+          <Tooltip title="Refresh">
+            <IconButton color="primary" size="small" onClick={refresh} aria-label="Refresh committees">
+              <ReloadOutlined />
+            </IconButton>
+          </Tooltip>
         </Box>
       </Toolbar>
     );
@@ -260,11 +269,7 @@ const CommitteesPage = () => {
   }
 
   function formatCommitteeName(committee: Committee) {
-    const chamberPrefix = committee.Agency === "House" || committee.Agency === "Senate" || committee.Agency === "Joint"
-      ? `${committee.Agency} `
-      : "";
-    const rawName = committee.LongName || committee.Name;
-    return rawName.startsWith(chamberPrefix) ? rawName : `${chamberPrefix}${rawName}`;
+    return committee.LongName || committee.Name;
   }
 
   function renderName(name: string) {
@@ -288,37 +293,44 @@ const CommitteesPage = () => {
   }
 
   return (<>
-    <LoadingOverlay loading={!initialized} />
+    <LoadingOverlay loading={loading} />
     <Card sx={{ mx: { xs: 1, md: 3 }, my: { xs: 2, md: 4 } }}>
       <CardContent>
-      <Typography component="h1" variant="h3" sx={{ fontSize: { xs: 28, md: 36 }, fontWeight: 700, mb: 2.5 }}>
-        Committees
-      </Typography>
-      <DataGrid
-        apiRef={apiRef}
-        autoHeight
-        rows={filteredRows}
-        columns={columns}
-        getRowId={(row) => row.Id}
-        paginationModel={paginationModel}
-        onPaginationModelChange={setPaginationModel}
-        pageSizeOptions={[10, 25, 50, 100]}
-        onRowClick={openCommittee}
-        showToolbar={true}
-        slots={{ toolbar: CustomToolbar }}
-        disableRowSelectionOnClick
-        sx={{
-          border: 0,
-          "& .MuiDataGrid-columnHeaders": { borderTop: "1px solid", borderColor: "divider" },
-          "& .MuiDataGrid-columnHeaderTitle": { fontWeight: 700 },
-          "& .MuiDataGrid-row": { cursor: "pointer" },
-          "& .MuiDataGrid-cell": { py: 2, alignItems: "center" }
-        }}
-      />
+        <Typography component="h1" variant="h3" sx={{ fontSize: { xs: 28, md: 36 }, fontWeight: 700, mb: 2.5 }}>
+          Committees
+        </Typography>
+        <DataGrid
+          apiRef={apiRef}
+          autoHeight
+          rows={pageInfo.rows}
+          columns={columns}
+          getRowId={(row) => row.Id}
+          pageSizeOptions={[10, 25, 50, 100]}
+          paginationMode="server"
+          paginationModel={paginationModel}
+          rowCount={pageInfo.totalRowCount}
+          onPaginationModelChange={setPaginationModel}
+          sortingMode="server"
+          sortModel={sortModel}
+          onSortModelChange={setSortModel}
+          filterMode="server"
+          filterModel={filterModel}
+          onFilterModelChange={setFilterModel}
+          onRowClick={params => navigate(`/committee/${params.row.Id}`)}
+          showToolbar={true}
+          slots={{ toolbar: CustomToolbar }}
+          disableRowSelectionOnClick
+          sx={{
+            border: 0,
+            "& .MuiDataGrid-columnHeaders": { borderTop: "1px solid", borderColor: "divider" },
+            "& .MuiDataGrid-columnHeaderTitle": { fontWeight: 700 },
+            "& .MuiDataGrid-row": { cursor: "pointer" },
+            "& .MuiDataGrid-cell": { py: 2, alignItems: "center" }
+          }}
+        />
       </CardContent>
     </Card>
-  </>
-  )
+  </>);
 };
 
 export default CommitteesPage;

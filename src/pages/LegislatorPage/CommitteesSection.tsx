@@ -12,6 +12,7 @@ import { Link } from "react-router-dom";
 import { LegislatureService } from '../../api/legislatureService';
 import { sleep } from '../../utils/sleep';
 import { LEGISLATORS_CONSTANTS } from './constants';
+import { Committee, Member } from '../../api/committee';
 
 export function CommitteesSection({ legislator }: { legislator: Member }) {
   const [committees, setCommittees] = useState<Committee[]>([]);

@@ -3,314 +3,233 @@ import { NavLink } from "react-router-dom";
 // material-ui
 import { HomeOutlined } from "@ant-design/icons";
 import { useNotifications } from "@digitalaidseattle/core";
+import { SupabaseConfiguration } from "@digitalaidseattle/supabase";
 import { Breadcrumbs, Button, Card, CardContent, CardHeader, IconButton, Stack, Typography } from '@mui/material';
 import { useState } from "react";
-import { BillDao } from "../api/billDao";
-import { CommitteeDao } from "../api/committeeDao";
-import { BillsDB } from "../api/database/BillsDB";
-import { CommitteesDB } from "../api/database/CommitteesDB";
-import { SponsorsDB } from "../api/database/SponsorsDB";
-import { UpdateScheduleDB } from "../api/database/UpdateScheduleDB";
-import { HtmlDao } from "../api/HtmlDao";
-import { LegislatorDao } from "../api/legislatorDao";
-import { FirebaseAiService, Project, ProjectContext } from "../api/screen-scraped/FirebaseAiService";
 import { LoadingOverlay } from "../components/LoadingOverlay";
 
 // project import
 
 // ==============================|| SAMPLE PAGE ||============================== //
 // const gemini_model = 'gemini-2.5-flash-lite';
-const gemini_model = 'gemini-3.1-flash-lite-preview';
 
 export const AdminPage = () => {
     const [loading, setLoading] = useState(false);
     const notify = useNotifications();
 
-    function loadLegislators(): void {
-        setLoading(true);
-        LegislatorDao.getInstance()
-            .getAll()
-            .then(legislators => SponsorsDB.getInstance().upsert(legislators))
-            .catch(error => {
-                console.log(error);
-                notify.error('Failed to load.')
-            })
-            .finally(() => {
-                notify.success('Loaded committees.')
-                setLoading(false)
-            });
-    }
-
-    function loadCommittees(): void {
-        setLoading(true);
-        CommitteeDao.getInstance()
-            .getAll()
-            .then(committees => CommitteesDB.getInstance().upsert(committees))
-            .catch(error => {
-                console.log(error);
-                notify.error('Failed to load.')
-            })
-            .finally(() => {
-                notify.success('Loaded legislators.')
-                setLoading(false)
-            });
-    }
-
-    function loadBills(): void {
-        setLoading(true);
-        BillDao.getInstance()
-            .getBills()
-            .then(bills => BillsDB.getInstance().upsert(bills))
-            .catch(error => {
-                console.log(error);
-                notify.error('Failed to load.')
-            })
-            .finally(() => {
-                notify.success('Loaded bills.')
-                setLoading(false)
-            });
-    }
-
-    async function loadBillSponsors(): Promise<void> {
+    async function legislatorJob(): Promise<void> {
         setLoading(true);
         try {
-            const bills = await BillsDB.getInstance().getAll();
-            for (let i = 0; i < bills.length; i++) {
-                const bill = bills[i];
-                const substrings = `${bill.Id}`.split(".")
-                const name = substrings[0].split("-")[0]
-                try {
-                    BillDao.getInstance()
-                        .getBillSponsors(name)
-                        .then(async sponsors => {
-                            const updated = {
-                                ...bill,
-                                Sponsors: sponsors
-                            }
-                            await BillsDB.getInstance()
-                                .upsert(updated);
-                        });
-                }
-                catch (error) {
-                    console.log(error);
-                    notify.error(`Failed to load sponsors. ${name}`);
-                    throw (error);
-                }
-            }
+            SupabaseConfiguration.getInstance()
+                .getSupabaseClient().functions
+                .invoke("legislator-services", {
+                    body: { biennium: "2025-26" },
+                })
+                .then((resp: any) => resp.data);
+        }
+        catch (error) {
+            console.log(error);
+            notify.error('Failed to load.')
+        }
+        finally {
+            notify.success('Loaded legislators.')
+            setLoading(false)
+        };
+    }
+
+    async function legislatorInfoJob(): Promise<void> {
+        setLoading(true);
+        try {
+            SupabaseConfiguration.getInstance()
+                .getSupabaseClient().functions
+                .invoke("legislator-info-service")
+                .then((resp: any) => resp.data);
+        }
+        catch (error) {
+            console.log(error);
+            notify.error('Failed to load.')
+        }
+        finally {
+            notify.success('Loaded committe members.')
+            setLoading(false)
+        };
+    }
+
+    async function loadCommitteMembersJob(): Promise<void> {
+        setLoading(true);
+        try {
+            SupabaseConfiguration.getInstance()
+                .getSupabaseClient().functions
+                .invoke("committee-membership-service", {
+                    body: { biennium: "2025-26" },
+                })
+                .then((resp: any) => resp.data);
+        }
+        catch (error) {
+            console.log(error);
+            notify.error('Failed to load.')
+        }
+        finally {
+            notify.success('Loaded committe members.')
+            setLoading(false)
+        };
+    }
+
+
+    async function loadCommitteesJob(): Promise<void> {
+        setLoading(true);
+        try {
+            SupabaseConfiguration.getInstance()
+                .getSupabaseClient().functions
+                .invoke("committee-info-service")
+                .then((resp: any) => resp.data);
+        }
+        catch (error) {
+            console.log(error);
+            notify.error('Failed to load.')
+        }
+        finally {
+            notify.success('Loaded committees.')
+            setLoading(false)
+        };
+    }
+
+    async function committeeLeadershipJob(): Promise<void> {
+        setLoading(true);
+        try {
+            SupabaseConfiguration.getInstance()
+                .getSupabaseClient().functions
+                .invoke("committee-leadership-service")
+                .then((resp: any) => resp.data);
+        }
+        catch (error) {
+            console.log(error);
+            notify.error('Failed to load.')
+        }
+        finally {
+            notify.success('Loaded committee members.')
+            setLoading(false)
+        };
+    }
+
+    async function committeeReferralJob(): Promise<void> {
+        setLoading(true);
+        try {
+            SupabaseConfiguration.getInstance()
+                .getSupabaseClient().functions
+                .invoke("committee-referral-service", {
+                    body: { biennium: "2025-26" },
+                })
+                .then((resp: any) => resp.data);
+        }
+        catch (error) {
+            console.log(error);
+            notify.error('Failed to load.')
+        }
+        finally {
+            notify.success('Loaded committee referrals.')
+            setLoading(false)
+        };
+    }
+
+    async function committeeInCommitteeJob(): Promise<void> {
+        setLoading(true);
+        try {
+            SupabaseConfiguration.getInstance()
+                .getSupabaseClient().functions
+                .invoke("committee-incommittee-service", {
+                    body: { biennium: "2025-26" },
+                })
+                .then((resp: any) => resp.data);
+        }
+        catch (error) {
+            console.log(error);
+            notify.error('Failed to load.')
+        }
+        finally {
+            notify.success('Loaded committee in-committee information.')
+            setLoading(false)
+        };
+    }
+
+    async function billInfoCachingJob(): Promise<void> {
+        setLoading(true);
+        try {
+            SupabaseConfiguration.getInstance()
+                .getSupabaseClient().functions
+                .invoke("legislation-info-service", {
+                    body: { year: 2026 },
+                })
+                .then((resp: any) => resp.data);
+        }
+        catch (error) {
+            console.log(error);
+            notify.error('Failed to load.')
+        }
+        finally {
+            notify.success('Loaded committe members.')
+            setLoading(false)
+        };
+    }
+
+    async function billDetailCachingJob(): Promise<void> {
+        setLoading(true);
+        try {
+            SupabaseConfiguration.getInstance()
+                .getSupabaseClient().functions
+                .invoke("legislation-detail-service")
+                .then((resp: any) => resp.data);
+        }
+        catch (error) {
+            console.log(error);
+            notify.error('Failed to load.')
+        }
+        finally {
+            notify.success('Loaded bill details.')
+            setLoading(false)
+        };
+    }
+
+    async function billCommitteeCachingJob(): Promise<void> {
+        setLoading(true);
+        try {
+            SupabaseConfiguration.getInstance()
+                .getSupabaseClient().functions
+                .invoke("legislation-committee-service", {
+                    body: { biennium: "2025-26" },
+                })
+                .then((resp: any) => resp.data);
+        }
+        catch (error) {
+            console.log(error);
+            notify.error('Failed to load.')
+        }
+        finally {
+            notify.success('Loaded committe members.')
+            setLoading(false)
+        };
+    }
+
+    async function billSponsorsCachingJob(): Promise<void> {
+        setLoading(true);
+        try {
+            SupabaseConfiguration.getInstance()
+                .getSupabaseClient().functions
+                .invoke("legislation-sponsors-service", {
+                    body: { biennium: "2025-26" },
+                })
+                .then((resp: any) => resp.data);
+        }
+        catch (error) {
+            console.log(error);
+            notify.error('Failed to load.')
+        }
+        finally {
             notify.success('Loaded bill sponsors.')
-            console.log('Done');
-        }
-        finally {
             setLoading(false)
         };
     }
 
-    async function loadCommitteMembers(): Promise<void> {
-        setLoading(true);
-        try {
-            const checkDate = new Date();
-
-            const committees = await CommitteesDB.getInstance()
-                .findLastUpdateBefore(checkDate, 'membership_update');
-            const now = new Date().toISOString();
-            committees.forEach(async committee => {
-                await CommitteeDao.getInstance()
-                    .getCommitteeMembers(committee.Agency, committee.Name)
-                    .then(async members => {
-                        const updated = {
-                            ...committee,
-                            membership_update: now,
-                            Members: members
-                        }
-                        await CommitteesDB.getInstance()
-                            .updateMembership(updated);
-                    })
-            });
-        }
-        catch (error) {
-            console.log(error);
-            notify.error('Failed to load.')
-        }
-        finally {
-            notify.success('Loaded committe members.')
-            setLoading(false)
-        };
-    }
-
-    async function scrapeLegislatorInfo(): Promise<void> {
-
-        const prompt = "Parse the provided page and find the Address and Legislative assistant. Return the results in structure JSON";
-        setLoading(true);
-        try {
-            const checkDate = await UpdateScheduleDB.getInstance()
-                .getByName('legislator_info')
-                .then(sched => sched.last_update);
-
-            const sponsors = await SponsorsDB.getInstance()
-                .findLastUpdateBefore(checkDate, 'info_update');
-            //for (let i = 0; i < sponsors.length; i++) {
-            for (let i = 0; i <= 0; i++) {
-                const sponsor = sponsors[i];
-                const url = `https://leg.wa.gov/legislators/member/${sponsor.FirstName}-${sponsor.LastName}`
-
-                const pageText = await HtmlDao.getInstance()
-                    .getHtml(url)
-
-                const context: ProjectContext = {
-                    type: 'text',
-                    name: 'website',
-                    value: pageText,
-                    tokenCount: 0,
-                }
-                const project: Project = {
-                    name: 'legislator-info',
-                    rating: 5,
-                    tags: [],
-                    template: '',
-                    prompt: prompt,
-                    contexts: [context],
-                    outputs: [{ name: 'Address' }, { name: 'LegislativeAssistant' }],
-                    tokenCount: 0,
-                    modelType: 'gemini-2.5-flash-lite',
-                }
-                const infoShema = {
-                    type: "object",
-                    properties: {
-                        Address: {
-                            type: "string"
-                        },
-                        LegislativeAssistant: {
-                            type: "array",
-                            items: {
-                                type: "object",
-                                properties: {
-                                    name: {
-                                        type: "string"
-                                    },
-                                    phone: {
-                                        type: "string"
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-
-                try {
-                    FirebaseAiService.getInstance()
-                        .parameterizedQuery(project, infoShema, gemini_model)
-                        .then(async result => {
-                            const info = JSON.parse(await result.response.text());
-                            const updated: Member = {
-                                ...sponsor,
-                                ...info
-                            };
-                            console.log(updated)
-                            await SponsorsDB.getInstance()
-                                .updateInfo(updated);
-                        })
-                } catch (err) {
-                    throw err;
-                }
-
-            }
-        }
-        catch (error) {
-            console.log(error);
-            notify.error('Failed to load.')
-        }
-        finally {
-            setLoading(false)
-            notify.success('Loaded legislator info.')
-        }
-    }
-
-    async function scrapeCommitteLeadership(): Promise<void> {
-
-        const prompt = "Parse the provided page and list the committee leaders in structured JSON";
-
-
-        setLoading(true);
-        try {
-            const checkDate = await UpdateScheduleDB.getInstance()
-                .getByName('committee_leadership')
-                .then(sched => sched.last_update);
-
-            const committees = await CommitteesDB.getInstance()
-                .findLastUpdateBefore(checkDate, 'leadership_update');
-            for (let i = 0; i <= 0; i++) {
-            // for (let i = 0; i <= committees.length; i++) {
-                const committee = committees[i];
-                const url = committee.Agency === 'House'
-                    ? `https://leg.wa.gov/about-the-legislature/committees/house-of-representatives/${committee.Acronym}`
-                    : committee.Agency === 'Senate'
-                        ? `https://leg.wa.gov/about-the-legislature/committees/senate/${committee.Acronym}`
-                        : `https://leg.wa.gov/about-the-legislature/committees/joint/${committee.Acronym}`
-
-                const pageText = await HtmlDao.getInstance()
-                    .getHtml(url)
-
-                const context: ProjectContext = {
-                    type: 'text',
-                    name: 'website',
-                    value: pageText,
-                    tokenCount: 0,
-                }
-                const project: Project = {
-                    name: 'chair-query',
-                    rating: 5,
-                    tags: [],
-                    template: '',
-                    prompt: prompt,
-                    contexts: [context],
-                    outputs: [
-                        { name: 'Chair' },
-                        { name: 'Vice Chair' },
-                        { name: 'Ranking Member' }
-                    ],
-                    tokenCount: 0,
-                    modelType: gemini_model,
-                }
-
-                const leadershipSchema = {
-                    type: "array",
-                    items: {
-                        type: "object",
-                        properties: {
-                            role: {
-                                type: "string"
-                            },
-                            name: {
-                                type: "string"
-                            }
-                        },
-                        required: ["role", "name"]
-                    }
-                }
-
-                FirebaseAiService.getInstance()
-                    .parameterizedQuery(project, leadershipSchema, gemini_model)
-                    .then(async result => {
-                        const info = JSON.parse(await result.response.text());
-                        const updated: Committee = {
-                            ...committee,
-                            Leadership: info
-                        };
-                        console.log(url, info)
-                        await CommitteesDB.getInstance()
-                            .updateLeadership(updated);
-                    })
-            }
-        }
-        catch (error) {
-            console.log(error);
-            notify.error('Failed to load.')
-        }
-        finally {
-            setLoading(false)
-            notify.success('Loaded committe members.')
-        };
-    }
 
     return (<>
         <LoadingOverlay loading={loading} />
@@ -322,17 +241,22 @@ export const AdminPage = () => {
             <CardHeader title={'Admin'} />
             <CardContent>
                 <Stack>
-                    <Button onClick={loadLegislators}>Load Legislators</Button>
-                    <Button onClick={loadCommittees}>Load Committees</Button>
-                    <Button onClick={loadBills}>Load Bills</Button>
-                    <Button onClick={loadBillSponsors}>Load Bill Sponsors</Button>
-                    <Button onClick={loadCommitteMembers}>Load Committee Members</Button>
-                    <Button onClick={scrapeLegislatorInfo}>Scrape Legislator Info</Button>
-                    <Button onClick={scrapeCommitteLeadership}>Scrape Committee Leadership</Button>
+                    <Button onClick={legislatorJob}>Edge load Legislators</Button>
+                    <Button onClick={legislatorInfoJob}>Edge load Legislator Info</Button>
+                    <hr />
+                    <Button onClick={loadCommitteesJob}>Edge Load Committees</Button>
+                    <Button onClick={loadCommitteMembersJob}>Edge Load Committee Members</Button>
+                    <Button onClick={committeeLeadershipJob}>Edge Load Committee Leadership</Button>
+                    <Button onClick={committeeReferralJob}>Edge Load Committee Referrals</Button>
+                    <Button onClick={committeeInCommitteeJob}>Edge Load Committee In-Committee</Button>
+                    <hr />
+                    <Button onClick={billInfoCachingJob}>Edge load Bills</Button>
+                    <Button onClick={billDetailCachingJob}>Edge load Bill Details</Button>
+                    <Button onClick={billCommitteeCachingJob}>Edge load Bill Committee</Button>
+                    <Button onClick={billSponsorsCachingJob}>Edge load Bill Sponsors</Button>
                 </Stack>
             </CardContent>
         </Card>
-
     </>
     )
 };

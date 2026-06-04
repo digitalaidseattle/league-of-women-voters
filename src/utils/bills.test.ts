@@ -7,6 +7,7 @@
 import { describe, expect, it } from "vitest";
 import { deriveDocumentLink, extractBillNumber, inferChamber, summarizeSponsors } from "./bills";
 import { LegislativeDocument } from "../api/bill";
+import { Member } from "../api/committee";
 
 describe("bills", () => {
 
@@ -14,7 +15,7 @@ describe("bills", () => {
         expect(deriveDocumentLink({ Id: 'test' } as LegislativeDocument))
             .toStrictEqual({ "label": "", "url": undefined });
         expect(deriveDocumentLink({ Id: 'test', Description: 'BILL', Url: 'EARL' } as LegislativeDocument))
-            .toStrictEqual({ "label": "BILL", "url": "EARL" });
+            .toStrictEqual({ "label": "View document", "url": "EARL" });
     });
 
     it("inferChamber", () => {
@@ -38,7 +39,7 @@ describe("bills", () => {
 
     it("summarizeSponsors", () => {
         expect(summarizeSponsors({ Id: 'test' } as LegislativeDocument)).toBe('');
-        expect(summarizeSponsors({ Id: 'test', Sponsors: [{ Name: 'bill' } as Sponsor, { Name: 'ted' } as Sponsor] } as LegislativeDocument)).toBe('bill, ted');
+        expect(summarizeSponsors({ Id: 'test', Sponsors: [{ Name: 'bill' } as Member, { Name: 'ted' } as Member] } as LegislativeDocument)).toBe('bill, ted');
     });
 
 

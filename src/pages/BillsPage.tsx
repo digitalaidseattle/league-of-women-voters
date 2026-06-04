@@ -8,169 +8,201 @@ import { useContext, useEffect, useState } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
 
 import {
-  ExpandAltOutlined,
+  ExportOutlined,
   HomeOutlined,
-  ReloadOutlined,
-  SearchOutlined
+  ReloadOutlined
 } from "@ant-design/icons";
 import {
   Breadcrumbs,
   Card,
   CardHeader,
   IconButton,
-  InputAdornment,
   Link,
-  TextField,
   Tooltip,
   Typography
 } from "@mui/material";
 import {
   DataGrid,
   GridColDef,
+  GridFilterModel,
   Toolbar,
   useGridApiRef
 } from "@mui/x-data-grid";
 
-import { LoadingContext, PageInfo } from "@digitalaidseattle/core";
-import type { BillRow } from "../api/bill";
+import { FilterItem, LoadingContext, PageInfo, QueryModel, useNotifications } from "@digitalaidseattle/core";
+import type { Bill } from "../api/bill";
 import { BillService } from "../api/billService";
 import { CHAMBER_TYPE, ChamberButtonGroup } from "../components/ChamberButtonGroup";
 import { LoadingOverlay } from "../components/LoadingOverlay";
-import { BillsService } from "../utils/bills";
+import { SearchField } from "../components/SearchField";
+import { GridSortModel } from "@mui/x-data-grid";
 
-const BILL_SEARCH_URL = "https://app.leg.wa.gov/billsearch/";
 const PAGE_SIZE = 25;
-
-const columns: GridColDef<BillRow>[] = [
-  {
-    field: "billNumber",
-    headerName: "Bill",
-    width: 120,
-    type: "string"
-  },
-  {
-    field: "committee",
-    headerName: "Committee",
-    flex: 1,
-    width: 120,
-    type: "string"
-  },
-  {
-    field: "title",
-    headerName: "Title",
-    flex: 1,
-    minWidth: 260,
-    type: "string"
-  },
-  {
-    field: "history",
-    headerName: "Bill History",
-    flex: 1,
-    minWidth: 240,
-    type: "string"
-  },
-  {
-    field: "status",
-    headerName: "Status",
-    width: 160,
-    type: "string",
-    renderCell: (params) => {
-      const { row } = params;
-      if (row.status && row.status.startsWith("http")) {
-        return (
-          <Link
-            href={row.status}
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Bill Status
-          </Link>
-        );
-      }
-      return row.status;
-    }
-  },
-  {
-    field: "latestDocumentLabel",
-    headerName: "Latest Available Documents",
-    flex: 1,
-    minWidth: 240,
-    type: "string",
-    renderCell: (params) => {
-      const { row } = params;
-      if (row.latestDocumentUrl) {
-        return (
-          <Link
-            href={row.latestDocumentUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            {row.latestDocumentLabel}
-          </Link>
-        );
-      }
-      return row.latestDocumentLabel;
-    }
-  }
-];
 
 export const BillsPage = () => {
   const apiRef = useGridApiRef();
   const navigate = useNavigate();
-  const [search, setSearch] = useState("");
-  const [paginationModel, setPaginationModel] = useState({ page: 0, pageSize: PAGE_SIZE });
-  const [pageInfo, setPageInfo] = useState<PageInfo<BillRow>>({ rows: [], totalRowCount: 0, });
+  const notifications = useNotifications();
   const { loading, setLoading } = useContext(LoadingContext);
+
+  const [paginationModel, setPaginationModel] = useState({ page: 0, pageSize: PAGE_SIZE });
+  const [sortModel, setSortModel] = useState<GridSortModel>([{ field: 'id', sort: 'asc' }]);
+  const [filterModel, setFilterModel] = useState<GridFilterModel>({ items: [] });
+  const [pageInfo, setPageInfo] = useState<PageInfo<Bill>>({ rows: [], totalRowCount: 0, });
+
+  const [search, setSearch] = useState("");
   const [chamber, setChamber] = useState<CHAMBER_TYPE>('all');
 
   useEffect(() => {
     fetchData();
-  }, [chamber, search]);
+  }, [chamber, search, paginationModel, sortModel, filterModel]);
 
   function fetchData() {
     setLoading(true);
-    setPageInfo({ rows: [], totalRowCount: 0 });
     BillService.getInstance()
-      .getAll()
-      .then(data => {
-        const rows = data
-          .map((bill) => BillsService.mapLegislativeDocumentToBillRow(bill)!)
-          .filter(b => b !== undefined)
-          .filter(row => rowFilter(row));
-        setPageInfo({
-          rows: rows,
-          totalRowCount: rows.length,
-        });
+      .find(createQueryModel())
+      .then(data => setPageInfo(data))
+      .catch(err => {
+        notifications.error('Error fetching bills.');
+        console.error('Error fetching bills:', err);
       })
       .finally(() => setLoading(false));
   };
 
-  function rowFilter(bill: BillRow): boolean {
-    const matchesTab =
-      chamber === "all" ? true : bill.chamber.toLowerCase() === chamber;
+  function exportData() {
+    setLoading(true);
+    BillService.getInstance()
+      .exportData(createQueryModel())
+      .then(() => notifications.success('Bills exported successfully'))
+      .catch(err => {
+        notifications.error('Error exporting bills.');
+        console.error('Error exporting bills:', err);
+      })
+      .finally(() => setLoading(false));
+  };
 
-    if (!matchesTab) {
-      return false;
+  function createQueryModel(): QueryModel {
+    const filterItems: FilterItem[] = [];
+    const agency = chamber === 'house' ? "House" : (chamber === 'senate' ? "Senate" : undefined);
+    if (agency) {
+      filterItems.push({
+        field: 'OriginalAgency',
+        operator: '=',
+        value: agency
+      })
+    }
+    if (search && search.trim() !== '') {
+      filterItems.push({
+        field: 'SearchKey',
+        operator: 'contains',
+        value: search
+      })
+    }
+    if (filterModel && filterModel.items.length > 0) {
+      const filterItem = filterModel.items[0];
+      filterItems.push({
+        field: filterItem.field,
+        operator: filterItem.operator,
+        value: filterItem.value
+      })
     }
 
-    const loweredQuery = search.trim().toLowerCase();
-    if (!loweredQuery) {
-      return true;
-    }
-
-    const haystack = [
-      bill.billNumber,
-      bill.title,
-      bill.committee,
-      bill.status,
-      bill.history,
-      bill.latestDocumentLabel
-    ]
-      .join(" ")
-      .toLowerCase();
-
-    return haystack.includes(loweredQuery);
+    const sortField = sortModel && sortModel.length > 0 ? sortModel![0].field : '';
+    const sortDirection = sortModel && sortModel.length > 0 ? sortModel![0].sort : '';
+    return {
+      ...paginationModel,
+      sortField: sortField,
+      sortDirection: sortDirection,
+      filterModel: {
+        items: filterItems
+      }
+    } as QueryModel;
   }
+
+  const columns: GridColDef<Bill>[] = [
+    {
+      field: "id",
+      headerName: "Bill",
+      width: 120,
+      type: "string",
+      renderCell: (params) => {
+        const { row } = params;
+        const year = row.Biennium.split('-')[0];
+        const billNumber = row.BillNumber
+        return (<>
+          <Link
+            title={`Open WA Leg ${row.BillId}`}
+            href={`https://app.leg.wa.gov/billsummary/?BillNumber=${billNumber}&Year=${year}`}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            {row.BillId}
+          </Link>
+        </>);
+      }
+    },
+    {
+      field: "Active",
+      headerName: "Active",
+      width: 120,
+      type: "boolean",
+      filterable: false,
+      sortable: false,
+    },
+    {
+      field: "CommitteeName",
+      headerName: "In Committee",
+      width: 240,
+      type: "string",
+      renderCell: (params) => {
+        const { row } = params;
+        const committee = row.InCommittee
+        return committee && <NavLink
+          title={`Open committee ${committee.Name}`}
+          to={`/committee/${committee.Id}`}
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          {committee.Name}
+        </NavLink>
+      }
+    },
+    {
+      field: "LegalTitle",
+      headerName: "Title",
+      flex: 1,
+      minWidth: 260,
+      type: "string",
+      filterable: false,
+      sortable: false,
+    },
+    {
+      field: "history",
+      headerName: "Bill History",
+      flex: 1,
+      minWidth: 240,
+      type: "string",
+      renderCell: (params) => {
+        const { row } = params;
+        return row.CurrentStatus ? row.CurrentStatus.HistoryLine : 'n/a';
+      },
+      filterable: false,
+      sortable: false,
+
+    },
+    {
+      field: "status",
+      headerName: "Status",
+      width: 160,
+      type: "string",
+      renderCell: (params) => {
+        const { row } = params;
+        return row.CurrentStatus ? row.CurrentStatus.Status : 'n/a';
+      },
+      filterable: false,
+      sortable: false,
+    }
+  ];
 
   function handleChamberChange(value: CHAMBER_TYPE): void {
     setChamber(value);
@@ -179,29 +211,13 @@ export const BillsPage = () => {
   function CustomToolbar() {
     return (
       <Toolbar>
-        <ChamberButtonGroup chamber={chamber} onChange={handleChamberChange} />
-        <TextField
-          value={search}
-          onChange={(event) => setSearch(event.target.value)}
-          size="small"
-          placeholder="Search"
-          sx={{ width: 220, mr: 1.5 }}
-          slotProps={{
-            input: {
-              startAdornment: (
-                <InputAdornment position="start">
-                  <SearchOutlined />
-                </InputAdornment>
-              )
-            }
-          }}
-        />
-        <Tooltip title="Open Bill Search">
-          <IconButton
-            color="primary"
-            onClick={() => window.open(BILL_SEARCH_URL, "_blank", "noopener")}
-          >
-            <ExpandAltOutlined />
+        <ChamberButtonGroup
+          chamber={chamber}
+          onChange={handleChamberChange} />
+        <SearchField value={search} onChange={(value) => setSearch(value)} />
+        <Tooltip title="Export">
+          <IconButton color="primary" size="small" onClick={exportData}>
+            <ExportOutlined />
           </IconButton>
         </Tooltip>
         <Tooltip title="Refresh">
@@ -223,14 +239,25 @@ export const BillsPage = () => {
       <CardHeader title="Bills" />
       <DataGrid
         apiRef={apiRef}
-        autoHeight
         rows={pageInfo.rows}
+        getRowId={(row) => row.BillId}
         columns={columns}
-        getRowId={(row) => row.id}
-        paginationModel={paginationModel}
-        onPaginationModelChange={setPaginationModel}
+
         pageSizeOptions={[10, 25, 50, 100]}
-        onRowDoubleClick={params => navigate(`/bill/${params.row.id}`)}
+        paginationMode='server'
+        paginationModel={paginationModel}
+        rowCount={pageInfo.totalRowCount}
+        onPaginationModelChange={setPaginationModel}
+
+        sortingMode="server"
+        sortModel={sortModel}
+        onSortModelChange={setSortModel}
+
+        filterMode="server"
+        filterModel={filterModel}
+        onFilterModelChange={setFilterModel}
+
+        onRowDoubleClick={params => navigate(`/bill/${params.row.BillId}`)}
         showToolbar={true}
         slots={{ toolbar: CustomToolbar }}
       />

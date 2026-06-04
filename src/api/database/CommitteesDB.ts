@@ -1,6 +1,7 @@
-import { Identifier } from "@digitalaidseattle/core";
+import { DataAccessOptions, Identifier, PageInfo, QueryModel } from "@digitalaidseattle/core";
 import { SupabaseConfiguration, SupabaseDAO } from "@digitalaidseattle/supabase";
 import { DAO } from "../DAO";
+import { Committee } from "../committee";
 
 export type DBCommittee = {
     id: Identifier,
@@ -8,7 +9,8 @@ export type DBCommittee = {
     updated_at: Date,
     membership_update: Date,
     leadership_update: Date,
-    committee: Committee
+    committee: Committee;
+    Agency: string;
 }
 
 class IternalCommitteeDAO extends SupabaseDAO<DBCommittee> {
@@ -59,16 +61,26 @@ export class CommitteesDB implements DAO<Committee> {
             .then(resps => resps.map(sponsorDB => sponsorDB.committee))
     }
 
-    async upsert(entity: Committee | Committee[]): Promise<Committee | Committee[]> {
+    async upsert(entity: Committee): Promise<Committee> {
         const now = new Date();
-        const uploads = (Array.isArray(entity) ? entity : [entity])
-            .map(cc => ({
-                id: cc.Id,
-                updated_at: now,
-                committee: cc
-            } as DBCommittee));
-        return Promise.all(uploads.map(up => this.db_dao.upsert(up)))
-            .then(resps => resps.map(db => db.committee))
+        const upload = ({
+            id: entity.Id,
+            updated_at: now,
+            committee: entity
+        } as DBCommittee);
+        return this.db_dao.upsert(upload)
+            .then(resp => resp.committee)
+    }
+
+    async find(queryModel: QueryModel, opts?: DataAccessOptions<Committee>): Promise<PageInfo<Committee>> {
+        return this.db_dao
+            .find(queryModel, opts as unknown as DataAccessOptions<DBCommittee>)
+            .then(pageInfo => {
+                return ({
+                    ...pageInfo,
+                    rows: pageInfo.rows.map(db => db.committee)
+                })
+            });
     }
 
     async updateLeadership(entity: Committee): Promise<Committee> {
@@ -83,7 +95,6 @@ export class CommitteesDB implements DAO<Committee> {
         return this.db_dao.upsert(up)
             .then(sponsorDB => sponsorDB.committee)
     }
-
 
     async updateMembership(entity: Committee): Promise<Committee> {
         const now = new Date();
