@@ -7,9 +7,10 @@
 
 import { DataAccessOptions, PageInfo, QueryModel } from "@digitalaidseattle/core";
 import type { Bill } from "./bill";
-import { BillExporter } from "./billsExporter";
-import { Member } from "./committee";
 import { BillsDB } from "./database/BillsDB";
+import { Committee, Member } from "./committee";
+import { LegislatureService } from "./legislatureService";
+import { BillExporter } from "./billsExporter";
 
 export class BillService {
 
@@ -43,6 +44,27 @@ export class BillService {
   async find(queryModel: QueryModel, opts?: DataAccessOptions<Bill>): Promise<PageInfo<Bill>> {
     return this.dao.find(queryModel, opts);
   }
+
+  getBillUrl(bill: Bill): string {
+    const year = bill.Biennium.split('-')[0];
+    const billNumber = bill.BillNumber
+    return `https://app.leg.wa.gov/billsummary/?BillNumber=${billNumber}&Year=${year}`
+  }
+
+  async findInCommittee(bill: Bill): Promise<Committee | undefined> {
+    return LegislatureService.getInstance()
+      .getAll()
+      .then(committees => {
+        for (const committee of committees) {
+          if (committee.InCommittee) {
+            if (committee.InCommittee.find(info => info.BillId === bill.BillId)) {
+              return committee;
+            }
+          }
+        }
+        return undefined;
+      })
+  };
 
   async exportData(queryModel: QueryModel): Promise<void> {
     return BillExporter.getInstance().exportData(queryModel);
