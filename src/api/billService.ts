@@ -10,8 +10,10 @@ import type { Bill } from "./bill";
 import { BillsDB } from "./database/BillsDB";
 import { Committee, Member } from "./committee";
 import { LegislatureService } from "./legislatureService";
+import { BillExporter } from "./billsExporter";
 
 export class BillService {
+
   private static instance: BillService;
 
   public static getInstance(): BillService {
@@ -49,14 +51,6 @@ export class BillService {
     return `https://app.leg.wa.gov/billsummary/?BillNumber=${billNumber}&Year=${year}`
   }
 
-  // async findInCommittee(bill: Bill): Promise<Committee | undefined> {
-  //   const committee = bill.InCommittee;
-  //   if (committee) {
-  //     return committee;
-  //   }
-  //   return undefined
-  // };
-
   async findInCommittee(bill: Bill): Promise<Committee | undefined> {
     return LegislatureService.getInstance()
       .getAll()
@@ -71,5 +65,9 @@ export class BillService {
         return undefined;
       })
   };
+
+  async exportData(queryModel: QueryModel): Promise<void> {
+    return BillExporter.getInstance().exportData(queryModel);
+  }
 
 }

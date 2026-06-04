@@ -1,7 +1,8 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { Identifier } from "@digitalaidseattle/core";
+import { DataAccessOptions, Identifier, PageInfo, QueryModel } from "@digitalaidseattle/core";
 import { Committee, Member } from "./committee";
 import { CommitteesDB } from "./database/CommitteesDB";
+import { LegislatureExporter } from "./legislatureExporter";
 
 class LegislatureService {
 
@@ -28,13 +29,19 @@ class LegislatureService {
     return this.dao.getById(id);
   }
 
+  async find(queryModel: QueryModel, opts?: DataAccessOptions<Committee>): Promise<PageInfo<Committee>> {
+    return this.dao.find(queryModel, opts);
+  }
+
   async findCommitteesByMember(member: Member): Promise<Committee[]> {
     const committees = await this.getAll();
     return committees.filter(committee =>
       (committee.Members ?? []).find(mem => mem.Name === member.Name) !== undefined
     )
   }
-
+  async exportData(queryModel: QueryModel): Promise<void> {
+    return LegislatureExporter.getInstance().exportData(queryModel);
+  }
 }
 
 

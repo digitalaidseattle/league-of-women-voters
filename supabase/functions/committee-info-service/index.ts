@@ -55,10 +55,12 @@ Deno.serve(async (req) => {
       const updatedCommittee: Committee = current
         ? {
           ...current.committee,
-          ...info
+          ...info,
+          Agency: info.Agency || current.committee.Agency,
         }
         : {
           ...info,
+          Agency: info.Agency
         }
       //const searchKey = calcCommitteeSearchKey(updatedCommittee as Bill);
       const updatedDBCommittee = {
