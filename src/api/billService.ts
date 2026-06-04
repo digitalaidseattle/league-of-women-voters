@@ -7,10 +7,12 @@
 
 import { DataAccessOptions, PageInfo, QueryModel } from "@digitalaidseattle/core";
 import type { Bill } from "./bill";
-import { BillsDB } from "./database/BillsDB";
+import { BillExporter } from "./billsExporter";
 import { Member } from "./committee";
+import { BillsDB } from "./database/BillsDB";
 
 export class BillService {
+
   private static instance: BillService;
 
   public static getInstance(): BillService {
@@ -40,6 +42,10 @@ export class BillService {
 
   async find(queryModel: QueryModel, opts?: DataAccessOptions<Bill>): Promise<PageInfo<Bill>> {
     return this.dao.find(queryModel, opts);
+  }
+
+  async exportData(queryModel: QueryModel): Promise<void> {
+    return BillExporter.getInstance().exportData(queryModel);
   }
 
 }
