@@ -230,6 +230,25 @@ export const AdminPage = () => {
         };
     }
 
+    async function billHearingsCachingJob(): Promise<void> {
+        setLoading(true);
+        try {
+            SupabaseConfiguration.getInstance()
+                .getSupabaseClient().functions
+                .invoke("legislation-hearings-service", {
+                    body: { biennium: "2025-26" },
+                })
+                .then((resp: any) => resp.data);
+        }
+        catch (error) {
+            console.log(error);
+            notify.error('Failed to load.')
+        }
+        finally {
+            notify.success('Loaded bill hearings.')
+            setLoading(false)
+        };
+    }
 
     return (<>
         <LoadingOverlay loading={loading} />
@@ -254,6 +273,7 @@ export const AdminPage = () => {
                     <Button onClick={billDetailCachingJob}>Edge load Bill Details</Button>
                     <Button onClick={billCommitteeCachingJob}>Edge load Bill Committee</Button>
                     <Button onClick={billSponsorsCachingJob}>Edge load Bill Sponsors</Button>
+                    <Button onClick={billHearingsCachingJob}>Edge load Bill Hearings</Button>
                 </Stack>
             </CardContent>
         </Card>
