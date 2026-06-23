@@ -15,7 +15,7 @@ describe("bills", () => {
         expect(deriveDocumentLink({ Id: 'test' } as LegislativeDocument))
             .toStrictEqual({ "label": "", "url": undefined });
         expect(deriveDocumentLink({ Id: 'test', Description: 'BILL', Url: 'EARL' } as LegislativeDocument))
-            .toStrictEqual({ "label": "BILL", "url": "EARL" });
+            .toStrictEqual({ "label": "View document", "url": "EARL" });
     });
 
     it("inferChamber", () => {

@@ -1,4 +1,4 @@
-import { Identifier } from "@digitalaidseattle/core";
+import { DataAccessOptions, Identifier, PageInfo, QueryModel } from "@digitalaidseattle/core";
 import { SupabaseConfiguration, SupabaseDAO } from "@digitalaidseattle/supabase";
 import { DAO } from "../DAO";
 import { Member } from "../committee";
@@ -54,16 +54,26 @@ export class SponsorsDB implements DAO<Member> {
             .then(wrapped => wrapped.sponsor);
     }
 
-    async upsert(entity: Member | Member[]): Promise<Member | Member[]> {
+    async upsert(entity: Member): Promise<Member> {
         const now = new Date();
-        const uploads = (Array.isArray(entity) ? entity : [entity])
-            .map(mm => ({
-                id: mm.Id,
-                sponsor: mm,
-                updated_at: now
-            } as DBSponsor));
-        return Promise.all(uploads.map(up => this.db_dao.upsert(up)))
-            .then(resps => resps.map(sponsorDB => sponsorDB.sponsor))
+        const upload = ({
+            id: entity.Id,
+            sponsor: entity,
+            updated_at: now
+        } as DBSponsor)
+        return this.db_dao.upsert(upload)
+            .then(resp => resp.sponsor)
+    }
+
+    async find(queryModel: QueryModel, opts?: DataAccessOptions<Member>): Promise<PageInfo<Member>> {
+        return this.db_dao
+            .find(queryModel, opts as unknown as DataAccessOptions<DBSponsor>)
+            .then(pageInfo => {
+                return ({
+                    ...pageInfo,
+                    rows: pageInfo.rows.map(dbSponsor => dbSponsor.sponsor)
+                })
+            });
     }
 
     async findLastUpdateBefore(date: Date, field?: string): Promise<Member[]> {

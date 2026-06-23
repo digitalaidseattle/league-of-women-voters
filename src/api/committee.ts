@@ -1,6 +1,7 @@
+import { Entity } from "@digitalaidseattle/core";
 import { LegislationInfo } from "./bill";
 
-export type Committee = {
+export type Committee = Entity & {
   Acronym: string;
   Agency: string;
   Id: number;
@@ -13,7 +14,7 @@ export type Committee = {
   InCommittee?: LegislationInfo[];
 };
 
-export type Member = {
+export type Member = Entity & {
   Id: number;
   Name: string;
   LongName: string;
