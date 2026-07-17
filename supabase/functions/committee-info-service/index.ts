@@ -67,6 +67,7 @@ Deno.serve(async (req) => {
         ...current,
         id: current ? current.id : updatedCommittee.Id,
         committee: updatedCommittee,
+        Agency: updatedCommittee.Agency,
         updated_at: now
       }
       allUpdated.push(await committeeDAO.upsert(updatedDBCommittee));

@@ -100,8 +100,8 @@ export const LegislatorsPage = () => {
       .find(createQueryModel())
       .then(data => setPageInfo(data))
       .catch(err => {
-        notifications.error('Error fetching bills.');
-        console.error('Error fetching bills:', err);
+        notifications.error('Error fetching legislators.');
+        console.error('Error fetching legislators:', err);
       })
       .finally(() => setLoading(false))
   }
@@ -189,8 +189,6 @@ export const LegislatorsPage = () => {
         filterMode="server"
         filterModel={filterModel}
         onFilterModelChange={setFilterModel}
-
-
 
         onRowDoubleClick={params => navigate(`/legislator/${params.row.Id}`)}
         showToolbar={true}
