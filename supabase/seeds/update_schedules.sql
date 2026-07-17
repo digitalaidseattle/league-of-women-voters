@@ -3,7 +3,7 @@ INSERT INTO
         "id",
         "name",
         "next_update",
-        "time_span"
+        "wait_time"
     )
 VALUES
     (
