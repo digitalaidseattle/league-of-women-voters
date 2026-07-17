@@ -5,15 +5,14 @@
 *
 */
 
-import { Bill } from "./types.ts";
+import { Committee } from "./types.ts";
 
-export function calcCommitteeSearchKey(bill: Bill): string {
+export function calcCommitteeSearchKey(commitee: Committee): string {
     return [
-        bill.BillNumber,
-        bill.LegalTitle,
-        bill.InCommittee ? bill.InCommittee.Name : undefined,
-        bill.CurrentStatus ? bill.CurrentStatus.Status : undefined,
-        bill.CurrentStatus ? bill.CurrentStatus.HistoryLine : undefined,
+        commitee.Name,
+        commitee.LongName,
+        commitee.Agency,
+        commitee.Acronym
     ]
         .filter(term => !!term)
         .join(" ")
