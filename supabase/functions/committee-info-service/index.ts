@@ -8,6 +8,7 @@ import { resetSchedule } from "../../shared/resetSchedule.ts";
 import { standardResponse } from "../../shared/standardResponse.ts";
 import { Committee, DBCommittee } from "../../shared/types.ts";
 import { UpdateSchedule, UpdateScheduleDAO } from "../../shared/UpdateScheduleDAO.ts";
+import { calcCommitteeSearchKey } from "../../shared/calcCommitteeSearchKey.ts";
 
 configure();
 const BASE_URL = "https://wslwebservices.leg.wa.gov/CommitteeService.asmx";
@@ -62,11 +63,13 @@ Deno.serve(async (req) => {
           ...info,
           Agency: info.Agency
         }
-      //const searchKey = calcCommitteeSearchKey(updatedCommittee as Bill);
+      const searchKey = calcCommitteeSearchKey(updatedCommittee as Committee);
       const updatedDBCommittee = {
         ...current,
         id: current ? current.id : updatedCommittee.Id,
         committee: updatedCommittee,
+        Agency: updatedCommittee.Agency,
+        SearchKey: searchKey,
         updated_at: now
       }
       allUpdated.push(await committeeDAO.upsert(updatedDBCommittee));
