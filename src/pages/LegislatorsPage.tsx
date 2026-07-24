@@ -91,14 +91,16 @@ export const LegislatorsPage = () => {
 
   useEffect(() => {
     refresh();
-  }, [chamber]);
+  }, [chamber, paginationModel, filterModel]);
 
   function refresh() {
     setLoading(false);
-    setPageInfo({ rows: [], totalRowCount: 0, });
     LegislatorService.getInstance()
-      .find(createQueryModel())
-      .then(data => setPageInfo(data))
+      .getAll()
+      .then(data => {
+        const filtered = data.filter(mem => filterByChamber(mem));
+        setPageInfo({ rows: filtered, totalRowCount: filtered.length })
+      })
       .catch(err => {
         notifications.error('Error fetching bills.');
         console.error('Error fetching bills:', err);
@@ -106,13 +108,23 @@ export const LegislatorsPage = () => {
       .finally(() => setLoading(false))
   }
 
+  function filterByChamber(member: Member) {
+    if (!chamber || chamber === 'all') {
+      return true;
+    }
+    return chamber === member.Agency.toLowerCase();
+  }
+
   function handleChamberChange(value: CHAMBER_TYPE): void {
     setChamber(value);
   }
 
+
+
   function createQueryModel(): QueryModel {
     const filterItems: FilterItem[] = [];
     const agency = chamber === 'house' ? "House" : (chamber === 'senate' ? "Senate" : undefined);
+
     if (agency) {
       filterItems.push({
         field: 'OriginalAgency',
@@ -120,8 +132,20 @@ export const LegislatorsPage = () => {
         value: agency
       })
     }
-    const sortField = "id";
-    const sortDirection = "asc";
+
+    if (filterModel.items.length > 0) {
+      const filterItem = filterModel.items[0];
+      if (filterItem.value !== undefined && filterItem.value !== null && filterItem.value !== '') {
+        filterItems.push({
+          field: filterItem.field,
+          operator: filterItem.operator,
+          value: filterItem.value
+        });
+      }
+    }
+
+    const sortField = sortModel.length > 0 ? sortModel[0].field : 'id';
+    const sortDirection = sortModel.length > 0 ? sortModel[0].sort : 'asc';
     return {
       ...paginationModel,
       sortField: sortField,
@@ -175,18 +199,17 @@ export const LegislatorsPage = () => {
         rows={pageInfo.rows}
         columns={columns}
         getRowId={(row) => row.Id}
-
         pageSizeOptions={[10, 25, 50, 100]}
-        paginationMode='server'
+
+        paginationMode='client'
         paginationModel={paginationModel}
-        rowCount={pageInfo.totalRowCount}
         onPaginationModelChange={setPaginationModel}
 
-        sortingMode="server"
+        sortingMode="client"
         sortModel={sortModel}
         onSortModelChange={setSortModel}
 
-        filterMode="server"
+        filterMode="client"
         filterModel={filterModel}
         onFilterModelChange={setFilterModel}
 
