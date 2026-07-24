@@ -10,7 +10,7 @@ import { NavLink, useNavigate } from "react-router-dom";
 // material-ui
 import { ExportOutlined, HomeOutlined, ReloadOutlined } from "@ant-design/icons";
 import { Breadcrumbs, Card, CardHeader, IconButton, Tooltip, Typography } from '@mui/material';
-import { DataGrid, GridColDef, GridFilterModel, Toolbar, useGridApiRef } from "@mui/x-data-grid";
+import { DataGrid, GridColDef, GridFilterModel, GridRenderCellParams, Toolbar, useGridApiRef } from "@mui/x-data-grid";
 
 import { FilterItem, LoadingContext, QueryModel, useNotifications } from '@digitalaidseattle/core';
 import { PageInfo } from "@digitalaidseattle/core";
@@ -25,6 +25,7 @@ import { GridSortModel } from '@mui/x-data-grid';
 const PAGE_SIZE = 25;
 
 export const LegislatorsPage = () => {
+  const service = LegislatorService.getInstance();
   const apiRef = useGridApiRef();
   const navigate = useNavigate();
   const notifications = useNotifications();
@@ -86,7 +87,17 @@ export const LegislatorsPage = () => {
         headerName: "Phone",
         width: 150,
         type: "string"
-      }
+      },
+      {
+        field: "LegislativeAssistant",
+        headerName: "Leg. Assistant",
+        width: 3000,
+        type: "string",
+        filterable: false,
+        sortable: false,
+        renderCell: (params: GridRenderCellParams<Member>) => service.getAssistantName(params.row),
+      },
+      
     ];
 
   useEffect(() => {
@@ -118,8 +129,6 @@ export const LegislatorsPage = () => {
   function handleChamberChange(value: CHAMBER_TYPE): void {
     setChamber(value);
   }
-
-
 
   function createQueryModel(): QueryModel {
     const filterItems: FilterItem[] = [];
@@ -162,8 +171,8 @@ export const LegislatorsPage = () => {
       .exportData(createQueryModel())
       .then(() => notifications.success('Bills exported successfully'))
       .catch(err => {
-        notifications.error('Error exporting bills.');
-        console.error('Error exporting bills:', err);
+        notifications.error('Error exporting legislators.');
+        console.error('Error exporting legislators:', err);
       })
       .finally(() => setLoading(false));
   };
@@ -212,8 +221,6 @@ export const LegislatorsPage = () => {
         filterMode="client"
         filterModel={filterModel}
         onFilterModelChange={setFilterModel}
-
-
 
         onRowDoubleClick={params => navigate(`/legislator/${params.row.Id}`)}
         showToolbar={true}
