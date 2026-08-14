@@ -15,14 +15,17 @@ const BASE_URL = "https://wslwebservices.leg.wa.gov/LegislationService.asmx";
 const parser = new XMLParser();
 
 async function fetchDetail(bill: Bill): Promise<Bill> {
-  const billUrl = `${BASE_URL}/GetLegislation?biennium=${bill.Biennium}&billNumber=${bill.BillNumber}`;
-  const response = await fetch(billUrl);
-  const xml = await response.text();
-  const json = parser.parse(xml);
-  console.info(billUrl, json);
-  const legislation = json["ArrayOfLegislation"]["Legislation"];
-  console.info(legislation);
-  return (Array.isArray(legislation) ? legislation : [legislation]).find((l: any) => l.BillId === bill.BillId) as Bill;
+  const url = `${BASE_URL}/GetLegislation?biennium=${bill.Biennium}&billNumber=${bill.BillNumber}`;
+  try {
+    const response = await fetch(url);
+    const xml = await response.text();
+    const json = parser.parse(xml);
+    const legislation = json["ArrayOfLegislation"]["Legislation"];
+    return (Array.isArray(legislation) ? legislation : [legislation]).find((l: any) => l.BillId === bill.BillId) as Bill;
+  } catch (err) {
+    console.error(`Error fetching billId = ${bill.BillId} url: ${url}`, err)
+    return {} as Bill;
+  }
 }
 
 Deno.serve(async (req) => {
@@ -57,21 +60,27 @@ Deno.serve(async (req) => {
     const now = new Date();
     for (let i = 0; i < entities.length; i++) {
       const dbBill = entities[i];
-      const detail = await fetchDetail(dbBill.bill);
-      const updatedBill = {
-        ...dbBill.bill,
-        ...detail,
+      try {
+        const detail = await fetchDetail(dbBill.bill);
+        const updatedBill = {
+          ...dbBill.bill,
+          ...detail,
+        }
+        const searchKey = calcSearchKey(updatedBill);
+        const updatedDBBill = {
+          ...dbBill,
+          bill: updatedBill,
+          updated_at: now,
+          detail_update: now,
+          PrimeSponsorID: detail.PrimeSponsorID,
+          SearchKey: searchKey
+        }
+        await billsDao.upsert(updatedDBBill);
+        console.info(`Updated bill ${dbBill.bill.BillId}.`);
+      } catch (err) {
+        console.error(`Error with ${dbBill.bill.BillId}`, err)
+        throw err
       }
-      const searchKey = calcSearchKey(updatedBill);
-      const updatedDBBill = {
-        ...dbBill,
-        bill: updatedBill,
-        updated_at: now,
-        detail_update: now,
-        PrimeSponsorID: detail.PrimeSponsorID,
-        SearchKey: searchKey
-      }
-      await billsDao.upsert(updatedDBBill);
     }
     console.info(`Updated ${entities.length} bills with detail information.`);
     return standardResponse(origin, `Done`);
