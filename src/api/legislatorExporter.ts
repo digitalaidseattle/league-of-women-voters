@@ -8,6 +8,7 @@
 import { Member } from "./committee";
 import { SponsorsDB } from "./database/SponsorsDB";
 import { EntityExporter } from "./EntityExporter";
+import { LegislatorService } from "./legislatorService";
 
 export class LegislatorExporter extends EntityExporter<Member> {
 
@@ -35,7 +36,7 @@ export class LegislatorExporter extends EntityExporter<Member> {
         {
           key: 'LegislativeAssistant',
           header: 'Assistant',
-          valueGetter: (member: any) => (member.LegislativeAssistant ?? []).map((a: any) => a.name).join(", ") ?? ""
+          valueGetter: (member: any) => LegislatorService.getInstance().getAssistantName(member)
         }
       ]);
   }
