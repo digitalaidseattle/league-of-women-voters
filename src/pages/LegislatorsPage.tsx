@@ -10,7 +10,7 @@ import { NavLink, useNavigate } from "react-router-dom";
 // material-ui
 import { ExportOutlined, HomeOutlined, ReloadOutlined } from "@ant-design/icons";
 import { Breadcrumbs, Card, CardHeader, IconButton, Tooltip, Typography } from '@mui/material';
-import { DataGrid, GridColDef, GridFilterModel, Toolbar, useGridApiRef } from "@mui/x-data-grid";
+import { DataGrid, GridColDef, GridFilterModel, GridRenderCellParams, Toolbar, useGridApiRef } from "@mui/x-data-grid";
 
 import { FilterItem, LoadingContext, QueryModel, useNotifications } from '@digitalaidseattle/core';
 import { PageInfo } from "@digitalaidseattle/core";
@@ -25,6 +25,7 @@ import { GridSortModel } from '@mui/x-data-grid';
 const PAGE_SIZE = 25;
 
 export const LegislatorsPage = () => {
+  const service = LegislatorService.getInstance();
   const apiRef = useGridApiRef();
   const navigate = useNavigate();
   const notifications = useNotifications();
@@ -86,24 +87,43 @@ export const LegislatorsPage = () => {
         headerName: "Phone",
         width: 150,
         type: "string"
-      }
+      },
+      {
+        field: "LegislativeAssistant",
+        headerName: "Leg. Assistant",
+        width: 3000,
+        type: "string",
+        filterable: false,
+        sortable: false,
+        renderCell: (params: GridRenderCellParams<Member>) => service.getAssistantName(params.row),
+      },
+      
     ];
 
   useEffect(() => {
     refresh();
-  }, [chamber]);
+  }, [chamber, paginationModel, filterModel]);
 
   function refresh() {
     setLoading(false);
-    setPageInfo({ rows: [], totalRowCount: 0, });
     LegislatorService.getInstance()
-      .find(createQueryModel())
-      .then(data => setPageInfo(data))
+      .getAll()
+      .then(data => {
+        const filtered = data.filter(mem => filterByChamber(mem));
+        setPageInfo({ rows: filtered, totalRowCount: filtered.length })
+      })
       .catch(err => {
         notifications.error('Error fetching legislators.');
         console.error('Error fetching legislators:', err);
       })
       .finally(() => setLoading(false))
+  }
+
+  function filterByChamber(member: Member) {
+    if (!chamber || chamber === 'all') {
+      return true;
+    }
+    return chamber === member.Agency.toLowerCase();
   }
 
   function handleChamberChange(value: CHAMBER_TYPE): void {
@@ -113,6 +133,7 @@ export const LegislatorsPage = () => {
   function createQueryModel(): QueryModel {
     const filterItems: FilterItem[] = [];
     const agency = chamber === 'house' ? "House" : (chamber === 'senate' ? "Senate" : undefined);
+
     if (agency) {
       filterItems.push({
         field: 'OriginalAgency',
@@ -120,8 +141,20 @@ export const LegislatorsPage = () => {
         value: agency
       })
     }
-    const sortField = "id";
-    const sortDirection = "asc";
+
+    if (filterModel.items.length > 0) {
+      const filterItem = filterModel.items[0];
+      if (filterItem.value !== undefined && filterItem.value !== null && filterItem.value !== '') {
+        filterItems.push({
+          field: filterItem.field,
+          operator: filterItem.operator,
+          value: filterItem.value
+        });
+      }
+    }
+
+    const sortField = sortModel.length > 0 ? sortModel[0].field : 'id';
+    const sortDirection = sortModel.length > 0 ? sortModel[0].sort : 'asc';
     return {
       ...paginationModel,
       sortField: sortField,
@@ -138,8 +171,8 @@ export const LegislatorsPage = () => {
       .exportData(createQueryModel())
       .then(() => notifications.success('Bills exported successfully'))
       .catch(err => {
-        notifications.error('Error exporting bills.');
-        console.error('Error exporting bills:', err);
+        notifications.error('Error exporting legislators.');
+        console.error('Error exporting legislators:', err);
       })
       .finally(() => setLoading(false));
   };
@@ -175,18 +208,17 @@ export const LegislatorsPage = () => {
         rows={pageInfo.rows}
         columns={columns}
         getRowId={(row) => row.Id}
-
         pageSizeOptions={[10, 25, 50, 100]}
-        paginationMode='server'
+
+        paginationMode='client'
         paginationModel={paginationModel}
-        rowCount={pageInfo.totalRowCount}
         onPaginationModelChange={setPaginationModel}
 
-        sortingMode="server"
+        sortingMode="client"
         sortModel={sortModel}
         onSortModelChange={setSortModel}
 
-        filterMode="server"
+        filterMode="client"
         filterModel={filterModel}
         onFilterModelChange={setFilterModel}
 

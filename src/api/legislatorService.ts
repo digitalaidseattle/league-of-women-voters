@@ -4,6 +4,7 @@ import { SponsorsDB } from "./database/SponsorsDB";
 import { LegislatorExporter } from "./legislatorExporter";
 
 class LegislatorService {
+
     private static instance: LegislatorService;
 
     public static getInstance(): LegislatorService {
@@ -41,6 +42,10 @@ class LegislatorService {
 
     async exportData(queryModel: QueryModel): Promise<void> {
         return LegislatorExporter.getInstance().exportData(queryModel);
+    }
+
+    getAssistantName(row: Member): string {
+        return (row.LegislativeAssistant ?? []).map((la: { name: string }) => la.name).join(', ');
     }
 }
 
