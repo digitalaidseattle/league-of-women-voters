@@ -19,11 +19,16 @@ async function fetchDetail(committee: Committee, biennium: string): Promise<Legi
   const agency = encodeURIComponent(committee.Agency);
   const committeeName = encodeURIComponent(committee.Name);
   const url = `${baseUrl}/${service}?biennium=${eBiennium}&agency=${agency}&committeeName=${committeeName}`
-  const response = await fetch(url);
-  const xml = await response.text();
-  const json = parser.parse(xml);
-  const members = json["ArrayOfCommitteeReferral"]["CommitteeReferral"];
-  return members;
+  try {
+    const response = await fetch(url);
+    const xml = await response.text();
+    const json = parser.parse(xml);
+    const members = json["ArrayOfCommitteeReferral"]["CommitteeReferral"];
+    return members;
+  } catch (err) {
+    console.error(`Error fetching ${committee.Name} url: ${url}`, err)
+    return []
+  }
 }
 
 Deno.serve(async (req) => {
@@ -54,23 +59,28 @@ Deno.serve(async (req) => {
     }
 
     const params = await req.json();
-    console.log(params)
     const now = new Date();
     for (let i = 0; i < entities.length; i++) {
       const dbCommittee = entities[i];
-      const detail = await fetchDetail(dbCommittee.committee, params.biennium);
-      const updatedCommittee = {
-        ...dbCommittee.committee,
-        Referrals: detail,
+      try {
+        const detail = await fetchDetail(dbCommittee.committee, params.biennium);
+        const updatedCommittee = {
+          ...dbCommittee.committee,
+          Referrals: detail,
+        }
+        // const searchKey = calcCommitteeSearchKey(updatedCommittee);
+        const updatedDBCommittee = {
+          ...dbCommittee,
+          committee: updatedCommittee,
+          updated_at: now,
+          referral_update: now,
+        }
+        await dao.upsert(updatedDBCommittee);
+        console.info(`Updated committee ${dbCommittee.id}.`);
+      } catch (err) {
+        console.error(`Error with ${dbCommittee.id}`, err)
+        throw err
       }
-      // const searchKey = calcCommitteeSearchKey(updatedCommittee);
-      const updatedDBCommittee = {
-        ...dbCommittee,
-        committee: updatedCommittee,
-        updated_at: now,
-        referral_update: now,
-      }
-      await dao.upsert(updatedDBCommittee);
     }
     console.info(`Updated ${entities.length} committees with referral information.`);
     return standardResponse(origin, `Done`);
