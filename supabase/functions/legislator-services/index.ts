@@ -6,7 +6,7 @@ import { errorResponse } from "../../shared/errorResponse.ts";
 import { resetSchedule } from "../../shared/resetSchedule.ts";
 import { SponsorDAO } from "../../shared/SponsorDAO.ts";
 import { standardResponse } from "../../shared/standardResponse.ts";
-import {  DBSponsor, Member } from "../../shared/types.ts";
+import { DBSponsor, Member } from "../../shared/types.ts";
 import { UpdateSchedule, UpdateScheduleDAO } from "../../shared/UpdateScheduleDAO.ts";
 
 configure();
@@ -34,7 +34,7 @@ Deno.serve(async (req) => {
   }
 
   try {
-    console.log("Starting committee info caching service...");
+    console.log("Starting legislator info caching service...");
 
     const updateScheduleDAO = new UpdateScheduleDAO();
 
@@ -67,6 +67,7 @@ Deno.serve(async (req) => {
         ...current,
         id: current ? current.id : updatedMember.Id,
         sponsor: updatedMember,
+        OriginalAgency: updatedMember.Agency,
         updated_at: now
       }
       allUpdated.push(await dao.upsert(updatedDBCommittee));
