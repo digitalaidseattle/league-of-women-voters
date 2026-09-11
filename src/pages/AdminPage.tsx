@@ -7,6 +7,7 @@ import { SupabaseConfiguration } from "@digitalaidseattle/supabase";
 import { Breadcrumbs, Button, Card, CardContent, CardHeader, IconButton, Stack, Typography } from '@mui/material';
 import { useState } from "react";
 import { LoadingOverlay } from "../components/LoadingOverlay";
+import { PreferencesDB } from "../api/database/PreferencesDB";
 
 // project import
 
@@ -17,13 +18,15 @@ export const AdminPage = () => {
     const [loading, setLoading] = useState(false);
     const notify = useNotifications();
 
+
     async function legislatorJob(): Promise<void> {
         setLoading(true);
         try {
+            const biennium = await PreferencesDB.getInstance().getCurrentBiennium();
             SupabaseConfiguration.getInstance()
                 .getSupabaseClient().functions
                 .invoke("legislator-services", {
-                    body: { biennium: "2025-26" },
+                    body: { biennium },
                 })
                 .then((resp: any) => resp.data);
         }
@@ -34,7 +37,7 @@ export const AdminPage = () => {
         finally {
             notify.success('Loaded legislators.')
             setLoading(false)
-        };
+        }
     }
 
     async function legislatorInfoJob(): Promise<void> {
@@ -52,16 +55,17 @@ export const AdminPage = () => {
         finally {
             notify.success('Loaded committe members.')
             setLoading(false)
-        };
+        }
     }
 
     async function loadCommitteMembersJob(): Promise<void> {
         setLoading(true);
         try {
+            const biennium = await PreferencesDB.getInstance().getCurrentBiennium();
             SupabaseConfiguration.getInstance()
                 .getSupabaseClient().functions
                 .invoke("committee-membership-service", {
-                    body: { biennium: "2025-26" },
+                    body: { biennium },
                 })
                 .then((resp: any) => resp.data);
         }
@@ -72,7 +76,7 @@ export const AdminPage = () => {
         finally {
             notify.success('Loaded committe members.')
             setLoading(false)
-        };
+        }
     }
 
 
@@ -91,7 +95,7 @@ export const AdminPage = () => {
         finally {
             notify.success('Loaded committees.')
             setLoading(false)
-        };
+        }
     }
 
     async function committeeLeadershipJob(): Promise<void> {
@@ -109,16 +113,17 @@ export const AdminPage = () => {
         finally {
             notify.success('Loaded committee members.')
             setLoading(false)
-        };
+        }
     }
 
     async function committeeReferralJob(): Promise<void> {
         setLoading(true);
         try {
+            const biennium = await PreferencesDB.getInstance().getCurrentBiennium();
             SupabaseConfiguration.getInstance()
                 .getSupabaseClient().functions
                 .invoke("committee-referral-service", {
-                    body: { biennium: "2025-26" },
+                    body: { biennium },
                 })
                 .then((resp: any) => resp.data);
         }
@@ -129,16 +134,17 @@ export const AdminPage = () => {
         finally {
             notify.success('Loaded committee referrals.')
             setLoading(false)
-        };
+        }
     }
 
     async function committeeInCommitteeJob(): Promise<void> {
         setLoading(true);
         try {
+            const biennium = await PreferencesDB.getInstance().getCurrentBiennium();
             SupabaseConfiguration.getInstance()
                 .getSupabaseClient().functions
                 .invoke("committee-incommittee-service", {
-                    body: { biennium: "2025-26" },
+                    body: { biennium },
                 })
                 .then((resp: any) => resp.data);
         }
@@ -149,7 +155,7 @@ export const AdminPage = () => {
         finally {
             notify.success('Loaded committee in-committee information.')
             setLoading(false)
-        };
+        }
     }
 
     async function billInfoCachingJob(): Promise<void> {
@@ -169,7 +175,7 @@ export const AdminPage = () => {
         finally {
             notify.success('Loaded committe members.')
             setLoading(false)
-        };
+        }
     }
 
     async function billDetailCachingJob(): Promise<void> {
@@ -187,16 +193,17 @@ export const AdminPage = () => {
         finally {
             notify.success('Loaded bill details.')
             setLoading(false)
-        };
+        }
     }
 
     async function billCommitteeCachingJob(): Promise<void> {
         setLoading(true);
         try {
+            const biennium = await PreferencesDB.getInstance().getCurrentBiennium();
             SupabaseConfiguration.getInstance()
                 .getSupabaseClient().functions
                 .invoke("legislation-committee-service", {
-                    body: { biennium: "2025-26" },
+                    body: { biennium },
                 })
                 .then((resp: any) => resp.data);
         }
@@ -207,16 +214,17 @@ export const AdminPage = () => {
         finally {
             notify.success('Loaded committe members.')
             setLoading(false)
-        };
+        }
     }
 
     async function billSponsorsCachingJob(): Promise<void> {
         setLoading(true);
         try {
+            const biennium = await PreferencesDB.getInstance().getCurrentBiennium();
             SupabaseConfiguration.getInstance()
                 .getSupabaseClient().functions
                 .invoke("legislation-sponsors-service", {
-                    body: { biennium: "2025-26" },
+                    body: { biennium },
                 })
                 .then((resp: any) => resp.data);
         }
@@ -227,16 +235,17 @@ export const AdminPage = () => {
         finally {
             notify.success('Loaded bill sponsors.')
             setLoading(false)
-        };
+        }
     }
 
     async function billHearingsCachingJob(): Promise<void> {
         setLoading(true);
         try {
+            const biennium = await PreferencesDB.getInstance().getCurrentBiennium();
             SupabaseConfiguration.getInstance()
                 .getSupabaseClient().functions
                 .invoke("legislation-hearings-service", {
-                    body: { biennium: "2025-26" },
+                    body: { biennium },
                 })
                 .then((resp: any) => resp.data);
         }
@@ -247,7 +256,7 @@ export const AdminPage = () => {
         finally {
             notify.success('Loaded bill hearings.')
             setLoading(false)
-        };
+        }
     }
 
     return (<>
