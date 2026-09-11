@@ -21,36 +21,6 @@ export function getCommitteePageTitle(committee: Committee) {
   return `${committee.Agency} Committee Legislation: ${shortName}`;
 }
 
-export function getLeadershipName(committee: Committee, role: string) {
-  const leadership = committee.Leadership ?? [];
-  const found = leadership.find((leader) => {
-    const normalizedRole = leader.role.toLowerCase();
-
-    if (role === "chair") {
-      return normalizedRole.includes("chair") &&
-        !normalizedRole.includes("vice") &&
-        !normalizedRole.includes("minority") &&
-        !normalizedRole.includes("majority");
-    }
-
-    if (role === "vice") {
-      return normalizedRole.includes("vice");
-    }
-
-    if (role === "ranking") {
-      return normalizedRole.includes("ranking") &&
-        !normalizedRole.includes("assistant");
-    }
-
-    if (role === "majority") {
-      return normalizedRole.includes("majority");
-    }
-
-    return false;
-  });
-  return formatPersonName(found?.name ?? "");
-}
-
 export function mapCommitteeBillRow(
   legislation: LegislationInfo,
   bills: Bill[]
@@ -69,13 +39,6 @@ export function mapCommitteeBillRow(
   };
 }
 
-function formatPersonName(name: string) {
-  const [lastName, firstName] = name.split(",").map((part) => part.trim());
-  if (firstName && lastName) {
-    return `${firstName} ${lastName}`;
-  }
-  return name;
-}
 
 function findBill(legislation: LegislationInfo, bills: Bill[]) {
   const normalizedBillId = normalizeBillId(legislation.BillId);
