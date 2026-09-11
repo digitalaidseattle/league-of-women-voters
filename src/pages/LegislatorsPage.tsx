@@ -113,8 +113,8 @@ export const LegislatorsPage = () => {
         setPageInfo({ rows: filtered, totalRowCount: filtered.length })
       })
       .catch(err => {
-        notifications.error('Error fetching bills.');
-        console.error('Error fetching bills:', err);
+        notifications.error('Error fetching legislators.');
+        console.error('Error fetching legislators:', err);
       })
       .finally(() => setLoading(false))
   }
