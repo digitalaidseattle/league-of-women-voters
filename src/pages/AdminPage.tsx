@@ -7,7 +7,6 @@ import { SupabaseConfiguration } from "@digitalaidseattle/supabase";
 import { Breadcrumbs, Button, Card, CardContent, CardHeader, IconButton, Stack, Typography } from '@mui/material';
 import { useState } from "react";
 import { LoadingOverlay } from "../components/LoadingOverlay";
-import { PreferencesDB } from "../api/database/PreferencesDB";
 
 // project import
 
@@ -22,12 +21,9 @@ export const AdminPage = () => {
     async function legislatorJob(): Promise<void> {
         setLoading(true);
         try {
-            const biennium = await PreferencesDB.getInstance().getCurrentBiennium();
             SupabaseConfiguration.getInstance()
                 .getSupabaseClient().functions
-                .invoke("legislator-services", {
-                    body: { biennium },
-                })
+                .invoke("legislator-services")
                 .then((resp: any) => resp.data);
         }
         catch (error) {
@@ -61,12 +57,9 @@ export const AdminPage = () => {
     async function loadCommitteMembersJob(): Promise<void> {
         setLoading(true);
         try {
-            const biennium = await PreferencesDB.getInstance().getCurrentBiennium();
             SupabaseConfiguration.getInstance()
                 .getSupabaseClient().functions
-                .invoke("committee-membership-service", {
-                    body: { biennium },
-                })
+                .invoke("committee-membership-service")
                 .then((resp: any) => resp.data);
         }
         catch (error) {
@@ -119,12 +112,9 @@ export const AdminPage = () => {
     async function committeeReferralJob(): Promise<void> {
         setLoading(true);
         try {
-            const biennium = await PreferencesDB.getInstance().getCurrentBiennium();
             SupabaseConfiguration.getInstance()
                 .getSupabaseClient().functions
-                .invoke("committee-referral-service", {
-                    body: { biennium },
-                })
+                .invoke("committee-referral-service")
                 .then((resp: any) => resp.data);
         }
         catch (error) {
@@ -140,12 +130,9 @@ export const AdminPage = () => {
     async function committeeInCommitteeJob(): Promise<void> {
         setLoading(true);
         try {
-            const biennium = await PreferencesDB.getInstance().getCurrentBiennium();
             SupabaseConfiguration.getInstance()
                 .getSupabaseClient().functions
-                .invoke("committee-incommittee-service", {
-                    body: { biennium },
-                })
+                .invoke("committee-incommittee-service")
                 .then((resp: any) => resp.data);
         }
         catch (error) {
@@ -199,12 +186,9 @@ export const AdminPage = () => {
     async function billCommitteeCachingJob(): Promise<void> {
         setLoading(true);
         try {
-            const biennium = await PreferencesDB.getInstance().getCurrentBiennium();
             SupabaseConfiguration.getInstance()
                 .getSupabaseClient().functions
-                .invoke("legislation-committee-service", {
-                    body: { biennium },
-                })
+                .invoke("legislation-committee-service")
                 .then((resp: any) => resp.data);
         }
         catch (error) {
@@ -220,12 +204,9 @@ export const AdminPage = () => {
     async function billSponsorsCachingJob(): Promise<void> {
         setLoading(true);
         try {
-            const biennium = await PreferencesDB.getInstance().getCurrentBiennium();
             SupabaseConfiguration.getInstance()
                 .getSupabaseClient().functions
-                .invoke("legislation-sponsors-service", {
-                    body: { biennium },
-                })
+                .invoke("legislation-sponsors-service")
                 .then((resp: any) => resp.data);
         }
         catch (error) {
@@ -241,12 +222,9 @@ export const AdminPage = () => {
     async function billHearingsCachingJob(): Promise<void> {
         setLoading(true);
         try {
-            const biennium = await PreferencesDB.getInstance().getCurrentBiennium();
             SupabaseConfiguration.getInstance()
                 .getSupabaseClient().functions
-                .invoke("legislation-hearings-service", {
-                    body: { biennium },
-                })
+                .invoke("legislation-hearings-service")
                 .then((resp: any) => resp.data);
         }
         catch (error) {
