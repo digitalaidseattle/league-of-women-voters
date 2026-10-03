@@ -2,7 +2,7 @@
 import { XMLParser } from "https://esm.sh/fast-xml-parser@4.3.5";
 import { BillsDAO } from "../../shared/BillsDAO.ts";
 import { configure } from "../../shared/configuration.ts";
-import { PreferencesDAO } from "../../shared/PreferencesDAO.ts";
+import { getCurrentBiennium } from "../../shared/getCurrentBiennium.ts";
 import { corsResponse } from "../../shared/corsResponse.ts";
 import { errorResponse } from "../../shared/errorResponse.ts";
 import { standardResponse } from "../../shared/standardResponse.ts";
@@ -67,7 +67,7 @@ Deno.serve(async (req) => {
       return standardResponse(origin, `Found nothing to update. Next check ${sched.next_update}`);
     }
 
-    const biennium = await PreferencesDAO.getInstance().getCurrentBiennium();
+    const biennium = await getCurrentBiennium();
     const map = await fetchInCommitteeMap(biennium);
     const now = new Date();
     for (let i = 0; i < entities.length; i++) {
