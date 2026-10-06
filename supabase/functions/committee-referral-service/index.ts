@@ -2,6 +2,7 @@
 import { XMLParser } from "https://esm.sh/fast-xml-parser@4.3.5";
 import { CommitteeDAO } from "../../shared/CommitteeDAO.ts";
 import { configure } from "../../shared/configuration.ts";
+import { getCurrentBiennium } from "../../shared/getCurrentBiennium.ts";
 import { corsResponse } from "../../shared/corsResponse.ts";
 import { errorResponse } from "../../shared/errorResponse.ts";
 import { resetSchedule } from "../../shared/resetSchedule.ts";
@@ -58,12 +59,12 @@ Deno.serve(async (req) => {
       return standardResponse(origin, `Found nothing to update. Next check ${sched.next_update}`);
     }
 
-    const params = await req.json();
+    const biennium = await getCurrentBiennium();
     const now = new Date();
     for (let i = 0; i < entities.length; i++) {
       const dbCommittee = entities[i];
       try {
-        const detail = await fetchDetail(dbCommittee.committee, params.biennium);
+        const detail = await fetchDetail(dbCommittee.committee, biennium);
         const updatedCommittee = {
           ...dbCommittee.committee,
           Referrals: detail,

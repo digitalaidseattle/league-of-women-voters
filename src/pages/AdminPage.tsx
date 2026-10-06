@@ -17,14 +17,13 @@ export const AdminPage = () => {
     const [loading, setLoading] = useState(false);
     const notify = useNotifications();
 
+
     async function legislatorJob(): Promise<void> {
         setLoading(true);
         try {
             SupabaseConfiguration.getInstance()
                 .getSupabaseClient().functions
-                .invoke("legislator-services", {
-                    body: { biennium: "2025-26" },
-                })
+                .invoke("legislator-services")
                 .then((resp: any) => resp.data);
         }
         catch (error) {
@@ -34,7 +33,7 @@ export const AdminPage = () => {
         finally {
             notify.success('Loaded legislators.')
             setLoading(false)
-        };
+        }
     }
 
     async function legislatorInfoJob(): Promise<void> {
@@ -52,7 +51,7 @@ export const AdminPage = () => {
         finally {
             notify.success('Loaded committe members.')
             setLoading(false)
-        };
+        }
     }
 
     async function loadCommitteMembersJob(): Promise<void> {
@@ -60,9 +59,7 @@ export const AdminPage = () => {
         try {
             SupabaseConfiguration.getInstance()
                 .getSupabaseClient().functions
-                .invoke("committee-membership-service", {
-                    body: { biennium: "2025-26" },
-                })
+                .invoke("committee-membership-service")
                 .then((resp: any) => resp.data);
         }
         catch (error) {
@@ -72,7 +69,7 @@ export const AdminPage = () => {
         finally {
             notify.success('Loaded committe members.')
             setLoading(false)
-        };
+        }
     }
 
 
@@ -91,7 +88,7 @@ export const AdminPage = () => {
         finally {
             notify.success('Loaded committees.')
             setLoading(false)
-        };
+        }
     }
 
     async function committeeLeadershipJob(): Promise<void> {
@@ -109,7 +106,7 @@ export const AdminPage = () => {
         finally {
             notify.success('Loaded committee members.')
             setLoading(false)
-        };
+        }
     }
 
     async function committeeReferralJob(): Promise<void> {
@@ -117,9 +114,7 @@ export const AdminPage = () => {
         try {
             SupabaseConfiguration.getInstance()
                 .getSupabaseClient().functions
-                .invoke("committee-referral-service", {
-                    body: { biennium: "2025-26" },
-                })
+                .invoke("committee-referral-service")
                 .then((resp: any) => resp.data);
         }
         catch (error) {
@@ -129,7 +124,7 @@ export const AdminPage = () => {
         finally {
             notify.success('Loaded committee referrals.')
             setLoading(false)
-        };
+        }
     }
 
     async function committeeInCommitteeJob(): Promise<void> {
@@ -137,9 +132,7 @@ export const AdminPage = () => {
         try {
             SupabaseConfiguration.getInstance()
                 .getSupabaseClient().functions
-                .invoke("committee-incommittee-service", {
-                    body: { biennium: "2025-26" },
-                })
+                .invoke("committee-incommittee-service")
                 .then((resp: any) => resp.data);
         }
         catch (error) {
@@ -149,7 +142,7 @@ export const AdminPage = () => {
         finally {
             notify.success('Loaded committee in-committee information.')
             setLoading(false)
-        };
+        }
     }
 
     async function billInfoCachingJob(): Promise<void> {
@@ -169,7 +162,7 @@ export const AdminPage = () => {
         finally {
             notify.success('Loaded committe members.')
             setLoading(false)
-        };
+        }
     }
 
     async function billDetailCachingJob(): Promise<void> {
@@ -187,7 +180,7 @@ export const AdminPage = () => {
         finally {
             notify.success('Loaded bill details.')
             setLoading(false)
-        };
+        }
     }
 
     async function billCommitteeCachingJob(): Promise<void> {
@@ -195,9 +188,7 @@ export const AdminPage = () => {
         try {
             SupabaseConfiguration.getInstance()
                 .getSupabaseClient().functions
-                .invoke("legislation-committee-service", {
-                    body: { biennium: "2025-26" },
-                })
+                .invoke("legislation-committee-service")
                 .then((resp: any) => resp.data);
         }
         catch (error) {
@@ -207,7 +198,7 @@ export const AdminPage = () => {
         finally {
             notify.success('Loaded committe members.')
             setLoading(false)
-        };
+        }
     }
 
     async function billSponsorsCachingJob(): Promise<void> {
@@ -215,9 +206,7 @@ export const AdminPage = () => {
         try {
             SupabaseConfiguration.getInstance()
                 .getSupabaseClient().functions
-                .invoke("legislation-sponsors-service", {
-                    body: { biennium: "2025-26" },
-                })
+                .invoke("legislation-sponsors-service")
                 .then((resp: any) => resp.data);
         }
         catch (error) {
@@ -227,7 +216,7 @@ export const AdminPage = () => {
         finally {
             notify.success('Loaded bill sponsors.')
             setLoading(false)
-        };
+        }
     }
 
     async function billHearingsCachingJob(): Promise<void> {
@@ -235,9 +224,7 @@ export const AdminPage = () => {
         try {
             SupabaseConfiguration.getInstance()
                 .getSupabaseClient().functions
-                .invoke("legislation-hearings-service", {
-                    body: { biennium: "2025-26" },
-                })
+                .invoke("legislation-hearings-service")
                 .then((resp: any) => resp.data);
         }
         catch (error) {
@@ -247,7 +234,7 @@ export const AdminPage = () => {
         finally {
             notify.success('Loaded bill hearings.')
             setLoading(false)
-        };
+        }
     }
 
     return (<>
