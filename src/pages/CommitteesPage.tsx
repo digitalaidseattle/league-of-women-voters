@@ -86,6 +86,7 @@ const CommitteesPage = () => {
           .map(com => service.transformCommittee(com))
           .filter(com => service.filterByChamber(com, chamber))
           .filter(com => service.filterBySearchKey(com, search));
+        console.log(filtered)
         setPageInfo({ rows: filtered, totalRowCount: filtered.length })
       })
       .catch(err => {
@@ -213,7 +214,7 @@ const CommitteesPage = () => {
         filterModel={filterModel}
         onFilterModelChange={setFilterModel}
 
-        onRowClick={params => navigate(`/committee/${params.row.Id}`)}
+        onRowClick={params => navigate(`/committee/${params.row.id}`)}
         showToolbar={true}
         slots={{ toolbar: CustomToolbar }}
         disableRowSelectionOnClick
