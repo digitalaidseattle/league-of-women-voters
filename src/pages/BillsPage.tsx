@@ -7,34 +7,28 @@
 import { useContext, useEffect, useState } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
 
-import {
-  ExportOutlined,
-  HomeOutlined,
-  ReloadOutlined
-} from "@ant-design/icons";
+import { HomeOutlined } from "@ant-design/icons";
 import {
   Breadcrumbs,
   Card,
   CardHeader,
   IconButton,
   Link,
-  Tooltip,
   Typography
 } from "@mui/material";
 import {
   DataGrid,
   GridColDef,
   GridFilterModel,
-  Toolbar,
   useGridApiRef
 } from "@mui/x-data-grid";
 
 import { FilterItem, LoadingContext, PageInfo, QueryModel, useNotifications } from "@digitalaidseattle/core";
 import type { Bill } from "../api/bill";
 import { BillService } from "../api/billService";
-import { CHAMBER_TYPE, ChamberButtonGroup } from "../components/ChamberButtonGroup";
+import { CHAMBER_TYPE } from "../components/ChamberButtonGroup";
 import { LoadingOverlay } from "../components/LoadingOverlay";
-import { SearchField } from "../components/SearchField";
+import { SearchToolbar } from "../components/SearchToolbar";
 import { GridSortModel } from "@mui/x-data-grid";
 
 const PAGE_SIZE = 25;
@@ -67,7 +61,7 @@ export const BillsPage = () => {
         console.error('Error fetching bills:', err);
       })
       .finally(() => setLoading(false));
-  };
+  }
 
   function exportData() {
     setLoading(true);
@@ -79,7 +73,7 @@ export const BillsPage = () => {
         console.error('Error exporting bills:', err);
       })
       .finally(() => setLoading(false));
-  };
+  }
 
   function createQueryModel(): QueryModel {
     const filterItems: FilterItem[] = [];
@@ -208,26 +202,6 @@ export const BillsPage = () => {
     setChamber(value);
   }
 
-  function CustomToolbar() {
-    return (
-      <Toolbar>
-        <ChamberButtonGroup
-          chamber={chamber}
-          onChange={handleChamberChange} />
-        <SearchField value={search} onChange={(value) => setSearch(value)} />
-        <Tooltip title="Export">
-          <IconButton color="primary" size="small" onClick={exportData}>
-            <ExportOutlined />
-          </IconButton>
-        </Tooltip>
-        <Tooltip title="Refresh">
-          <IconButton color="primary" size="small" onClick={fetchData}>
-            <ReloadOutlined />
-          </IconButton>
-        </Tooltip>
-      </Toolbar>
-    );
-  }
 
   return (<>
     <LoadingOverlay loading={loading} />
@@ -258,8 +232,18 @@ export const BillsPage = () => {
         onFilterModelChange={setFilterModel}
 
         onRowDoubleClick={params => navigate(`/bill/${params.row.BillId}`)}
-        showToolbar={true}
-        slots={{ toolbar: CustomToolbar }}
+        showToolbar
+        slots={{ toolbar: SearchToolbar }}
+        slotProps={{
+          toolbar: {
+            chamber,
+            onChamberChange: handleChamberChange,
+            search,
+            onSearchChange: setSearch,
+            onExport: exportData,
+            onRefresh: fetchData
+          }
+        }}
       />
     </Card>
   </>
