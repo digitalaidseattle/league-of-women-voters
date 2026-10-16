@@ -4,16 +4,16 @@
  *  @copyright 2026 Digital Aid Seattle
  *
  */
-import { ExpandAltOutlined, ExportOutlined, HomeOutlined, ReloadOutlined } from "@ant-design/icons";
+import { ExpandAltOutlined, HomeOutlined } from "@ant-design/icons";
 import { FilterItem, LoadingContext, PageInfo, QueryModel, useNotifications } from "@digitalaidseattle/core";
-import { Breadcrumbs, Card, CardHeader, IconButton, Toolbar, Tooltip, Typography } from '@mui/material';
+import { Breadcrumbs, Card, CardHeader, IconButton, Tooltip, Typography } from '@mui/material';
 import { DataGrid, GridColDef, GridFilterModel, GridSortModel, useGridApiRef } from "@mui/x-data-grid";
 import { useContext, useEffect, useMemo, useState } from 'react';
 import { NavLink, useNavigate } from "react-router-dom";
 import { FlattenCommittee, LegislatureService } from '../api/legislatureService';
-import { CHAMBER_TYPE, ChamberButtonGroup } from "../components/ChamberButtonGroup";
+import { CHAMBER_TYPE } from "../components/ChamberButtonGroup";
 import { LoadingOverlay } from "../components/LoadingOverlay";
-import { SearchField } from "../components/SearchField";
+import { SearchToolbar } from "../components/SearchToolbar";
 
 const PAGE_SIZE = 25;
 const COMMITTEE_SEARCH_URL = "https://leg.wa.gov/about-the-legislature/committees/";
@@ -157,33 +157,6 @@ const CommitteesPage = () => {
       .finally(() => setLoading(false));
   }
 
-  function CustomToolbar() {
-    return (
-      <Toolbar>
-        <ChamberButtonGroup chamber={chamber} onChange={handleChamberChange} />
-        <SearchField value={search} onChange={(value) => setSearch(value)} />
-        <Tooltip title="Open committee directory">
-          <IconButton
-            color="primary"
-            onClick={() => window.open(COMMITTEE_SEARCH_URL, "_blank", "noopener")}
-            aria-label="Open committee directory"
-          >
-            <ExpandAltOutlined />
-          </IconButton>
-        </Tooltip>
-        <Tooltip title="Export">
-          <IconButton color="primary" size="small" onClick={exportData} aria-label="Export committees">
-            <ExportOutlined />
-          </IconButton>
-        </Tooltip>
-        <Tooltip title="Refresh">
-          <IconButton color="primary" size="small" onClick={refresh} aria-label="Refresh committees">
-            <ReloadOutlined />
-          </IconButton>
-        </Tooltip>
-      </Toolbar>
-    );
-  }
 
   return (<>
     <LoadingOverlay loading={loading} />
@@ -214,8 +187,29 @@ const CommitteesPage = () => {
         onFilterModelChange={setFilterModel}
 
         onRowClick={params => navigate(`/committee/${params.row.Id}`)}
-        showToolbar={true}
-        slots={{ toolbar: CustomToolbar }}
+        showToolbar
+        slots={{ toolbar: SearchToolbar }}
+        slotProps={{
+          toolbar: {
+            chamber,
+            onChamberChange: handleChamberChange,
+            search,
+            onSearchChange: setSearch,
+            onExport: exportData,
+            onRefresh: refresh,
+            actions: (
+              <Tooltip title="Open committee directory">
+                <IconButton
+                  color="primary"
+                  onClick={() => window.open(COMMITTEE_SEARCH_URL, "_blank", "noopener")}
+                  aria-label="Open committee directory"
+                >
+                  <ExpandAltOutlined />
+                </IconButton>
+              </Tooltip>
+            )
+          }
+        }}
         disableRowSelectionOnClick
       />
     </Card>
