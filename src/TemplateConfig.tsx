@@ -9,6 +9,7 @@ import {
 import logo from "./assets/images/LWV_Logo2_500x337_rgb.jpg";
 
 import { MenuItem } from "@digitalaidseattle/mui";
+import { PreferencesProfileItem } from "./components/PreferencesProfileItem";
 import packageJson from "../package.json";
 
 export const TemplateConfig = () => {
@@ -61,6 +62,7 @@ export const TemplateConfig = () => {
         drawerWidth: 240,
         menuItems: [pages, admin],
         toolbarItems: [],
+        profileItems: [<PreferencesProfileItem key="preferences" />],
         version: packageJson.version,
     });
 }

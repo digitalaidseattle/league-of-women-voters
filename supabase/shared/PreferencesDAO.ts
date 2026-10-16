@@ -20,6 +20,7 @@ export class PreferencesDAO extends SupabaseDAO<DBPreference> {
     const { data, error } = await this.client
       .from(this.tableName)
       .select('biennium')
+      .is('user_id', null)
       .order('created_at', { ascending: false })
       .limit(1)
       .single();
