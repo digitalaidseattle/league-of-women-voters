@@ -48,7 +48,7 @@ Deno.serve(async (req) => {
     }
 
     const billsDao = BillsDAO.getInstance();
-    const entities = await billsDao.findLastUpdateBefore(sched.next_update, 'sponsors_update')
+    const entities = await billsDao.findActiveLastUpdateBefore(sched.next_update, 'sponsors_update')
     if (entities.length === 0) {
       await resetSchedule(sched);
       console.info(`Found nothing to update.  Nect scheduled check`, sched.next_update);

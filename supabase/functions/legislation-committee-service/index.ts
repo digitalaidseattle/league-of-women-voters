@@ -2,6 +2,7 @@
 import { XMLParser } from "https://esm.sh/fast-xml-parser@4.3.5";
 import { BillsDAO } from "../../shared/BillsDAO.ts";
 import { configure } from "../../shared/configuration.ts";
+import { getCurrentBiennium } from "../../shared/getCurrentBiennium.ts";
 import { corsResponse } from "../../shared/corsResponse.ts";
 import { errorResponse } from "../../shared/errorResponse.ts";
 import { standardResponse } from "../../shared/standardResponse.ts";
@@ -59,15 +60,15 @@ Deno.serve(async (req) => {
     }
 
     const billsDao = BillsDAO.getInstance();
-    const entities = await billsDao.findLastUpdateBefore(sched.next_update, 'committee_update')
+    const entities = await billsDao.findActiveLastUpdateBefore(sched.next_update, 'committee_update')
     if (entities.length === 0) {
       await resetSchedule(sched);
       console.info(`Found nothing to update.  Nect scheduled check`, sched.next_update);
       return standardResponse(origin, `Found nothing to update. Next check ${sched.next_update}`);
     }
 
-    const params = await req.json();
-    const map = await fetchInCommitteeMap(params.biennium);
+    const biennium = await getCurrentBiennium();
+    const map = await fetchInCommitteeMap(biennium);
     const now = new Date();
     for (let i = 0; i < entities.length; i++) {
       const dbBill = entities[i];
