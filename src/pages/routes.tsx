@@ -12,6 +12,7 @@ import {
   MinimalLayout
 } from "@digitalaidseattle/mui";
 import { AdminPage } from "./AdminPage";
+import { SystemSettingsPage } from "./SystemSettingsPage";
 import { BillPage } from "./BillPage";
 import { BillsPage } from "./BillsPage";
 import CommitteePage from './CommitteePage';
@@ -59,6 +60,10 @@ const routes = [
       {
         path: "admin",
         element: <AdminPage />,
+      },
+      {
+        path: "system-settings",
+        element: <SystemSettingsPage />,
       },
       {
         path: "privacy",
