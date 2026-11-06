@@ -2,6 +2,7 @@
 
 import {
     FileTextOutlined,
+    SettingOutlined,
     TeamOutlined,
     ToolOutlined,
     UserOutlined
@@ -51,6 +52,13 @@ export const TemplateConfig = () => {
                 type: 'item',
                 url: '/admin',
                 icon: <ToolOutlined />
+            } as MenuItem,
+            {
+                id: 'systemSettings',
+                title: 'System Settings',
+                type: 'item',
+                url: '/system-settings',
+                icon: <SettingOutlined />
             } as MenuItem
         ]
     } as MenuItem;
