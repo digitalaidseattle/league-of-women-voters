@@ -1,5 +1,6 @@
 import { DataAccessOptions, Identifier, PageInfo, QueryModel } from "@digitalaidseattle/core";
 import { Member } from "./committee";
+import { PreferencesDB } from "./database/PreferencesDB";
 import { SponsorsDB } from "./database/SponsorsDB";
 import { LegislatorExporter } from "./legislatorExporter";
 
@@ -14,18 +15,14 @@ class LegislatorService {
         return LegislatorService.instance;
     }
 
-    biennium: string;
     dao: SponsorsDB;
 
     constructor() {
-        const current = import.meta.env.VITE_LWVW_CURRENT_BIENNIUM;
-        if (current) {
-            this.biennium = current;
-        } else {
-            throw new Error("VITE_LWVW_CURRENT_BIENNIUM is required, but was not provided.");
-        }
-
         this.dao = SponsorsDB.getInstance();
+    }
+
+    async getCurrentBiennium(): Promise<string> {
+        return PreferencesDB.getInstance().getCurrentBiennium();
     }
 
     async getAll(): Promise<Member[]> {
@@ -40,8 +37,8 @@ class LegislatorService {
         return this.dao.find(queryModel, opts);
     }
 
-    async exportData(queryModel: QueryModel): Promise<void> {
-        return LegislatorExporter.getInstance().exportData(queryModel);
+    async exportData(queryModel: QueryModel, visibleHeaders?: string[]): Promise<void> {
+        return LegislatorExporter.getInstance().exportData(queryModel, visibleHeaders);
     }
 
     getAssistantName(row: Member): string {

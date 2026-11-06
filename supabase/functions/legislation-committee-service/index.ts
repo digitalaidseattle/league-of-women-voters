@@ -55,15 +55,15 @@ Deno.serve(async (req) => {
       .getByName('bill_committee_update');
 
     if (sched.next_update.getTime() > new Date().getTime()) {
-      console.info(`Not time to be updated`, sched.next_update);
-      return standardResponse(origin, `Not time to be updated`);
+      console.info(`Not due for an update yet.`, sched.next_update);
+      return standardResponse(origin, `Not due for an update yet.`);
     }
 
     const billsDao = BillsDAO.getInstance();
     const entities = await billsDao.findActiveLastUpdateBefore(sched.next_update, 'committee_update')
     if (entities.length === 0) {
       await resetSchedule(sched);
-      console.info(`Found nothing to update.  Nect scheduled check`, sched.next_update);
+      console.info(`Found nothing to update.  Next scheduled check`, sched.next_update);
       return standardResponse(origin, `Found nothing to update. Next check ${sched.next_update}`);
     }
 
