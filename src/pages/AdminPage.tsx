@@ -4,241 +4,277 @@ import { NavLink } from "react-router-dom";
 import { HomeOutlined } from "@ant-design/icons";
 import { useNotifications } from "@digitalaidseattle/core";
 import { SupabaseConfiguration } from "@digitalaidseattle/supabase";
-import { Breadcrumbs, Button, Card, CardContent, CardHeader, IconButton, Stack, Typography } from '@mui/material';
-import { useState } from "react";
-import { LoadingOverlay } from "../components/LoadingOverlay";
+import { Breadcrumbs, Button, Card, CardContent, CardHeader, CircularProgress, IconButton, Stack, Typography } from '@mui/material';
+import { useEffect, useState } from "react";
 
 // project import
+
+// Kept outside the component so running jobs survive leaving and returning to this page
+const runningJobs = new Set<string>();
+const runningListeners = new Set<() => void>();
+
+function setJobRunning(job: string, isRunning: boolean) {
+    if (isRunning) {
+        runningJobs.add(job);
+    } else {
+        runningJobs.delete(job);
+    }
+    runningListeners.forEach(listener => listener());
+}
 
 // ==============================|| SAMPLE PAGE ||============================== //
 // const gemini_model = 'gemini-2.5-flash-lite';
 
 export const AdminPage = () => {
-    const [loading, setLoading] = useState(false);
+    // Jobs currently running. Only their buttons are disabled, so the rest of the app stays usable.
+    const [running, setRunning] = useState<string[]>(() => [...runningJobs]);
     const notify = useNotifications();
+
+    useEffect(() => {
+        const update = () => setRunning([...runningJobs]);
+        runningListeners.add(update);
+        return () => {
+            runningListeners.delete(update);
+        };
+    }, []);
+
+    function start(job: string) {
+        setJobRunning(job, true);
+    }
+
+    function finish(job: string) {
+        setJobRunning(job, false);
+    }
+
+    function jobButtonProps(job: string) {
+        const isRunning = running.includes(job);
+        return {
+            disabled: isRunning,
+            startIcon: isRunning ? <CircularProgress size={16} /> : undefined
+        };
+    }
 
 
     async function legislatorJob(): Promise<void> {
-        setLoading(true);
+        start('legislatorJob');
         try {
-            SupabaseConfiguration.getInstance()
+            const { data, error } = await SupabaseConfiguration.getInstance()
                 .getSupabaseClient().functions
-                .invoke("legislator-services")
-                .then((resp: any) => resp.data);
+                .invoke("legislator-services");
+            if (error) throw error;
+            notify.success(`Load legislators: ${data}`)
         }
         catch (error) {
             console.log(error);
             notify.error('Failed to load.')
         }
         finally {
-            notify.success('Loaded legislators.')
-            setLoading(false)
+            finish('legislatorJob')
         }
     }
 
     async function legislatorInfoJob(): Promise<void> {
-        setLoading(true);
+        start('legislatorInfoJob');
         try {
-            SupabaseConfiguration.getInstance()
+            const { data, error } = await SupabaseConfiguration.getInstance()
                 .getSupabaseClient().functions
-                .invoke("legislator-info-service")
-                .then((resp: any) => resp.data);
+                .invoke("legislator-info-service");
+            if (error) throw error;
+            notify.success(`Load legislator info: ${data}`)
         }
         catch (error) {
             console.log(error);
             notify.error('Failed to load.')
         }
         finally {
-            notify.success('Loaded committe members.')
-            setLoading(false)
+            finish('legislatorInfoJob')
         }
     }
 
     async function loadCommitteMembersJob(): Promise<void> {
-        setLoading(true);
+        start('loadCommitteMembersJob');
         try {
-            SupabaseConfiguration.getInstance()
+            const { data, error } = await SupabaseConfiguration.getInstance()
                 .getSupabaseClient().functions
-                .invoke("committee-membership-service")
-                .then((resp: any) => resp.data);
+                .invoke("committee-membership-service");
+            if (error) throw error;
+            notify.success(`Load committee members: ${data}`)
         }
         catch (error) {
             console.log(error);
             notify.error('Failed to load.')
         }
         finally {
-            notify.success('Loaded committe members.')
-            setLoading(false)
+            finish('loadCommitteMembersJob')
         }
     }
 
 
     async function loadCommitteesJob(): Promise<void> {
-        setLoading(true);
+        start('loadCommitteesJob');
         try {
-            SupabaseConfiguration.getInstance()
+            const { data, error } = await SupabaseConfiguration.getInstance()
                 .getSupabaseClient().functions
-                .invoke("committee-info-service")
-                .then((resp: any) => resp.data);
+                .invoke("committee-info-service");
+            if (error) throw error;
+            notify.success(`Load committees: ${data}`)
         }
         catch (error) {
             console.log(error);
             notify.error('Failed to load.')
         }
         finally {
-            notify.success('Loaded committees.')
-            setLoading(false)
+            finish('loadCommitteesJob')
         }
     }
 
     async function committeeLeadershipJob(): Promise<void> {
-        setLoading(true);
+        start('committeeLeadershipJob');
         try {
-            SupabaseConfiguration.getInstance()
+            const { data, error } = await SupabaseConfiguration.getInstance()
                 .getSupabaseClient().functions
-                .invoke("committee-leadership-service")
-                .then((resp: any) => resp.data);
+                .invoke("committee-leadership-service");
+            if (error) throw error;
+            notify.success(`Load committee leadership: ${data}`)
         }
         catch (error) {
             console.log(error);
             notify.error('Failed to load.')
         }
         finally {
-            notify.success('Loaded committee members.')
-            setLoading(false)
+            finish('committeeLeadershipJob')
         }
     }
 
     async function committeeReferralJob(): Promise<void> {
-        setLoading(true);
+        start('committeeReferralJob');
         try {
-            SupabaseConfiguration.getInstance()
+            const { data, error } = await SupabaseConfiguration.getInstance()
                 .getSupabaseClient().functions
-                .invoke("committee-referral-service")
-                .then((resp: any) => resp.data);
+                .invoke("committee-referral-service");
+            if (error) throw error;
+            notify.success(`Load committee referrals: ${data}`)
         }
         catch (error) {
             console.log(error);
             notify.error('Failed to load.')
         }
         finally {
-            notify.success('Loaded committee referrals.')
-            setLoading(false)
+            finish('committeeReferralJob')
         }
     }
 
     async function committeeInCommitteeJob(): Promise<void> {
-        setLoading(true);
+        start('committeeInCommitteeJob');
         try {
-            SupabaseConfiguration.getInstance()
+            const { data, error } = await SupabaseConfiguration.getInstance()
                 .getSupabaseClient().functions
-                .invoke("committee-incommittee-service")
-                .then((resp: any) => resp.data);
+                .invoke("committee-incommittee-service");
+            if (error) throw error;
+            notify.success(`Load committee in-committee information: ${data}`)
         }
         catch (error) {
             console.log(error);
             notify.error('Failed to load.')
         }
         finally {
-            notify.success('Loaded committee in-committee information.')
-            setLoading(false)
+            finish('committeeInCommitteeJob')
         }
     }
 
     async function billInfoCachingJob(): Promise<void> {
-        setLoading(true);
+        start('billInfoCachingJob');
         try {
-            SupabaseConfiguration.getInstance()
+            const { data, error } = await SupabaseConfiguration.getInstance()
                 .getSupabaseClient().functions
                 .invoke("legislation-info-service", {
                     body: { year: 2026 },
-                })
-                .then((resp: any) => resp.data);
+                });
+            if (error) throw error;
+            notify.success(`Load bills: ${data}`)
         }
         catch (error) {
             console.log(error);
             notify.error('Failed to load.')
         }
         finally {
-            notify.success('Loaded committe members.')
-            setLoading(false)
+            finish('billInfoCachingJob')
         }
     }
 
     async function billDetailCachingJob(): Promise<void> {
-        setLoading(true);
+        start('billDetailCachingJob');
         try {
-            SupabaseConfiguration.getInstance()
+            const { data, error } = await SupabaseConfiguration.getInstance()
                 .getSupabaseClient().functions
-                .invoke("legislation-detail-service")
-                .then((resp: any) => resp.data);
+                .invoke("legislation-detail-service");
+            if (error) throw error;
+            notify.success(`Load bill details: ${data}`)
         }
         catch (error) {
             console.log(error);
             notify.error('Failed to load.')
         }
         finally {
-            notify.success('Loaded bill details.')
-            setLoading(false)
+            finish('billDetailCachingJob')
         }
     }
 
     async function billCommitteeCachingJob(): Promise<void> {
-        setLoading(true);
+        start('billCommitteeCachingJob');
         try {
-            SupabaseConfiguration.getInstance()
+            const { data, error } = await SupabaseConfiguration.getInstance()
                 .getSupabaseClient().functions
-                .invoke("legislation-committee-service")
-                .then((resp: any) => resp.data);
+                .invoke("legislation-committee-service");
+            if (error) throw error;
+            notify.success(`Load bill committees: ${data}`)
         }
         catch (error) {
             console.log(error);
             notify.error('Failed to load.')
         }
         finally {
-            notify.success('Loaded committe members.')
-            setLoading(false)
+            finish('billCommitteeCachingJob')
         }
     }
 
     async function billSponsorsCachingJob(): Promise<void> {
-        setLoading(true);
+        start('billSponsorsCachingJob');
         try {
-            SupabaseConfiguration.getInstance()
+            const { data, error } = await SupabaseConfiguration.getInstance()
                 .getSupabaseClient().functions
-                .invoke("legislation-sponsors-service")
-                .then((resp: any) => resp.data);
+                .invoke("legislation-sponsors-service");
+            if (error) throw error;
+            notify.success(`Load bill sponsors: ${data}`)
         }
         catch (error) {
             console.log(error);
             notify.error('Failed to load.')
         }
         finally {
-            notify.success('Loaded bill sponsors.')
-            setLoading(false)
+            finish('billSponsorsCachingJob')
         }
     }
 
     async function billHearingsCachingJob(): Promise<void> {
-        setLoading(true);
+        start('billHearingsCachingJob');
         try {
-            SupabaseConfiguration.getInstance()
+            const { data, error } = await SupabaseConfiguration.getInstance()
                 .getSupabaseClient().functions
-                .invoke("legislation-hearings-service")
-                .then((resp: any) => resp.data);
+                .invoke("legislation-hearings-service");
+            if (error) throw error;
+            notify.success(`Load bill hearings: ${data}`)
         }
         catch (error) {
             console.log(error);
             notify.error('Failed to load.')
         }
         finally {
-            notify.success('Loaded bill hearings.')
-            setLoading(false)
+            finish('billHearingsCachingJob')
         }
     }
 
     return (<>
-        <LoadingOverlay loading={loading} />
         <Breadcrumbs aria-label="breadcrumb">
             <NavLink to="/" ><IconButton size="medium"><HomeOutlined /></IconButton></NavLink>
             <Typography color="text.primary">Admin</Typography>
@@ -247,20 +283,20 @@ export const AdminPage = () => {
             <CardHeader title={'Admin'} />
             <CardContent>
                 <Stack>
-                    <Button onClick={legislatorJob}>Edge load Legislators</Button>
-                    <Button onClick={legislatorInfoJob}>Edge load Legislator Info</Button>
+                    <Button onClick={legislatorJob} {...jobButtonProps('legislatorJob')}>Edge load Legislators</Button>
+                    <Button onClick={legislatorInfoJob} {...jobButtonProps('legislatorInfoJob')}>Edge load Legislator Info</Button>
                     <hr />
-                    <Button onClick={loadCommitteesJob}>Edge Load Committees</Button>
-                    <Button onClick={loadCommitteMembersJob}>Edge Load Committee Members</Button>
-                    <Button onClick={committeeLeadershipJob}>Edge Load Committee Leadership</Button>
-                    <Button onClick={committeeReferralJob}>Edge Load Committee Referrals</Button>
-                    <Button onClick={committeeInCommitteeJob}>Edge Load Committee In-Committee</Button>
+                    <Button onClick={loadCommitteesJob} {...jobButtonProps('loadCommitteesJob')}>Edge Load Committees</Button>
+                    <Button onClick={loadCommitteMembersJob} {...jobButtonProps('loadCommitteMembersJob')}>Edge Load Committee Members</Button>
+                    <Button onClick={committeeLeadershipJob} {...jobButtonProps('committeeLeadershipJob')}>Edge Load Committee Leadership</Button>
+                    <Button onClick={committeeReferralJob} {...jobButtonProps('committeeReferralJob')}>Edge Load Committee Referrals</Button>
+                    <Button onClick={committeeInCommitteeJob} {...jobButtonProps('committeeInCommitteeJob')}>Edge Load Committee In-Committee</Button>
                     <hr />
-                    <Button onClick={billInfoCachingJob}>Edge load Bills</Button>
-                    <Button onClick={billDetailCachingJob}>Edge load Bill Details</Button>
-                    <Button onClick={billCommitteeCachingJob}>Edge load Bill Committee</Button>
-                    <Button onClick={billSponsorsCachingJob}>Edge load Bill Sponsors</Button>
-                    <Button onClick={billHearingsCachingJob}>Edge load Bill Hearings</Button>
+                    <Button onClick={billInfoCachingJob} {...jobButtonProps('billInfoCachingJob')}>Edge load Bills</Button>
+                    <Button onClick={billDetailCachingJob} {...jobButtonProps('billDetailCachingJob')}>Edge load Bill Details</Button>
+                    <Button onClick={billCommitteeCachingJob} {...jobButtonProps('billCommitteeCachingJob')}>Edge load Bill Committee</Button>
+                    <Button onClick={billSponsorsCachingJob} {...jobButtonProps('billSponsorsCachingJob')}>Edge load Bill Sponsors</Button>
+                    <Button onClick={billHearingsCachingJob} {...jobButtonProps('billHearingsCachingJob')}>Edge load Bill Hearings</Button>
                 </Stack>
             </CardContent>
         </Card>
