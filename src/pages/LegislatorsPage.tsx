@@ -8,7 +8,7 @@ import { useContext, useEffect, useState } from 'react';
 import { NavLink, useNavigate } from "react-router-dom";
 
 // material-ui
-import { ExportOutlined, HomeOutlined, ReloadOutlined } from "@ant-design/icons";
+import { ExpandAltOutlined, ExportOutlined, HomeOutlined, ReloadOutlined } from "@ant-design/icons";
 import { Breadcrumbs, Card, CardHeader, IconButton, Tooltip, Typography } from '@mui/material';
 import { DataGrid, GridColDef, GridFilterModel, GridRenderCellParams, Toolbar, useGridApiRef } from "@mui/x-data-grid";
 
@@ -40,6 +40,31 @@ export const LegislatorsPage = () => {
 
   const columns: GridColDef[] =
     [
+      {
+        field: "actions",
+        headerName: "",
+        width: 90,
+        align: "center",
+        headerAlign: "center",
+        sortable: false,
+        filterable: false,
+        disableColumnMenu: true,
+        renderCell: (params) => (
+          <Tooltip title="View legislator">
+            <IconButton
+              color="primary"
+              size="small"
+              aria-label="View legislator"
+              onClick={(event) => {
+                event.stopPropagation();
+                navigate(`/legislator/${params.row.Id}`);
+              }}
+            >
+              <ExpandAltOutlined />
+            </IconButton>
+          </Tooltip>
+        )
+      },
       {
         field: "Name",
         headerName: "Name",

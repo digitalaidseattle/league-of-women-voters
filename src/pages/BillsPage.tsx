@@ -8,6 +8,7 @@ import { useContext, useEffect, useState } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
 
 import {
+  ExpandAltOutlined,
   ExportOutlined,
   HomeOutlined,
   ReloadOutlined
@@ -120,6 +121,31 @@ export const BillsPage = () => {
   }
 
   const columns: GridColDef<Bill>[] = [
+    {
+      field: "actions",
+      headerName: "",
+      width: 90,
+      align: "center",
+      headerAlign: "center",
+      sortable: false,
+      filterable: false,
+      disableColumnMenu: true,
+      renderCell: (params) => (
+        <Tooltip title="View bill">
+          <IconButton
+            color="primary"
+            size="small"
+            aria-label="View bill"
+            onClick={(event) => {
+              event.stopPropagation();
+              navigate(`/bill/${params.row.BillId}`);
+            }}
+          >
+            <ExpandAltOutlined />
+          </IconButton>
+        </Tooltip>
+      )
+    },
     {
       field: "id",
       headerName: "Bill",
