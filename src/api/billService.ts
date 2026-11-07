@@ -66,8 +66,8 @@ export class BillService {
       })
   };
 
-  async exportData(queryModel: QueryModel): Promise<void> {
-    return BillExporter.getInstance().exportData(queryModel);
+  async exportData(queryModel: QueryModel, visibleHeaders?: string[]): Promise<void> {
+    return BillExporter.getInstance().exportData(queryModel, visibleHeaders);
   }
 
 }
