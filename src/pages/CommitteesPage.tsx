@@ -35,6 +35,31 @@ const CommitteesPage = () => {
 
   const columns: GridColDef<FlattenCommittee>[] = useMemo(() => [
     {
+      field: "actions",
+      headerName: "",
+      width: 90,
+      align: "center",
+      headerAlign: "center",
+      sortable: false,
+      filterable: false,
+      disableColumnMenu: true,
+      renderCell: (params) => (
+        <Tooltip title="View committee">
+          <IconButton
+            color="primary"
+            size="small"
+            aria-label="View committee"
+            onClick={(event) => {
+              event.stopPropagation();
+              navigate(`/committee/${params.row.id}`);
+            }}
+          >
+            <ExpandAltOutlined />
+          </IconButton>
+        </Tooltip>
+      )
+    },
+    {
       field: "Name",
       headerName: "Name",
       minWidth: 330,
@@ -71,7 +96,7 @@ const CommitteesPage = () => {
       align: "right",
       headerAlign: "right",
     }
-  ], []);
+  ], [navigate]);
 
   useEffect(() => {
     refresh();
@@ -213,7 +238,7 @@ const CommitteesPage = () => {
         filterModel={filterModel}
         onFilterModelChange={setFilterModel}
 
-        onRowClick={params => navigate(`/committee/${params.row.Id}`)}
+        onRowClick={params => navigate(`/committee/${params.row.id}`)}
         showToolbar={true}
         slots={{ toolbar: CustomToolbar }}
         disableRowSelectionOnClick
