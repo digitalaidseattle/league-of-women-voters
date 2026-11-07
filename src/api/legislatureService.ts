@@ -53,8 +53,8 @@ class LegislatureService {
     )
   }
 
-  async exportData(queryModel: QueryModel): Promise<void> {
-    return LegislatureExporter.getInstance().exportData(queryModel);
+  async exportData(queryModel: QueryModel, visibleHeaders?: string[]): Promise<void> {
+    return LegislatureExporter.getInstance().exportData(queryModel, visibleHeaders);
   }
 
   getLeadershipName(committee: Committee, role: string) {

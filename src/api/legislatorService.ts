@@ -40,8 +40,8 @@ class LegislatorService {
         return this.dao.find(queryModel, opts);
     }
 
-    async exportData(queryModel: QueryModel): Promise<void> {
-        return LegislatorExporter.getInstance().exportData(queryModel);
+    async exportData(queryModel: QueryModel, visibleHeaders?: string[]): Promise<void> {
+        return LegislatorExporter.getInstance().exportData(queryModel, visibleHeaders);
     }
 
     getAssistantName(row: Member): string {
