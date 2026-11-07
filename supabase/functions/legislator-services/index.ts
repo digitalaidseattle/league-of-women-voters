@@ -43,8 +43,8 @@ Deno.serve(async (req) => {
       .getByName('legislator_update');
 
     if (sched.next_update.getTime() > new Date().getTime()) {
-      console.info(`Not time to be updated`, sched.next_update);
-      return standardResponse(origin, `Not time to be updated`);
+      console.info(`Not due for an update yet.`, sched.next_update);
+      return standardResponse(origin, `Not due for an update yet.`);
     }
 
     const biennium = await getCurrentBiennium();

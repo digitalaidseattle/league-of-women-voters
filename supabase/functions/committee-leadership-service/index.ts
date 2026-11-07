@@ -81,8 +81,8 @@ Deno.serve(async (req) => {
     const sched = await updateScheduleDAO.getByName('committee_leadership');
 
     if (sched.next_update.getTime() > new Date().getTime()) {
-      console.info(`Not time to be updated`, sched.next_update);
-      return standardResponse(origin, `Not time to be updated`);
+      console.info(`Not due for an update yet.`, sched.next_update);
+      return standardResponse(origin, `Not due for an update yet.`);
     }
 
     const entities = await dao.findLastUpdateBefore(sched.next_update, 'leadership_update');
