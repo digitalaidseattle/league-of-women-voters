@@ -54,7 +54,7 @@ Deno.serve(async (req) => {
     }
 
     const billsDao = BillsDAO.getInstance();
-    const entities = await billsDao.findLastUpdateBefore(sched.next_update, 'hearings_update');
+    const entities = await billsDao.findActiveLastUpdateBefore(sched.next_update, 'hearings_update');
 
     console.log('legislation-hearings-service: found ', entities.length);
 
