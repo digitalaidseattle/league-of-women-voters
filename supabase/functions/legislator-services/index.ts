@@ -7,6 +7,7 @@ import { errorResponse } from "../../shared/errorResponse.ts";
 import { resetSchedule } from "../../shared/resetSchedule.ts";
 import { SponsorDAO } from "../../shared/SponsorDAO.ts";
 import { standardResponse } from "../../shared/standardResponse.ts";
+import { notDueResponse } from "../../shared/notDueResponse.ts";
 import { DBSponsor, Member } from "../../shared/types.ts";
 import { UpdateSchedule, UpdateScheduleDAO } from "../../shared/UpdateScheduleDAO.ts";
 
@@ -43,8 +44,7 @@ Deno.serve(async (req) => {
       .getByName('legislator_update');
 
     if (sched.next_update.getTime() > new Date().getTime()) {
-      console.info(`Not time to be updated`, sched.next_update);
-      return standardResponse(origin, `Not time to be updated`);
+      return notDueResponse(origin, sched);
     }
 
     const biennium = await getCurrentBiennium();

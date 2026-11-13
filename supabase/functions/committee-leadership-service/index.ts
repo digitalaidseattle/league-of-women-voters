@@ -7,6 +7,7 @@ import { configure } from "../../shared/configuration.ts";
 import { corsResponse } from "../../shared/corsResponse.ts";
 import { errorResponse } from "../../shared/errorResponse.ts";
 import { standardResponse } from "../../shared/standardResponse.ts";
+import { notDueResponse } from "../../shared/notDueResponse.ts";
 import { Committee } from "../../shared/types.ts";
 import { resetSchedule } from '../../shared/resetSchedule.ts';
 
@@ -81,8 +82,7 @@ Deno.serve(async (req) => {
     const sched = await updateScheduleDAO.getByName('committee_leadership');
 
     if (sched.next_update.getTime() > new Date().getTime()) {
-      console.info(`Not time to be updated`, sched.next_update);
-      return standardResponse(origin, `Not time to be updated`);
+      return notDueResponse(origin, sched);
     }
 
     const entities = await dao.findLastUpdateBefore(sched.next_update, 'leadership_update');
