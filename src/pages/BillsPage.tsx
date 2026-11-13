@@ -187,7 +187,7 @@ export const BillsPage = () => {
             rel="noopener noreferrer"
             sx={{ flexShrink: 0 }}
           >
-            History
+            View Full History
           </Link>
         );
         if (!row.CurrentStatus) {
