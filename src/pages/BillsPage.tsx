@@ -9,6 +9,7 @@ import { NavLink, useNavigate } from "react-router-dom";
 
 import { HomeOutlined } from "@ant-design/icons";
 import {
+  Box,
   Breadcrumbs,
   Card,
   CardHeader,
@@ -178,18 +179,33 @@ export const BillsPage = () => {
       type: "string",
       renderCell: (params) => {
         const { row } = params;
-        if (row.CurrentStatus) {
-          return row.CurrentStatus.HistoryLine;
-        }
-        return (
+        const historyLink = (
           <Link
             title={`Open roll calls for ${row.BillId}`}
             href={BillService.getInstance().getHistoryUrl(row)}
             target="_blank"
             rel="noopener noreferrer"
+            sx={{ flexShrink: 0 }}
           >
             History
           </Link>
+        );
+        if (!row.CurrentStatus) {
+          return historyLink;
+        }
+        // Long history lines are truncated so the link stays visible
+        return (
+          <Box sx={{ display: 'flex', gap: 0.5, minWidth: 0 }}>
+            <Box
+              component="span"
+              title={row.CurrentStatus.HistoryLine}
+              sx={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}
+            >
+              {row.CurrentStatus.HistoryLine}
+            </Box>
+            <span>·</span>
+            {historyLink}
+          </Box>
         );
       },
       filterable: false,
