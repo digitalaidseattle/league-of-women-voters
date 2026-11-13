@@ -148,7 +148,7 @@ const CommitteesPage = () => {
   function exportData() {
     setLoading(true);
     service
-      .exportData(createQueryModel(), apiRef.current?.getVisibleColumns().map(col => col.headerName ?? col.field))
+      .exportData(createQueryModel(), apiRef.current!.getVisibleColumns().map(col => col.headerName ?? col.field))
       .then(() => notifications.success('Committees exported successfully'))
       .catch(err => {
         notifications.error('Error exporting committees.');

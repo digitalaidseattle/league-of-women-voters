@@ -53,7 +53,7 @@ class LegislatureService {
     )
   }
 
-  async exportData(queryModel: QueryModel, visibleHeaders?: string[]): Promise<void> {
+  async exportData(queryModel: QueryModel, visibleHeaders: string[]): Promise<void> {
     return LegislatureExporter.getInstance().exportData(queryModel, visibleHeaders);
   }
 

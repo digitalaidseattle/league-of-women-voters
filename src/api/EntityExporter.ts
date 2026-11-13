@@ -41,7 +41,7 @@ export abstract class EntityExporter<T extends Entity> {
     return entities;
   }
 
-  mapEntity(entity: T, columns: EntityExportColumn<T>[] = this.columns): Record<string, any> {
+  mapEntity(entity: T, columns: EntityExportColumn<T>[]): Record<string, any> {
     let mapped = {};
     for (const column of columns) {
       mapped = {
@@ -52,7 +52,7 @@ export abstract class EntityExporter<T extends Entity> {
     return mapped as Record<string, any>;
   }
 
-  getUploadOptions(columns: EntityExportColumn<T>[] = this.columns): any {
+  getUploadOptions(columns: EntityExportColumn<T>[]): any {
     return ({
       fileName: this.fileName,
       sheetName: this.sheetName,
@@ -60,11 +60,9 @@ export abstract class EntityExporter<T extends Entity> {
     })
   }
 
-  // visibleHeaders: the table's visible column headers; when given, only those columns are exported
-  async exportData(queryModel: QueryModel, visibleHeaders?: string[]): Promise<void> {
-    const columns = visibleHeaders
-      ? this.columns.filter(column => visibleHeaders.includes(column.header))
-      : this.columns;
+  // visibleHeaders: the table's visible column headers; only those columns are exported
+  async exportData(queryModel: QueryModel, visibleHeaders: string[]): Promise<void> {
+    const columns = this.columns.filter(column => visibleHeaders.includes(column.header));
     let allBills = await this.fetchEntities(queryModel);
     const exportData: Record<string, any>[] = allBills.map(bill => this.mapEntity(bill, columns) as Record<string, any>);
 

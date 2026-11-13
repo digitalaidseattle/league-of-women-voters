@@ -66,7 +66,7 @@ export const BillsPage = () => {
   function exportData() {
     setLoading(true);
     BillService.getInstance()
-      .exportData(createQueryModel(), apiRef.current?.getVisibleColumns().map(col => col.headerName ?? col.field))
+      .exportData(createQueryModel(), apiRef.current!.getVisibleColumns().map(col => col.headerName ?? col.field))
       .then(() => notifications.success('Bills exported successfully'))
       .catch(err => {
         notifications.error('Error exporting bills.');

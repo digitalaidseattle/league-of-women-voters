@@ -40,7 +40,7 @@ class LegislatorService {
         return this.dao.find(queryModel, opts);
     }
 
-    async exportData(queryModel: QueryModel, visibleHeaders?: string[]): Promise<void> {
+    async exportData(queryModel: QueryModel, visibleHeaders: string[]): Promise<void> {
         return LegislatorExporter.getInstance().exportData(queryModel, visibleHeaders);
     }
 
