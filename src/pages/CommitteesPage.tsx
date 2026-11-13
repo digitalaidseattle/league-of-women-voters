@@ -211,7 +211,7 @@ const CommitteesPage = () => {
         filterModel={filterModel}
         onFilterModelChange={setFilterModel}
 
-        onRowClick={params => navigate(`/committee/${params.row.Id}`)}
+        onRowClick={params => navigate(`/committee/${params.row.id}`)}
         showToolbar
         slots={{ toolbar: SearchToolbar }}
         slotProps={{
@@ -223,11 +223,11 @@ const CommitteesPage = () => {
             onExport: exportData,
             onRefresh: refresh,
             actions: (
-              <Tooltip title="Open committee directory">
+              <Tooltip title="View committee">
                 <IconButton
                   color="primary"
                   onClick={() => window.open(COMMITTEE_SEARCH_URL, "_blank", "noopener")}
-                  aria-label="Open committee directory"
+                  aria-label="View committee"
                 >
                   <ExpandAltOutlined />
                 </IconButton>
