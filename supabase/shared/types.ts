@@ -37,6 +37,13 @@ export type DBSponsor = {
   sponsor: Member
 }
 
+export type DBPreference = {
+  id: Identifier,
+  biennium: string,
+  bills: string[],
+  created_at: Date
+}
+
 export type DBCommittee = {
   id: Identifier,
   created_at: Date,

@@ -25,13 +25,14 @@ export class BillsDAO extends SupabaseDAO<DBBill> {
     });
   }
 
-  async findLastUpdateBefore(date: Date, field?: string): Promise<DBBill[]> {
+  async findActiveLastUpdateBefore(date: Date, field?: string): Promise<DBBill[]> {
     try {
       const check = field ?? 'updated_at';
       const dateString = date.toISOString();
       return this.client
         .from(this.tableName)
         .select('*')
+        .filter('bill->>Active', 'isdistinct', 'false')
         .or(`${check}.lt.${dateString},${check}.is.null`)
         .then((resp: any) => resp.data.map((json: any) => this.mapJson(json)));
     }
