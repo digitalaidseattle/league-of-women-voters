@@ -6,14 +6,41 @@
  */
 import { HomeOutlined } from "@ant-design/icons";
 import { LoadingContext, useNotifications } from "@digitalaidseattle/core";
-import { Breadcrumbs, Card, CardContent, CardHeader, Grid, IconButton, Typography } from '@mui/material';
+import {
+  Box,
+  Breadcrumbs,
+  Card,
+  CardContent,
+  CardHeader,
+  IconButton,
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableRow,
+  Typography
+} from '@mui/material';
 import dayjs from "dayjs";
-import { Fragment, useContext, useEffect, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import { NavLink, useParams } from "react-router-dom";
 import { BillHistoryEntry } from "../../api/bill";
 import { BillService } from "../../api/billService";
 import { LoadingOverlay } from "../../components/LoadingOverlay";
 import { BILL_CONSTANTS } from "./constants";
+
+// WA Leg returns the history once per version of the bill (e.g. SB and SSB),
+// so the same action can appear more than once
+function removeDuplicates(entries: BillHistoryEntry[]): BillHistoryEntry[] {
+  const seen = new Set<string>();
+  return entries.filter(entry => {
+    const key = `${entry.ActionDate}|${entry.HistoryLine}`;
+    if (seen.has(key)) {
+      return false;
+    }
+    seen.add(key);
+    return true;
+  });
+}
 
 export const BillHistoryPage = () => {
   const { id } = useParams<string>();
@@ -30,7 +57,7 @@ export const BillHistoryPage = () => {
       service.getById(id)
         .then(bill => service.getHistory(bill))
         .then(entries => setHistory(
-          [...entries].sort((a, b) => dayjs(a.ActionDate).diff(dayjs(b.ActionDate)))
+          removeDuplicates(entries).sort((a, b) => dayjs(a.ActionDate).diff(dayjs(b.ActionDate)))
         ))
         .catch(err => {
           notifications.error('Error loading bill history.');
@@ -61,20 +88,30 @@ export const BillHistoryPage = () => {
           {loaded && history.length === 0 &&
             <Typography>{BILL_CONSTANTS.no_history}</Typography>
           }
-          {years.map(year => (
-            <Fragment key={year}>
-              <Typography variant="h5" sx={{ mt: 2, mb: 1 }}>{year}</Typography>
-              <Grid container spacing={1}>
-                {history
-                  .filter(entry => dayjs(entry.ActionDate).format('YYYY') === year)
-                  .map((entry, idx) => (
-                    <Fragment key={idx}>
-                      <Grid size={2}>{dayjs(entry.ActionDate).format('MMM D')}</Grid>
-                      <Grid size={10}>{entry.HistoryLine}</Grid>
-                    </Fragment>
-                  ))}
-              </Grid>
-            </Fragment>
+          {years.map((year, index) => (
+            <Box key={year} sx={{ mt: index === 0 ? 0 : 4 }}>
+              <Typography variant="h5" sx={{ mb: 1 }}>
+                {BILL_CONSTANTS.year_label}: {year}
+              </Typography>
+              <Table size="small">
+                <TableHead>
+                  <TableRow>
+                    <TableCell sx={{ width: 120, fontWeight: 700 }}>{BILL_CONSTANTS.date_label}</TableCell>
+                    <TableCell sx={{ fontWeight: 700 }}>{BILL_CONSTANTS.description_label}</TableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {history
+                    .filter(entry => dayjs(entry.ActionDate).format('YYYY') === year)
+                    .map((entry, idx) => (
+                      <TableRow key={idx}>
+                        <TableCell sx={{ whiteSpace: 'nowrap' }}>{dayjs(entry.ActionDate).format('MMM D')}</TableCell>
+                        <TableCell>{entry.HistoryLine}</TableCell>
+                      </TableRow>
+                    ))}
+                </TableBody>
+              </Table>
+            </Box>
           ))}
         </CardContent>
       </Card>

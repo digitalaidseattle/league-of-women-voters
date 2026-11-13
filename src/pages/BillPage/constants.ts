@@ -20,4 +20,7 @@ export const BILL_CONSTANTS = {
   full_history_label: 'Full History',
   view_full_history: 'View Full History',
   no_history: 'No history found',
+  year_label: 'Year',
+  date_label: 'Date',
+  description_label: 'Description',
 }
