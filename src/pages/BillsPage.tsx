@@ -178,7 +178,19 @@ export const BillsPage = () => {
       type: "string",
       renderCell: (params) => {
         const { row } = params;
-        return row.CurrentStatus ? row.CurrentStatus.HistoryLine : 'n/a';
+        if (row.CurrentStatus) {
+          return row.CurrentStatus.HistoryLine;
+        }
+        return (
+          <Link
+            title={`Open roll calls for ${row.BillId}`}
+            href={BillService.getInstance().getHistoryUrl(row)}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            History
+          </Link>
+        );
       },
       filterable: false,
       sortable: false,

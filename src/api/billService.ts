@@ -51,6 +51,10 @@ export class BillService {
     return `https://app.leg.wa.gov/billsummary/?BillNumber=${billNumber}&Year=${year}`
   }
 
+  getHistoryUrl(bill: Bill): string {
+    return `https://app.leg.wa.gov/bi/RollCallsOnABill/RollCall?biennium=${bill.Biennium}&billNumber=${bill.BillNumber}&initiative=False`
+  }
+
   async findInCommittee(bill: Bill): Promise<Committee | undefined> {
     return LegislatureService.getInstance()
       .getAll()
