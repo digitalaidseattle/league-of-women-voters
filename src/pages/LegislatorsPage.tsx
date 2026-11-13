@@ -168,8 +168,8 @@ export const LegislatorsPage = () => {
   function exportData() {
     setLoading(true);
     LegislatorService.getInstance()
-      .exportData(createQueryModel())
-      .then(() => notifications.success('Bills exported successfully'))
+      .exportData(createQueryModel(), apiRef.current!.getVisibleColumns().map(col => col.headerName ?? col.field))
+      .then(() => notifications.success('Legislators exported successfully'))
       .catch(err => {
         notifications.error('Error exporting legislators.');
         console.error('Error exporting legislators:', err);
