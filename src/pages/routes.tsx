@@ -14,6 +14,7 @@ import {
 import { AdminPage } from "./AdminPage";
 import { SystemSettingsPage } from "./SystemSettingsPage";
 import { BillPage } from "./BillPage";
+import { BillHistoryPage } from "./BillPage/HistoryPage";
 import { BillsPage } from "./BillsPage";
 import CommitteePage from './CommitteePage';
 import CommitteesPage from './CommitteesPage';
@@ -48,6 +49,10 @@ const routes = [
       {
         path: "bill/:id",
         element: <BillPage />,
+      },
+      {
+        path: "bill/:id/history",
+        element: <BillHistoryPage />,
       },
       {
         path: "legislators",

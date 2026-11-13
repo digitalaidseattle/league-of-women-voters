@@ -41,7 +41,12 @@ export function InfoSection({ bill }: { bill: Bill }) {
         <Grid size={4}>{BILL_CONSTANTS.status}:</Grid>
         <Grid size={8}>{bill.CurrentStatus?.Status}</Grid>
         <Grid size={4}>{BILL_CONSTANTS.history}:</Grid>
-        <Grid size={8}>{bill.CurrentStatus?.HistoryLine}</Grid>
+        <Grid size={8}>
+          {bill.CurrentStatus && `${bill.CurrentStatus.HistoryLine} · `}
+          <NavLink to={`/bill/${bill.BillId}/history`}>
+            {BILL_CONSTANTS.view_full_history}
+          </NavLink>
+        </Grid>
         <Grid size={4}>{BILL_CONSTANTS.current_page}:</Grid>
         <Grid size={8}>
           <Link

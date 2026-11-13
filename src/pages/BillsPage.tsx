@@ -30,6 +30,7 @@ import { BillService } from "../api/billService";
 import { CHAMBER_TYPE } from "../components/ChamberButtonGroup";
 import { LoadingOverlay } from "../components/LoadingOverlay";
 import { SearchToolbar } from "../components/SearchToolbar";
+import { BILL_CONSTANTS } from "./BillPage/constants";
 import { GridSortModel } from "@mui/x-data-grid";
 
 const PAGE_SIZE = 25;
@@ -179,15 +180,26 @@ export const BillsPage = () => {
       type: "string",
       renderCell: (params) => {
         const { row } = params;
-        const historyLine = row.CurrentStatus ? row.CurrentStatus.HistoryLine : 'n/a';
-        // Long history lines are truncated; hovering shows the full text
+        const historyLink = (
+          <NavLink to={`/bill/${row.BillId}/history`} style={{ flexShrink: 0 }}>
+            {BILL_CONSTANTS.view_full_history}
+          </NavLink>
+        );
+        if (!row.CurrentStatus) {
+          return historyLink;
+        }
+        // Long history lines are truncated (full text on hover) so the link stays visible
         return (
-          <Box
-            component="span"
-            title={historyLine}
-            sx={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}
-          >
-            {historyLine}
+          <Box sx={{ display: 'flex', gap: 0.5, minWidth: 0 }}>
+            <Box
+              component="span"
+              title={row.CurrentStatus.HistoryLine}
+              sx={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}
+            >
+              {row.CurrentStatus.HistoryLine}
+            </Box>
+            <span>·</span>
+            {historyLink}
           </Box>
         );
       },
