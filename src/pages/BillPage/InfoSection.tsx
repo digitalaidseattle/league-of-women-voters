@@ -41,7 +41,17 @@ export function InfoSection({ bill }: { bill: Bill }) {
         <Grid size={4}>{BILL_CONSTANTS.status}:</Grid>
         <Grid size={8}>{bill.CurrentStatus?.Status}</Grid>
         <Grid size={4}>{BILL_CONSTANTS.history}:</Grid>
-        <Grid size={8}>{bill.CurrentStatus?.HistoryLine}</Grid>
+        <Grid size={8}>
+          {bill.CurrentStatus && `${bill.CurrentStatus.HistoryLine} · `}
+          <Link
+            title={`Open roll calls for ${bill.BillId}`}
+            href={billService.getHistoryUrl(bill)}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            View Full History
+          </Link>
+        </Grid>
         <Grid size={4}>{BILL_CONSTANTS.current_page}:</Grid>
         <Grid size={8}>
           <Link
