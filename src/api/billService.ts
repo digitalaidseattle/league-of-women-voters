@@ -6,7 +6,8 @@
  */
 
 import { DataAccessOptions, PageInfo, QueryModel } from "@digitalaidseattle/core";
-import type { Bill } from "./bill";
+import { SupabaseConfiguration } from "@digitalaidseattle/supabase";
+import type { Bill, BillHistoryEntry } from "./bill";
 import { BillsDB } from "./database/BillsDB";
 import { Committee, Member } from "./committee";
 import { LegislatureService } from "./legislatureService";
@@ -49,6 +50,17 @@ export class BillService {
     const year = bill.Biennium.split('-')[0];
     const billNumber = bill.BillNumber
     return `https://app.leg.wa.gov/billsummary/?BillNumber=${billNumber}&Year=${year}`
+  }
+
+  // Full history is fetched from WA Leg on demand by the bill-history-service edge function
+  async getHistory(bill: Bill): Promise<BillHistoryEntry[]> {
+    const { data, error } = await SupabaseConfiguration.getInstance()
+      .getSupabaseClient().functions
+      .invoke("bill-history-service", {
+        body: { biennium: bill.Biennium, billNumber: bill.BillNumber }
+      });
+    if (error) throw error;
+    return data as BillHistoryEntry[];
   }
 
   async findInCommittee(bill: Bill): Promise<Committee | undefined> {
