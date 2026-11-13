@@ -4,6 +4,7 @@
  *  @copyright 2026 Digital Aid Seattle
  *
  */
+import dayjs from "dayjs";
 import { useContext, useEffect, useState } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
 
@@ -188,18 +189,24 @@ export const BillsPage = () => {
         if (!row.CurrentStatus) {
           return historyLink;
         }
-        // Long history lines are truncated (full text on hover) so the link stays visible
+        // Date of the latest action above its history line. Long lines are
+        // truncated (full text on hover) so the link stays visible.
         return (
-          <Box sx={{ display: 'flex', gap: 0.5, minWidth: 0 }}>
-            <Box
-              component="span"
-              title={row.CurrentStatus.HistoryLine}
-              sx={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}
-            >
-              {row.CurrentStatus.HistoryLine}
+          <Box sx={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', height: '100%', minWidth: 0, lineHeight: 1.4 }}>
+            <Box component="span" sx={{ color: 'text.secondary', fontSize: '0.75rem' }}>
+              {dayjs(row.CurrentStatus.ActionDate).format('MMM D, YYYY')}
             </Box>
-            <span>·</span>
-            {historyLink}
+            <Box sx={{ display: 'flex', gap: 0.5, minWidth: 0 }}>
+              <Box
+                component="span"
+                title={row.CurrentStatus.HistoryLine}
+                sx={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}
+              >
+                {row.CurrentStatus.HistoryLine}
+              </Box>
+              <span>·</span>
+              {historyLink}
+            </Box>
           </Box>
         );
       },
