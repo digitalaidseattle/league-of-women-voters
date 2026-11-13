@@ -179,32 +179,15 @@ export const BillsPage = () => {
       type: "string",
       renderCell: (params) => {
         const { row } = params;
-        const historyLink = (
-          <Link
-            title={`Open roll calls for ${row.BillId}`}
-            href={BillService.getInstance().getHistoryUrl(row)}
-            target="_blank"
-            rel="noopener noreferrer"
-            sx={{ flexShrink: 0 }}
-          >
-            View Full History
-          </Link>
-        );
-        if (!row.CurrentStatus) {
-          return historyLink;
-        }
-        // Long history lines are truncated so the link stays visible
+        const historyLine = row.CurrentStatus ? row.CurrentStatus.HistoryLine : 'n/a';
+        // Long history lines are truncated; hovering shows the full text
         return (
-          <Box sx={{ display: 'flex', gap: 0.5, minWidth: 0 }}>
-            <Box
-              component="span"
-              title={row.CurrentStatus.HistoryLine}
-              sx={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}
-            >
-              {row.CurrentStatus.HistoryLine}
-            </Box>
-            <span>·</span>
-            {historyLink}
+          <Box
+            component="span"
+            title={historyLine}
+            sx={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}
+          >
+            {historyLine}
           </Box>
         );
       },
