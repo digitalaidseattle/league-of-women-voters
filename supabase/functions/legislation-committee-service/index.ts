@@ -6,6 +6,7 @@ import { getCurrentBiennium } from "../../shared/getCurrentBiennium.ts";
 import { corsResponse } from "../../shared/corsResponse.ts";
 import { errorResponse } from "../../shared/errorResponse.ts";
 import { standardResponse } from "../../shared/standardResponse.ts";
+import { notDueResponse } from "../../shared/notDueResponse.ts";
 import { Bill, Committee, DBCommittee, LegislationInfo } from "../../shared/types.ts";
 import { UpdateSchedule, UpdateScheduleDAO } from "../../shared/UpdateScheduleDAO.ts";
 import { resetSchedule } from "../../shared/resetSchedule.ts";
@@ -55,8 +56,7 @@ Deno.serve(async (req) => {
       .getByName('bill_committee_update');
 
     if (sched.next_update.getTime() > new Date().getTime()) {
-      console.info(`Not due for an update yet.`, sched.next_update);
-      return standardResponse(origin, `Not due for an update yet.`);
+      return notDueResponse(origin, sched);
     }
 
     const billsDao = BillsDAO.getInstance();

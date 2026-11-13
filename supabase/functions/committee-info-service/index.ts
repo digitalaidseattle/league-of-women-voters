@@ -6,6 +6,7 @@ import { corsResponse } from "../../shared/corsResponse.ts";
 import { errorResponse } from "../../shared/errorResponse.ts";
 import { resetSchedule } from "../../shared/resetSchedule.ts";
 import { standardResponse } from "../../shared/standardResponse.ts";
+import { notDueResponse } from "../../shared/notDueResponse.ts";
 import { Committee, DBCommittee } from "../../shared/types.ts";
 import { UpdateSchedule, UpdateScheduleDAO } from "../../shared/UpdateScheduleDAO.ts";
 import { calcCommitteeSearchKey } from "../../shared/calcCommitteeSearchKey.ts";
@@ -41,8 +42,7 @@ Deno.serve(async (req) => {
       .getByName('committee_info_update');
 
     if (sched.next_update.getTime() > new Date().getTime()) {
-      console.info(`Not due for an update yet.`, sched.next_update);
-      return standardResponse(origin, `Not due for an update yet.`);
+      return notDueResponse(origin, sched);
     }
 
     const infos = await fetchData();
