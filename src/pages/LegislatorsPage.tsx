@@ -43,19 +43,22 @@ export const LegislatorsPage = () => {
       {
         field: "Name",
         headerName: "Name",
-        width: 200,
+        minWidth: 160,
+        flex: 1,
         type: "string"
       },
       {
         field: "FirstName",
         headerName: "First Name",
-        width: 200,
+        minWidth: 120,
+        flex: 0.8,
         type: "string"
       },
       {
         field: "LastName",
         headerName: "Last Name",
-        width: 200,
+        minWidth: 120,
+        flex: 0.8,
         type: "string"
       },
       {
@@ -79,7 +82,8 @@ export const LegislatorsPage = () => {
       {
         field: "Email",
         headerName: "Email",
-        width: 250,
+        minWidth: 200,
+        flex: 1.2,
         type: "string"
       },
       {
@@ -91,7 +95,8 @@ export const LegislatorsPage = () => {
       {
         field: "LegislativeAssistant",
         headerName: "Leg. Assistant",
-        width: 3000,
+        minWidth: 180,
+        flex: 1,
         type: "string",
         filterable: false,
         sortable: false,
@@ -105,7 +110,7 @@ export const LegislatorsPage = () => {
   }, [chamber, paginationModel, filterModel]);
 
   function refresh() {
-    setLoading(false);
+    setLoading(true);
     LegislatorService.getInstance()
       .getAll()
       .then(data => {
