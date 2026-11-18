@@ -57,7 +57,7 @@ export class BillService {
     const { data, error } = await SupabaseConfiguration.getInstance()
       .getSupabaseClient().functions
       .invoke("bill-history-service", {
-        body: { biennium: bill.Biennium, billNumber: bill.BillNumber }
+        body: { billNumber: bill.BillNumber }
       });
     if (error) throw error;
     return data as BillHistoryEntry[];

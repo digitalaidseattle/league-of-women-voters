@@ -1,7 +1,11 @@
 
 import { XMLParser } from "https://esm.sh/fast-xml-parser@4.3.5";
+import { configure } from "../../shared/configuration.ts";
 import { corsResponse } from "../../shared/corsResponse.ts";
 import { errorResponse } from "../../shared/errorResponse.ts";
+import { getCurrentBiennium } from "../../shared/getCurrentBiennium.ts";
+
+configure();
 
 // Returns a bill's full history on demand (nothing is cached in the database)
 const BASE_URL = "https://wslwebservices.leg.wa.gov/LegislationService.asmx";
@@ -42,11 +46,12 @@ Deno.serve(async (req) => {
   }
 
   try {
-    const { biennium, billNumber } = await req.json();
-    if (!biennium || !billNumber) {
-      throw new Error("biennium and billNumber are required", { cause: "BadRequest" });
+    const { billNumber } = await req.json();
+    if (!billNumber) {
+      throw new Error("billNumber is required", { cause: "BadRequest" });
     }
-    const history = await fetchHistory(String(biennium), String(billNumber));
+    const biennium = await getCurrentBiennium();
+    const history = await fetchHistory(biennium, String(billNumber));
     return new Response(JSON.stringify(history), {
       headers: {
         "Content-Type": "application/json",
