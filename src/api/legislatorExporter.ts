@@ -26,6 +26,7 @@ export class LegislatorExporter extends EntityExporter<Member> {
       "legislators_export",
       "Legislators",
       [
+        { key: 'Name', header: 'Name' },
         { key: 'FirstName', header: 'First Name' },
         { key: 'LastName', header: 'Last Name' },
         { key: 'Agency', header: 'Chamber' },
@@ -35,7 +36,7 @@ export class LegislatorExporter extends EntityExporter<Member> {
         { key: 'Phone', header: 'Phone' },
         {
           key: 'LegislativeAssistant',
-          header: 'Assistant',
+          header: 'Leg. Assistant',
           valueGetter: (member: any) => LegislatorService.getInstance().getAssistantName(member)
         }
       ]);
