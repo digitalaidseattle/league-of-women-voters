@@ -1,11 +1,8 @@
 
+import { createClient } from "jsr:@supabase/supabase-js@2";
 import { XMLParser } from "https://esm.sh/fast-xml-parser@4.3.5";
-import { configure } from "../../shared/configuration.ts";
 import { corsResponse } from "../../shared/corsResponse.ts";
 import { errorResponse } from "../../shared/errorResponse.ts";
-import { getCurrentBiennium } from "../../shared/getCurrentBiennium.ts";
-
-configure();
 
 // Returns a bill's full history on demand (nothing is cached in the database)
 const BASE_URL = "https://wslwebservices.leg.wa.gov/LegislationService.asmx";
@@ -16,6 +13,22 @@ type BillHistoryEntry = {
   HistoryLine: string;
   Status: string;
 };
+
+// Same query as PreferencesDAO.getCurrentBiennium. The shared DAO pulls in
+// @digitalaidseattle/supabase and Firebase, which makes this bundle too large to deploy.
+async function getCurrentBiennium(): Promise<string> {
+  const client = createClient(Deno.env.get("SUPABASE_URL")!, Deno.env.get("SUPABASE_ANON_KEY")!);
+  const { data, error } = await client
+    .from("Preferences")
+    .select("biennium")
+    .order("created_at", { ascending: false })
+    .limit(1)
+    .single();
+  if (error) {
+    throw new Error(`Failed to load Preferences: ${error.message}`);
+  }
+  return data.biennium as string;
+}
 
 async function fetchHistory(biennium: string, billNumber: string): Promise<BillHistoryEntry[]> {
   // A biennium like "2025-26" covers Jan 1, 2025 through Dec 31, 2026
