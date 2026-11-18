@@ -4,11 +4,13 @@
  *  @copyright 2026 Digital Aid Seattle
  *
  */
+import dayjs from "dayjs";
 import { useContext, useEffect, useState } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
 
 import { HomeOutlined } from "@ant-design/icons";
 import {
+  Box,
   Breadcrumbs,
   Card,
   CardHeader,
@@ -29,6 +31,7 @@ import { BillService } from "../api/billService";
 import { CHAMBER_TYPE } from "../components/ChamberButtonGroup";
 import { LoadingOverlay } from "../components/LoadingOverlay";
 import { SearchToolbar } from "../components/SearchToolbar";
+import { BILL_CONSTANTS } from "./BillPage/constants";
 import { GridSortModel } from "@mui/x-data-grid";
 
 const PAGE_SIZE = 25;
@@ -178,7 +181,34 @@ export const BillsPage = () => {
       type: "string",
       renderCell: (params) => {
         const { row } = params;
-        return row.CurrentStatus ? row.CurrentStatus.HistoryLine : 'n/a';
+        const historyLink = (
+          <NavLink to={`/bill/${row.BillId}/history`} style={{ flexShrink: 0 }}>
+            {BILL_CONSTANTS.view_full_history}
+          </NavLink>
+        );
+        if (!row.CurrentStatus) {
+          return historyLink;
+        }
+        // Date of the latest action above its history line. Long lines are
+        // truncated (full text on hover) so the link stays visible.
+        return (
+          <Box sx={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', height: '100%', minWidth: 0, lineHeight: 1.4 }}>
+            <Box component="span" sx={{ color: 'text.secondary', fontSize: '0.75rem' }}>
+              {dayjs(row.CurrentStatus.ActionDate).format('MMM D, YYYY')}
+            </Box>
+            <Box sx={{ display: 'flex', gap: 0.5, minWidth: 0 }}>
+              <Box
+                component="span"
+                title={row.CurrentStatus.HistoryLine}
+                sx={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}
+              >
+                {row.CurrentStatus.HistoryLine}
+              </Box>
+              <span>·</span>
+              {historyLink}
+            </Box>
+          </Box>
+        );
       },
       filterable: false,
       sortable: false,

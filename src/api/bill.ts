@@ -188,6 +188,13 @@ type BillRow = {
   raw: LegislativeDocument;
 };
 
+// One entry of a bill's full history, from the bill-history-service edge function
+type BillHistoryEntry = {
+  ActionDate: string;
+  HistoryLine: string;
+  Status: string;
+};
+
 
 export type {
   DocumentHistoryLine,
@@ -196,5 +203,6 @@ export type {
   LegislativeDocument,
   Bill,
   BillHearing,
+  BillHistoryEntry,
   BillRow
 };
