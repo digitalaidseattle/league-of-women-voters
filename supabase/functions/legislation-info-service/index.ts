@@ -5,6 +5,7 @@ import { configure } from "../../shared/configuration.ts";
 import { corsResponse } from "../../shared/corsResponse.ts";
 import { errorResponse } from "../../shared/errorResponse.ts";
 import { standardResponse } from "../../shared/standardResponse.ts";
+import { notDueResponse } from "../../shared/notDueResponse.ts";
 import { Bill, DBBill, LegislationInfo } from "../../shared/types.ts";
 import { UpdateSchedule, UpdateScheduleDAO } from "../../shared/UpdateScheduleDAO.ts";
 import { resetSchedule } from "../../shared/resetSchedule.ts";
@@ -64,8 +65,7 @@ Deno.serve(async (req) => {
       .getByName('bill_info_update');
 
     if (sched.next_update.getTime() > new Date().getTime()) {
-      console.info(`Not time to be updated`, sched.next_update);
-      return standardResponse(origin, `Not time to be updated`);
+      return notDueResponse(origin, sched);
     }
     const params = await req.json();
     const year = params.year;

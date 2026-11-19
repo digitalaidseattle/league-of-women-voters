@@ -7,6 +7,7 @@ import { corsResponse } from "../../shared/corsResponse.ts";
 import { errorResponse } from "../../shared/errorResponse.ts";
 import { resetSchedule } from "../../shared/resetSchedule.ts";
 import { standardResponse } from "../../shared/standardResponse.ts";
+import { notDueResponse } from "../../shared/notDueResponse.ts";
 import { Member } from "../../shared/types.ts";
 
 configure();
@@ -82,8 +83,7 @@ Deno.serve(async (req) => {
     const sched = await updateScheduleDAO.getByName('legislator_info');
 
     if (sched.next_update.getTime() > new Date().getTime()) {
-      console.info(`Not time to be updated`, sched.next_update);
-      return standardResponse(origin, `Not time to be updated`);
+      return notDueResponse(origin, sched);
     }
 
     const entities = await sponsorDAO.findLastUpdateBefore(sched.next_update, 'info_update');
