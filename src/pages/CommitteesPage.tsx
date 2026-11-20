@@ -35,6 +35,31 @@ const CommitteesPage = () => {
 
   const columns: GridColDef<FlattenCommittee>[] = useMemo(() => [
     {
+      field: "actions",
+      headerName: "",
+      width: 90,
+      align: "center",
+      headerAlign: "center",
+      sortable: false,
+      filterable: false,
+      disableColumnMenu: true,
+      renderCell: (params) => (
+        <Tooltip title="View committee">
+          <IconButton
+            color="primary"
+            size="small"
+            aria-label="View committee"
+            onClick={(event) => {
+              event.stopPropagation();
+              navigate(`/committee/${params.row.id}`);
+            }}
+          >
+            <ExpandAltOutlined />
+          </IconButton>
+        </Tooltip>
+      )
+    },
+    {
       field: "Name",
       headerName: "Name",
       minWidth: 330,
@@ -71,7 +96,7 @@ const CommitteesPage = () => {
       align: "right",
       headerAlign: "right",
     }
-  ], []);
+  ], [navigate]);
 
   useEffect(() => {
     refresh();
@@ -186,7 +211,7 @@ const CommitteesPage = () => {
         filterModel={filterModel}
         onFilterModelChange={setFilterModel}
 
-        onRowClick={params => navigate(`/committee/${params.row.Id}`)}
+        onRowClick={params => navigate(`/committee/${params.row.id}`)}
         showToolbar
         slots={{ toolbar: SearchToolbar }}
         slotProps={{
@@ -198,11 +223,11 @@ const CommitteesPage = () => {
             onExport: exportData,
             onRefresh: refresh,
             actions: (
-              <Tooltip title="Open committee directory">
+              <Tooltip title="View committee">
                 <IconButton
                   color="primary"
                   onClick={() => window.open(COMMITTEE_SEARCH_URL, "_blank", "noopener")}
-                  aria-label="Open committee directory"
+                  aria-label="View committee"
                 >
                   <ExpandAltOutlined />
                 </IconButton>

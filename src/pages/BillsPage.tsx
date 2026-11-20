@@ -7,13 +7,17 @@
 import { useContext, useEffect, useState } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
 
-import { HomeOutlined } from "@ant-design/icons";
+import {
+  ExpandAltOutlined,
+  HomeOutlined
+} from "@ant-design/icons";
 import {
   Breadcrumbs,
   Card,
   CardHeader,
   IconButton,
   Link,
+  Tooltip,
   Typography
 } from "@mui/material";
 import {
@@ -24,12 +28,12 @@ import {
 } from "@mui/x-data-grid";
 
 import { FilterItem, LoadingContext, PageInfo, QueryModel, useNotifications } from "@digitalaidseattle/core";
+import { GridSortModel } from "@mui/x-data-grid";
 import type { Bill } from "../api/bill";
 import { BillService } from "../api/billService";
 import { CHAMBER_TYPE } from "../components/ChamberButtonGroup";
 import { LoadingOverlay } from "../components/LoadingOverlay";
 import { SearchToolbar } from "../components/SearchToolbar";
-import { GridSortModel } from "@mui/x-data-grid";
 
 const PAGE_SIZE = 25;
 
@@ -114,6 +118,31 @@ export const BillsPage = () => {
   }
 
   const columns: GridColDef<Bill>[] = [
+    {
+      field: "actions",
+      headerName: "",
+      width: 90,
+      align: "center",
+      headerAlign: "center",
+      sortable: false,
+      filterable: false,
+      disableColumnMenu: true,
+      renderCell: (params) => (
+        <Tooltip title="View bill">
+          <IconButton
+            color="primary"
+            size="small"
+            aria-label="View bill"
+            onClick={(event) => {
+              event.stopPropagation();
+              navigate(`/bill/${params.row.BillId}`);
+            }}
+          >
+            <ExpandAltOutlined />
+          </IconButton>
+        </Tooltip>
+      )
+    },
     {
       field: "id",
       headerName: "Bill",
