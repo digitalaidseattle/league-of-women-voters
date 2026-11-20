@@ -25,14 +25,17 @@ export class BillExporter extends EntityExporter<Bill> {
       "bills_export",
       "Bills",
       [
-        { key: 'BillId', header: 'Bill ID' },
-        { key: 'BillNumber', header: 'Bill Number' },
-        { key: 'InCommittee', header: 'Committee Name' },
-        { key: 'OriginalAgency', header: 'Original Agency' },
-        { key: 'LegalTitle', header: 'Legal Title' },
+        { key: 'BillId', header: 'Bill' },
+        { key: 'Active', header: 'Active' },
+        {
+          key: 'InCommittee',
+          header: 'In Committee',
+          valueGetter: (bill: any) => bill.InCommittee?.Name ?? ""
+        },
+        { key: 'LegalTitle', header: 'Title' },
         {
           key: 'CurrentStatus',
-          header: 'History Line',
+          header: 'Bill History',
           valueGetter: (bill: any) => bill.CurrentStatus?.HistoryLine ?? ""
         },
         {
