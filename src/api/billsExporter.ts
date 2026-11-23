@@ -25,6 +25,7 @@ export class BillExporter extends EntityExporter<Bill> {
       "bills_export",
       "Bills",
       [
+        { key: 'OriginalAgency', header: 'Chamber' },
         { key: 'BillId', header: 'Bill' },
         { key: 'Active', header: 'Active' },
         {

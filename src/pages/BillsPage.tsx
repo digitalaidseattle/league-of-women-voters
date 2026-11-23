@@ -59,7 +59,7 @@ export const BillsPage = () => {
     setLoading(true);
     BillService.getInstance()
       .find(createQueryModel())
-      .then(data => setPageInfo(data))
+      .then(async data => setPageInfo(data))
       .catch(err => {
         notifications.error('Error fetching bills.');
         console.error('Error fetching bills:', err);
@@ -144,9 +144,17 @@ export const BillsPage = () => {
       )
     },
     {
+      field: "OriginalAgency",
+      headerName: "Chamber",
+      width: 100,
+      type: "string",
+      filterable: false,
+      sortable: false,
+    },
+    {
       field: "id",
       headerName: "Bill",
-      width: 120,
+      width: 100,
       type: "string",
       renderCell: (params) => {
         const { row } = params;
