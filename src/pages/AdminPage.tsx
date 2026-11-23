@@ -1,244 +1,62 @@
+import { Fragment } from "react";
 import { NavLink } from "react-router-dom";
 
 // material-ui
 import { HomeOutlined } from "@ant-design/icons";
 import { useNotifications } from "@digitalaidseattle/core";
-import { SupabaseConfiguration } from "@digitalaidseattle/supabase";
-import { Breadcrumbs, Button, Card, CardContent, CardHeader, IconButton, Stack, Typography } from '@mui/material';
-import { useState } from "react";
-import { LoadingOverlay } from "../components/LoadingOverlay";
+import { Breadcrumbs, Button, Card, CardContent, CardHeader, CircularProgress, IconButton, Stack, Typography } from '@mui/material';
 
 // project import
+import { runEdgeJob, useRunningJobs } from "../utils/edgeJobs";
 
-// ==============================|| SAMPLE PAGE ||============================== //
-// const gemini_model = 'gemini-2.5-flash-lite';
+type EdgeJob = {
+    functionName: string;
+    label: string;
+    buttonText: string;
+    body?: Record<string, unknown>;
+};
+
+// Each group is separated by a divider on the page
+const JOB_GROUPS: EdgeJob[][] = [
+    [
+        { functionName: "legislator-services", label: "Load legislators", buttonText: "Edge load Legislators" },
+        { functionName: "legislator-info-service", label: "Load legislator info", buttonText: "Edge load Legislator Info" },
+    ],
+    [
+        { functionName: "committee-info-service", label: "Load committees", buttonText: "Edge Load Committees" },
+        { functionName: "committee-membership-service", label: "Load committee members", buttonText: "Edge Load Committee Members" },
+        { functionName: "committee-leadership-service", label: "Load committee leadership", buttonText: "Edge Load Committee Leadership" },
+        { functionName: "committee-referral-service", label: "Load committee referrals", buttonText: "Edge Load Committee Referrals" },
+        { functionName: "committee-incommittee-service", label: "Load committee in-committee information", buttonText: "Edge Load Committee In-Committee" },
+    ],
+    [
+        { functionName: "legislation-info-service", label: "Load bills", buttonText: "Edge load Bills", body: { year: 2026 } },
+        { functionName: "legislation-detail-service", label: "Load bill details", buttonText: "Edge load Bill Details" },
+        { functionName: "legislation-committee-service", label: "Load bill committees", buttonText: "Edge load Bill Committee" },
+        { functionName: "legislation-sponsors-service", label: "Load bill sponsors", buttonText: "Edge load Bill Sponsors" },
+        { functionName: "legislation-hearings-service", label: "Load bill hearings", buttonText: "Edge load Bill Hearings" },
+    ],
+];
+
+// ==============================|| ADMIN PAGE ||============================== //
 
 export const AdminPage = () => {
-    const [loading, setLoading] = useState(false);
+    // Only the running job's button is disabled, so the rest of the app stays usable
+    const running = useRunningJobs();
     const notify = useNotifications();
 
-
-    async function legislatorJob(): Promise<void> {
-        setLoading(true);
+    async function runJob(job: EdgeJob): Promise<void> {
         try {
-            SupabaseConfiguration.getInstance()
-                .getSupabaseClient().functions
-                .invoke("legislator-services")
-                .then((resp: any) => resp.data);
+            const data = await runEdgeJob(job.functionName, job.body);
+            notify.success(`${job.label}: ${data}`)
         }
         catch (error) {
             console.log(error);
             notify.error('Failed to load.')
-        }
-        finally {
-            notify.success('Loaded legislators.')
-            setLoading(false)
-        }
-    }
-
-    async function legislatorInfoJob(): Promise<void> {
-        setLoading(true);
-        try {
-            SupabaseConfiguration.getInstance()
-                .getSupabaseClient().functions
-                .invoke("legislator-info-service")
-                .then((resp: any) => resp.data);
-        }
-        catch (error) {
-            console.log(error);
-            notify.error('Failed to load.')
-        }
-        finally {
-            notify.success('Loaded committe members.')
-            setLoading(false)
-        }
-    }
-
-    async function loadCommitteMembersJob(): Promise<void> {
-        setLoading(true);
-        try {
-            SupabaseConfiguration.getInstance()
-                .getSupabaseClient().functions
-                .invoke("committee-membership-service")
-                .then((resp: any) => resp.data);
-        }
-        catch (error) {
-            console.log(error);
-            notify.error('Failed to load.')
-        }
-        finally {
-            notify.success('Loaded committe members.')
-            setLoading(false)
-        }
-    }
-
-
-    async function loadCommitteesJob(): Promise<void> {
-        setLoading(true);
-        try {
-            SupabaseConfiguration.getInstance()
-                .getSupabaseClient().functions
-                .invoke("committee-info-service")
-                .then((resp: any) => resp.data);
-        }
-        catch (error) {
-            console.log(error);
-            notify.error('Failed to load.')
-        }
-        finally {
-            notify.success('Loaded committees.')
-            setLoading(false)
-        }
-    }
-
-    async function committeeLeadershipJob(): Promise<void> {
-        setLoading(true);
-        try {
-            SupabaseConfiguration.getInstance()
-                .getSupabaseClient().functions
-                .invoke("committee-leadership-service")
-                .then((resp: any) => resp.data);
-        }
-        catch (error) {
-            console.log(error);
-            notify.error('Failed to load.')
-        }
-        finally {
-            notify.success('Loaded committee members.')
-            setLoading(false)
-        }
-    }
-
-    async function committeeReferralJob(): Promise<void> {
-        setLoading(true);
-        try {
-            SupabaseConfiguration.getInstance()
-                .getSupabaseClient().functions
-                .invoke("committee-referral-service")
-                .then((resp: any) => resp.data);
-        }
-        catch (error) {
-            console.log(error);
-            notify.error('Failed to load.')
-        }
-        finally {
-            notify.success('Loaded committee referrals.')
-            setLoading(false)
-        }
-    }
-
-    async function committeeInCommitteeJob(): Promise<void> {
-        setLoading(true);
-        try {
-            SupabaseConfiguration.getInstance()
-                .getSupabaseClient().functions
-                .invoke("committee-incommittee-service")
-                .then((resp: any) => resp.data);
-        }
-        catch (error) {
-            console.log(error);
-            notify.error('Failed to load.')
-        }
-        finally {
-            notify.success('Loaded committee in-committee information.')
-            setLoading(false)
-        }
-    }
-
-    async function billInfoCachingJob(): Promise<void> {
-        setLoading(true);
-        try {
-            SupabaseConfiguration.getInstance()
-                .getSupabaseClient().functions
-                .invoke("legislation-info-service", {
-                    body: { year: 2026 },
-                })
-                .then((resp: any) => resp.data);
-        }
-        catch (error) {
-            console.log(error);
-            notify.error('Failed to load.')
-        }
-        finally {
-            notify.success('Loaded committe members.')
-            setLoading(false)
-        }
-    }
-
-    async function billDetailCachingJob(): Promise<void> {
-        setLoading(true);
-        try {
-            SupabaseConfiguration.getInstance()
-                .getSupabaseClient().functions
-                .invoke("legislation-detail-service")
-                .then((resp: any) => resp.data);
-        }
-        catch (error) {
-            console.log(error);
-            notify.error('Failed to load.')
-        }
-        finally {
-            notify.success('Loaded bill details.')
-            setLoading(false)
-        }
-    }
-
-    async function billCommitteeCachingJob(): Promise<void> {
-        setLoading(true);
-        try {
-            SupabaseConfiguration.getInstance()
-                .getSupabaseClient().functions
-                .invoke("legislation-committee-service")
-                .then((resp: any) => resp.data);
-        }
-        catch (error) {
-            console.log(error);
-            notify.error('Failed to load.')
-        }
-        finally {
-            notify.success('Loaded committe members.')
-            setLoading(false)
-        }
-    }
-
-    async function billSponsorsCachingJob(): Promise<void> {
-        setLoading(true);
-        try {
-            SupabaseConfiguration.getInstance()
-                .getSupabaseClient().functions
-                .invoke("legislation-sponsors-service")
-                .then((resp: any) => resp.data);
-        }
-        catch (error) {
-            console.log(error);
-            notify.error('Failed to load.')
-        }
-        finally {
-            notify.success('Loaded bill sponsors.')
-            setLoading(false)
-        }
-    }
-
-    async function billHearingsCachingJob(): Promise<void> {
-        setLoading(true);
-        try {
-            SupabaseConfiguration.getInstance()
-                .getSupabaseClient().functions
-                .invoke("legislation-hearings-service")
-                .then((resp: any) => resp.data);
-        }
-        catch (error) {
-            console.log(error);
-            notify.error('Failed to load.')
-        }
-        finally {
-            notify.success('Loaded bill hearings.')
-            setLoading(false)
         }
     }
 
     return (<>
-        <LoadingOverlay loading={loading} />
         <Breadcrumbs aria-label="breadcrumb">
             <NavLink to="/" ><IconButton size="medium"><HomeOutlined /></IconButton></NavLink>
             <Typography color="text.primary">Admin</Typography>
@@ -247,20 +65,24 @@ export const AdminPage = () => {
             <CardHeader title={'Admin'} />
             <CardContent>
                 <Stack>
-                    <Button onClick={legislatorJob}>Edge load Legislators</Button>
-                    <Button onClick={legislatorInfoJob}>Edge load Legislator Info</Button>
-                    <hr />
-                    <Button onClick={loadCommitteesJob}>Edge Load Committees</Button>
-                    <Button onClick={loadCommitteMembersJob}>Edge Load Committee Members</Button>
-                    <Button onClick={committeeLeadershipJob}>Edge Load Committee Leadership</Button>
-                    <Button onClick={committeeReferralJob}>Edge Load Committee Referrals</Button>
-                    <Button onClick={committeeInCommitteeJob}>Edge Load Committee In-Committee</Button>
-                    <hr />
-                    <Button onClick={billInfoCachingJob}>Edge load Bills</Button>
-                    <Button onClick={billDetailCachingJob}>Edge load Bill Details</Button>
-                    <Button onClick={billCommitteeCachingJob}>Edge load Bill Committee</Button>
-                    <Button onClick={billSponsorsCachingJob}>Edge load Bill Sponsors</Button>
-                    <Button onClick={billHearingsCachingJob}>Edge load Bill Hearings</Button>
+                    {JOB_GROUPS.map((group, index) => (
+                        <Fragment key={index}>
+                            {index > 0 && <hr />}
+                            {group.map(job => {
+                                const isRunning = running.includes(job.functionName);
+                                return (
+                                    <Button
+                                        key={job.functionName}
+                                        onClick={() => runJob(job)}
+                                        disabled={isRunning}
+                                        startIcon={isRunning ? <CircularProgress size={16} /> : undefined}
+                                    >
+                                        {job.buttonText}
+                                    </Button>
+                                );
+                            })}
+                        </Fragment>
+                    ))}
                 </Stack>
             </CardContent>
         </Card>
