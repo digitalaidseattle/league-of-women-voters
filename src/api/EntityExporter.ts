@@ -9,18 +9,14 @@ import { Entity, QueryModel } from "@digitalaidseattle/core";
 import { ExportColumn, SpreadsheetService } from "./spreadsheetService";
 import { DAO } from "./DAO";
 
-export type EntityExportColumn<T> = ExportColumn<T> & {
-  valueGetter?: (item: T) => any;
-};
-
 export abstract class EntityExporter<T extends Entity> {
 
   dao: DAO<T>;
   fileName: string;
   sheetName: string
-  columns: EntityExportColumn<T>[] = [];
+  columns: ExportColumn<T>[] = [];
 
-  constructor(dao: DAO<T>, fileName: string, sheetName: string, columns: EntityExportColumn<T>[]) {
+  constructor(dao: DAO<T>, fileName: string, sheetName: string, columns: ExportColumn<T>[]) {
     this.dao = dao;
     this.fileName = fileName;
     this.sheetName = sheetName;
@@ -41,9 +37,9 @@ export abstract class EntityExporter<T extends Entity> {
     return entities;
   }
 
-  mapEntity(entity: T): Record<string, any> {
+  mapEntity(entity: T, columns: ExportColumn<T>[]): Record<string, any> {
     let mapped = {};
-    for (const column of this.columns) {
+    for (const column of columns) {
       mapped = {
         ...mapped,
         [column.header]: column.valueGetter ? column.valueGetter(entity) : entity[column.key as keyof typeof entity]
@@ -52,20 +48,22 @@ export abstract class EntityExporter<T extends Entity> {
     return mapped as Record<string, any>;
   }
 
-  getUploadOptions(): any {
+  getUploadOptions(columns: ExportColumn<T>[]): any {
     return ({
       fileName: this.fileName,
       sheetName: this.sheetName,
-      columns: this.columns
+      columns: columns
     })
   }
 
-  async exportData(queryModel: QueryModel): Promise<void> {
+  // visibleHeaders: the table's visible column headers; only those columns are exported
+  async exportData(queryModel: QueryModel, visibleHeaders: string[]): Promise<void> {
+    const columns = this.columns.filter(column => visibleHeaders.includes(column.header));
     let allBills = await this.fetchEntities(queryModel);
-    const exportData: Record<string, any>[] = allBills.map(bill => this.mapEntity(bill) as Record<string, any>);
+    const exportData: Record<string, any>[] = allBills.map(bill => this.mapEntity(bill, columns) as Record<string, any>);
 
     SpreadsheetService.getInstance()
-      .downloadXlsx(exportData, this.getUploadOptions());
+      .downloadXlsx(exportData, this.getUploadOptions(columns));
   }
 
 }

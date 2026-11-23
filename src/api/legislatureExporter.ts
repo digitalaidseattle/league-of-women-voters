@@ -26,13 +26,12 @@ export class LegislatureExporter extends EntityExporter<any> {
       "committees_export",
       "Committees",
       [
-        { key: 'Name', header: 'Committee Name' },
-        { key: 'Agency', header: 'Chamber' },
-        { key: 'Phone', header: 'Phone' },
+        { key: 'Name', header: 'Name' },
         { key: 'Chair', header: 'Chair' },
         { key: 'ViceChair', header: 'Vice Chair' },
-        { key: 'MinorityChair', header: 'Ranking Minority Member' },
-        { key: 'AsstMinorityChair', header: 'Asst Ranking Minority Member' }
+        { key: 'MinorityChair', header: 'Minority Chair' },
+        { key: 'AsstMinorityChair', header: 'Asst Minority Chair' },
+        { key: 'MemberCount', header: 'Members' }
       ]);
   }
 
@@ -58,9 +57,13 @@ export class LegislatureExporter extends EntityExporter<any> {
     }
 
     if (queryModel.sortField) {
-      flattened = flattened.sort((a: any, b: any) => (queryModel.sortDirection === 'asc')
-        ? a[queryModel.sortField].localeCompare(b[queryModel.sortField])
-        : b[queryModel.sortField].localeCompare(a[queryModel.sortField]))
+      const field = queryModel.sortField;
+      const direction = queryModel.sortDirection === 'asc' ? 1 : -1;
+      // Numbers (e.g. MemberCount) compare numerically; everything else as text
+      flattened = flattened.sort((a: any, b: any) =>
+        direction * (typeof a[field] === 'number' && typeof b[field] === 'number'
+          ? a[field] - b[field]
+          : String(a[field] ?? '').localeCompare(String(b[field] ?? ''))));
     }
 
     console.log(queryModel, flattened);
